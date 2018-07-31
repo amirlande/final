@@ -6,6 +6,10 @@ void print(int x){
 }
 
 int main() {
+    printf("Hello, World!\n");
+    printf("love you too\n");
+    printf("Amir Lande Blau is handsome");
+    printf("eran wrote this edit");
 
     printf("eran wrote this");
 
