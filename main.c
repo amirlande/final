@@ -1,8 +1,13 @@
 #include <stdio.h>
 
 
-void print(int x){
-    printf("%d", x);
+void print(int f){
+    printf("%d", f);
+}
+
+void print2(int y){
+    printf("%d", y);
+
 }
 
 int main() {
