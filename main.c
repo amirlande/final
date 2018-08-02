@@ -19,6 +19,7 @@ int main() {
     printf("eran wrote this");
 
     int x = 0;
+    printf("love you");
     print(x);
     return 0;
 }
