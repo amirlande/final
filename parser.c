@@ -3,3 +3,4 @@
 //
 
 #include "parser.h"
+#include "commands.h" /* gives access to all user commands called by the parser */
