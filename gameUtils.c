@@ -61,8 +61,6 @@ gameParams *getExampleGame(int n, int m) {
         free(game2);
         exit(0);
     }
-
-
     game2->n = n;
     game2->m = m;
     game2->mode = edit;
@@ -84,7 +82,6 @@ gameParams *getExampleGame(int n, int m) {
             }
         }
     }
-
 
     game2->solution = allocateCellMatrix(game2->solution, m * n);
     game2->counter = 0;

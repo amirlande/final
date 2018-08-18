@@ -4,7 +4,6 @@
 #ifndef FINAL_GAMEUTILS_H
 #define FINAL_GAMEUTILS_H
 
-#endif //FINAL_GAMEUTILS_H
 
 /* part 1 - game structs and defines: */
 
@@ -96,3 +95,6 @@ gameParams *getExampleGame(int n, int m);
 
 /* Allocates memory for cell matrix mat with NxN values */
 cell ***allocateCellMatrix(cell ***mat, int N) ;
+
+
+#endif //FINAL_GAMEUTILS_H
