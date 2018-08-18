@@ -17,6 +17,7 @@ int check_err_cells(gameParams *game) {
 }
 
 
+
 /* allocates memory for a new board and copies values of
  * board_to_be_copied. returns pointer to the new board struct*/
 cell **copy_board(cell **board_to_be_copied) {
@@ -70,4 +71,10 @@ cell ***allocateCellMatrix(cell ***mat, int N) {
     }
 
     return mat;
+}
+
+
+int find_first_empty_cell(cell **board, int *row, int *col) {
+    /* to implement */
+    return 1;
 }

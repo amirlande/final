@@ -4,7 +4,6 @@
 #ifndef FINAL_GAMEUTILS_H
 #define FINAL_GAMEUTILS_H
 
-
 /* part 1 - game structs and defines: */
 
 #define TRUE 1
@@ -84,6 +83,7 @@ cell **copy_board(cell **board_to_be_copied);
 /* frees memory of a given board */
 void free_board(cell **board_to_be_freed);
 
+int find_first_empty_cell(cell **board, int *, int *);
 
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
@@ -95,3 +95,8 @@ cell ***allocateCellMatrix(cell ***mat, int N);
 
 
 #endif //FINAL_GAMEUTILS_H
+
+
+
+
+
