@@ -2,7 +2,9 @@
 // Created by amirlande on 8/2/2018.
 //
 
-#include "gameUtils.h" /* gives access to all struct definitions and utility functions
+#include "gameUtils.h"
+#include <stdio.h>
+/* gives access to all struct definitions and utility functions
  * used by the solving algorithms */
 
 

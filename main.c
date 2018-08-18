@@ -3,6 +3,9 @@
 #include "gameUtils.h" /* gives access to functions required to initialize game
  * (initGame, createNewBoard) */
 
-int main() {
+#include "commands.h"
 
+int main() {
+    gameParams *game = getExampleGame();
+    print_board(game);
 }
