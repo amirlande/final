@@ -19,6 +19,7 @@ int solveUsingILP(gameParams *game) {
  * operates as a recursive function, but uses an explicit stack of calls instead of actual recursion
  * when finished - counter holds the number of solutions*/
 
+#if 0
 
 
 void count_solutions_rec(cell **board, int *counter) {
@@ -36,7 +37,6 @@ void count_solutions_rec(cell **board, int *counter) {
 
 }
 
-
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function returns the number of solutions for a given board using exhaustive backtracking
  * it is called by num_solutions (in commands.h) */
@@ -50,3 +50,5 @@ int count_solutions(gameParams *game) {
     free_board(temp_board); /* free memory before returning */
     return num_of_sols;
 }
+
+#endif

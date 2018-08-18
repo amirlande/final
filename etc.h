@@ -11,10 +11,7 @@
 #include "gameUtils.h"
 
 
-gameParams *getExampleGame(int n, int m) ;
-
-
-
+gameParams *getExampleGame(int n, int m);
 
 
 #endif //FINAL_ETC_H

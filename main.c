@@ -5,12 +5,10 @@
  * (initGame, createNewBoard) */
 
 #include "commands.h"
-
-
-
+#include "etc.h"
 
 
 int main() {
-    gameParams *game = getExampleGame(5,4);
+    gameParams *game = getExampleGame(5, 4);
     print_board(game);
 }

@@ -9,9 +9,6 @@
 
 /* prints the Sudoku board */
 void print_board(gameParams *game) {
-    /* need to implement function -
-     * must check whether game->markErrors is 0 or 1 and
-     * display or not erroneous values accordingly */
 
     int i, j, m, n, N;
     char cellRow, cellState, *separatorRow = NULL;
@@ -30,13 +27,15 @@ void print_board(gameParams *game) {
             if (j % n == 0) {
                 printf("%c", cellRow);
             }
+            cellState = ' ';
             if (game->userBoard[i][j]->isFixed) {
                 cellState = '.';
             }
                 /* if cell is not fixed, we check if it's erroneous if we are in edit mode or markErrors */
-            else if (!(game->userBoard[i][j]->isValid) && (game->mode == edit || game->markErrors)) {
+            else if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
                 cellState = '*';
             }
+
             printf(" %2d%c", game->userBoard[i][j]->value, cellState);
         }
         printf("%c\n", cellRow);
@@ -70,6 +69,7 @@ int validate(gameParams *game) {
     }
 }
 
+#if 0
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
@@ -97,3 +97,4 @@ int num_solutions(gameParams *game) {
     return 0;
 }
 
+#endif

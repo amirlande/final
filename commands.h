@@ -27,5 +27,4 @@ int validate(gameParams *game);
 int num_solutions(gameParams *game);
 
 
-
 #endif //FINAL_COMMANDS_H
