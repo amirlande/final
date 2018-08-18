@@ -90,11 +90,8 @@ void free_board(cell **board_to_be_freed);
  * exits with exit(0) if failed to malloc */
 char *getLineSeparator(gameParams *game);
 
-/* get an instance of a game if needed for tests */
-gameParams *getExampleGame(int n, int m);
-
 /* Allocates memory for cell matrix mat with NxN values */
-cell ***allocateCellMatrix(cell ***mat, int N) ;
+cell ***allocateCellMatrix(cell ***mat, int N);
 
 
 #endif //FINAL_GAMEUTILS_H

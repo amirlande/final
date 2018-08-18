@@ -2,7 +2,7 @@
 // Created by amirlande on 8/2/2018.
 //
 
-#include "gameUtils.h"
+#include "solver.h"
 #include <stdio.h>
 /* gives access to all struct definitions and utility functions
  * used by the solving algorithms */
@@ -18,6 +18,9 @@ int solveUsingILP(gameParams *game) {
 /* called by count_solutions (which has the precondition of no erroneous cells!)
  * operates as a recursive function, but uses an explicit stack of calls instead of actual recursion
  * when finished - counter holds the number of solutions*/
+
+
+
 void count_solutions_rec(cell **board, int *counter) {
     int row, col;
     int val;
@@ -32,6 +35,7 @@ void count_solutions_rec(cell **board, int *counter) {
 
 
 }
+
 
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function returns the number of solutions for a given board using exhaustive backtracking

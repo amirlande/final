@@ -4,7 +4,9 @@
 #ifndef FINAL_COMMANDS_H
 #define FINAL_COMMANDS_H
 
-#include "gameUtils.h"
+#include "gameUtils.h" /* gives access to all struct definitions */
+#include "solver.h" /* gives access to solving functions */
+#include "input_output.h" /* gives access to edit, solve and save commands */
 
 /* prints the Sudoku board */
 void print_board(gameParams *game);

@@ -5,9 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "commands.h"
-#include "gameUtils.h" /* gives access to all struct definitions */
-#include "solver.h" /* gives access to solving functions */
-#include "input_output.h" /* gives access to edit, solve and save commands */
 
 
 /* prints the Sudoku board */
@@ -18,11 +15,6 @@ void print_board(gameParams *game) {
 
     int i, j, m, n, N;
     char cellRow, cellState, *separatorRow = NULL;
-
-
-    gameParams *game2 = getExampleGame();
-    game = game2;
-
 
     n = game->n;
     m = game->m;
@@ -38,8 +30,14 @@ void print_board(gameParams *game) {
             if (j % n == 0) {
                 printf("%c", cellRow);
             }
-            cellState = (char) ((game->userBoard[i][j].isFixed) ? '.' : ' ');
-            printf(" %2d%c", game->userBoard[i][j].value, cellState);
+            if (game->userBoard[i][j]->isFixed) {
+                cellState = '.';
+            }
+                /* if cell is not fixed, we check if it's erroneous if we are in edit mode or markErrors */
+            else if (!(game->userBoard[i][j]->isValid) && (game->mode == edit || game->markErrors)) {
+                cellState = '*';
+            }
+            printf(" %2d%c", game->userBoard[i][j]->value, cellState);
         }
         printf("%c\n", cellRow);
     }
@@ -98,5 +96,4 @@ int num_solutions(gameParams *game) {
     /* gets here in case num_of_sols == 0 */
     return 0;
 }
-
 
