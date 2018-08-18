@@ -10,31 +10,9 @@
 
 int main() {
     int i;
-    gameParams *game = getExampleGame(3, 3);
-
-
+    gameParams *game = getExampleGame(2, 2);
     printBoard(game);
-
-
-    printf("next");
-    scanf("%d", &i);
-
-
-    printf("%d\n", game->movesList->currentMove->change->prevVal->value);
-
-
-    printf("next");
-    scanf("%d", &i);
-
-
     undo(game);
-
-
-    printf("next");
-    scanf("%d", &i);
-
-
     redo(game);
-
     return 1;
 }

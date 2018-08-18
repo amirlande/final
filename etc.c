@@ -63,8 +63,8 @@ gameParams *getExampleGame(int n, int m) {
     first->change->x = 1;
     first->change->y = 1;
 
-    first->change->currVal = game2->userBoard[1][1];
-    first->change->prevVal = game2->userBoard[3][3];
+    first->change->currVal = game2->userBoard[3][3];
+    first->change->prevVal = game2->userBoard[0][0];
 
     game2->movesList->currentMove = first;
 

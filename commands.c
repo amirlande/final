@@ -174,8 +174,6 @@ int set(int x, int y, int z, gameParams *game) {
  * lists and nodes are updated properly */
 int undo(gameParams *game) {
 
-    printf("#1");
-
     cellChangeRecNode *moveToUndo, *moveToPrint;
 
     if (game->movesList->size == 0) {
@@ -183,18 +181,13 @@ int undo(gameParams *game) {
         return 0;
     }
 
-    printf("#2");
-
     moveToUndo = game->movesList->currentMove->change;
     moveToPrint = moveToUndo;
-
     game->movesList->currentMove = game->movesList->currentMove->prev;
     game->movesList->size--;
 
-    printf("#3");
-
-    if(moveToUndo != NULL){
-        printf("%d\n",moveToUndo->currVal->value);
+    if (moveToUndo != NULL) {
+        printf("%d\n", moveToUndo->currVal->value);
     }
 
     while (moveToUndo != NULL) {
@@ -203,17 +196,10 @@ int undo(gameParams *game) {
         moveToUndo = moveToUndo->next;
     }
 
-    printf("#4");
     printBoard(game);
-    printChanges(game,moveToPrint,0);
-
-    printf("#5");
-// makeRecChanges(game, moveToUndo);  not used
-
+    printChanges(game, moveToPrint, 0);
 
     return 1;
-
-
 }
 
 
@@ -224,32 +210,29 @@ int undo(gameParams *game) {
  * Post:
  * last command that was undone is redone
  * lists and nodes are updated properly */
-int redo(gameParams *game){
+int redo(gameParams *game) {
+
     cellChangeRecNode *moveToRedo, *moveToPrint;
 
-    if(game->movesList->currentMove->next == NULL){
+    if (game->movesList->currentMove->next == NULL) {
         printf("Error: no moves to redo\n");
         return 0;
     }
-
+    game->movesList->currentMove = game->movesList->currentMove->next;
     moveToRedo = game->movesList->currentMove->change;
     moveToPrint = moveToRedo;
-    game->movesList->currentMove = game->movesList->currentMove->next;
     game->movesList->size++;
 
-
-    while(moveToRedo != NULL){
+    while (moveToRedo != NULL) {
         game->userBoard[moveToRedo->x - 1][moveToRedo->y - 1] = moveToRedo->currVal;
         moveToRedo = moveToRedo->next;
     }
+
     printBoard(game);
-
-    printChanges(game,moveToPrint,1);
-
+    printChanges(game, moveToPrint, 1);
 
     return 1;
 }
-
 
 
 #if 0

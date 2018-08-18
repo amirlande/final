@@ -48,7 +48,7 @@ char *getLineSeparator(gameParams *game) {
     for (i = 0; i < 4 * N + m + 1; i++) {
         separator[i] = '-';
     }
-    separator[i]='\0';
+    separator[i] = '\0';
 
 
     return separator;
@@ -119,7 +119,6 @@ int checkIfValid(int x, int y, int z, gameParams *game) {
 }
 
 
-
 #if 0
 /* Called by undo
  * implemented recursively for printing in thr right order:
@@ -145,18 +144,24 @@ int makeRecChanges(gameParams *game, cellChangeRecNode *moveToUndo) {
 /* prints the changes after undo/redo */
 int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
     int curr, prev, tmp;
+    char *command;
+
 
     while (moveToPrint != NULL) {
         curr = moveToPrint->currVal->value;
         prev = moveToPrint->prevVal->value;
 
         /* switching vlues of prev and curr at redo */
-        if (isRedo){
+        if (isRedo) {
             tmp = curr;
             curr = prev;
             prev = tmp;
         }
-        printf("Undo %d,%d: ", moveToPrint->x, moveToPrint->y);
+
+        command = isRedo ? "Redo" : "Undo";
+        printf("%s %d,%d: ", command, moveToPrint->x, moveToPrint->y);
+
+
         if (!curr) { // curr is zero
             if (!prev) { // both zeros
                 printf("from _ to _\n");
