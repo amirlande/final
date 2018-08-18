@@ -69,7 +69,6 @@ int validate(gameParams *game) {
     }
 }
 
-#if 0
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
@@ -97,4 +96,3 @@ int num_solutions(gameParams *game) {
     return 0;
 }
 
-#endif
