@@ -51,15 +51,17 @@ typedef struct cell {
     int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
 } cell;
 
-enum gameMode {init, solve, edit};
+enum gameMode {
+    init, solve, edit
+};
 /* the main struct that represents the Sudoku game */
 typedef struct gameParams {
     enum gameMode mode;
     int markErrors;
     int n;
     int m;
-    cell **userBoard;
-    cell **solution;
+    cell ***userBoard;
+    cell ***solution;
     int counter;
     listOfMoves movesList;
 
@@ -83,6 +85,18 @@ void free_board(cell **board_to_be_freed);
 
 int find_first_empty_cell(cell **board, int *, int *);
 
+/* returns the line separator for print_board
+ * consists 4N+m+1 dashes ('-')
+ * exits with exit(0) if failed to malloc */
+char *getLineSeparator(gameParams *game);
+
+/* Allocates memory for cell matrix mat with NxN values */
+cell ***allocateCellMatrix(cell ***mat, int N);
 
 
 #endif //FINAL_GAMEUTILS_H
+
+
+
+
+

@@ -2,7 +2,9 @@
 // Created by amirlande on 8/2/2018.
 //
 
-#include "gameUtils.h" /* gives access to all struct definitions and utility functions
+#include "solver.h"
+#include <stdio.h>
+/* gives access to all struct definitions and utility functions
  * used by the solving algorithms */
 
 
@@ -44,3 +46,4 @@ int count_solutions(gameParams *game) {
     free_board(temp_board); /* free memory before returning */
     return num_of_sols;
 }
+

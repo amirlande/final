@@ -3,17 +3,45 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "commands.h"
-#include "gameUtils.h" /* gives access to all struct definitions */
-#include "solver.h" /* gives access to solving functions */
-#include "input_output.h" /* gives access to edit, solve and save commands */
 
 
 /* prints the Sudoku board */
 void print_board(gameParams *game) {
-    /* need to implement function -
-     * must check whether game->markErrors is 0 or 1 and
-     * display or not erroneous values accordingly */
+
+    int i, j, m, n, N;
+    char cellRow, cellState, *separatorRow = NULL;
+
+    n = game->n;
+    m = game->m;
+    N = n * m;
+    separatorRow = getLineSeparator(game);
+    cellRow = '|';
+
+    for (i = 0; i < N; i++) {
+        if (i % m == 0) {
+            printf("%s\n", separatorRow);
+        }
+        for (j = 0; j < N; j++) {
+            if (j % n == 0) {
+                printf("%c", cellRow);
+            }
+            cellState = ' ';
+            if (game->userBoard[i][j]->isFixed) {
+                cellState = '.';
+            }
+                /* if cell is not fixed, we check if it's erroneous if we are in edit mode or markErrors */
+            else if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
+                cellState = '*';
+            }
+
+            printf(" %2d%c", game->userBoard[i][j]->value, cellState);
+        }
+        printf("%c\n", cellRow);
+    }
+    printf("%s\n", separatorRow);
+
 }
 
 /* preconditions: 1. called only in SOLVE mode 2. X is either 0 or 1
@@ -35,8 +63,7 @@ int validate(gameParams *game) {
     if (solveUsingILP(game) == FALSE) {
         printf("Validation failed: board is unsolvable\n");
         return FALSE; /* returns 0 */
-    }
-    else {
+    } else {
         printf("Validation passed: board is solvable\n");
         return TRUE; /* returns 1 */
     }
@@ -61,11 +88,11 @@ int num_solutions(gameParams *game) {
     if (num_of_sols == 1) {
         printf("This is a good board!\n");
         return 1;
-    }
-    else if (num_of_sols > 1){
+    } else if (num_of_sols > 1) {
         printf("The puzzle has more than 1 solution, try to edit it further\n");
         return 1;
     }
     /* gets here in case num_of_sols == 0 */
     return 0;
 }
+
