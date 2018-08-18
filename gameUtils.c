@@ -52,8 +52,8 @@ char *getLineSeparator(gameParams *game) {
 }
 
 /* get an instance of a game if needed for tests */
-gameParams *getExampleGame() {
-    gameParams *game2 = null;
+gameParams *getExampleGame(int n, int m) {
+    gameParams *game2 = NULL;
     int i, j;
     game2 = (gameParams *) malloc(sizeof(gameParams));
     if (game2 == NULL) {
@@ -63,70 +63,48 @@ gameParams *getExampleGame() {
     }
 
 
-    game2->n = 5;
-    game2->m = 2;
-    game2->gameMode = edit;
+    game2->n = n;
+    game2->m = m;
+    game2->mode = edit;
     game2->markErrors = 1;
-    game2->movesList = null;
     game2->counter = 0;
-    game2->userBoard = allocateMatrix(game2->userBoard, game2->n * game2->m);
+    game2->userBoard = allocateCellMatrix(game2->userBoard, game2->n * game2->m);
 
-    for (i = 0; i < 10; i++) {
-        for (j = 0; j < 10; j++) {
-            game2->userBoard[i][j] = malloc(sizeof(cell));
-            game2->userBoard[i][j].value = i * j;
-            game2->userBoard[i][j].isValid = 1;
+    for (i = 0; i < m * n; i++) {
+        for (j = 0; j < m * n; j++) {
+            game2->userBoard[i][j] = (cell *) malloc(sizeof(cell *));
+            game2->userBoard[i][j]->value = i * j;
+            game2->userBoard[i][j]->isValid = 1;
 
             if (i % 3 == 0) {
-                game2->userBoard[i][j].isFixed = 1;
+                game2->userBoard[i][j]->isFixed = 1;
             }
             if (j % 3 == 0) {
-                game2->userBoard[i][j].isValid = 0;
+                game2->userBoard[i][j]->isValid = 0;
             }
         }
     }
 
 
-    /*
-     *
-     * typedef struct cell {
-    int value;
-    int isFixed;
-    int isValid;  isValid == 1 means it's not erroneous,
-} cell;
-     *
-     *
-     *
-     *
-     *     enum gameMode mode;
-    int markErrors;
-    int n;
-    int m;
-    cell **userBoard;
-    cell **solution;
-    int counter;
-    listOfMoves movesList;
-     */
-
-
-    game2->solution = allocateMatrix(game2->solution);
+    game2->solution = allocateCellMatrix(game2->solution, m * n);
     game2->counter = 0;
 
+    return game2;
 
 }
 
 
-/* Allocates memory for matrix mat with NxN values */
-int **allocateMatrix(int **mat, int N) {
+/* Allocates memory for cell matrix mat with NxN values */
+cell ***allocateCellMatrix(cell ***mat, int N) {
 
     int i;
-    mat = calloc(N, sizeof(int *));
+    mat = (cell ***) malloc(N * sizeof(cell ***));
     if (mat == NULL) {
         printf("Error: calloc has failed\n");
         exit(0);
     }
     for (i = 0; i < N; i++) {
-        mat[i] = calloc(N, sizeof(int));
+        mat[i] = (cell **) malloc(N * sizeof(cell **));
         if (mat[i] == NULL) {
             printf("Error: calloc has failed\n");
             exit(0);

@@ -62,8 +62,8 @@ typedef struct gameParams {
     int markErrors;
     int n;
     int m;
-    cell **userBoard;
-    cell **solution;
+    cell ***userBoard;
+    cell ***solution;
     int counter;
     listOfMoves movesList;
 
@@ -92,7 +92,7 @@ void free_board(cell **board_to_be_freed);
 char *getLineSeparator(gameParams *game);
 
 /* get an instance of a game if needed for tests */
-gameParams *getExampleGame();
+gameParams *getExampleGame(int n, int m);
 
-/* Allocates memory for matrix mat with NxN values */
-int **allocateMatrix(int **mat, int N);
+/* Allocates memory for cell matrix mat with NxN values */
+cell ***allocateCellMatrix(cell ***mat, int N) ;

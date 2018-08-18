@@ -17,7 +17,7 @@ void print_board(gameParams *game) {
      * display or not erroneous values accordingly */
 
     int i, j, m, n, N;
-    char cellRow, cellState, *separatorRow = null;
+    char cellRow, cellState, *separatorRow = NULL;
 
 
     gameParams *game2 = getExampleGame();

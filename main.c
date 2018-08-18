@@ -6,6 +6,6 @@
 #include "commands.h"
 
 int main() {
-    gameParams *game = getExampleGame();
+    gameParams *game = getExampleGame(5,2);
     print_board(game);
 }
