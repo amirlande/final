@@ -46,6 +46,7 @@ typedef struct userMoveNode {
 
 /* a doubly linked list of nodes of type userMoveNode
  * head is pointer to the head of the list
+ * head of list is an empty node which is not counter at size
  * currentMove is a pointer to the last move made by the user*/
 typedef struct listOfMoves {
     userMoveNode *head;
@@ -102,6 +103,9 @@ cell ***allocateCellMatrix(cell ***mat, int N);
 void getNewCurrentMove(gameParams *game);
 
 int checkIfValid(int x, int y, int z, gameParams *game);
+
+/* prints the changes after undo/redo */
+int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
 
 
 /* Called by undo

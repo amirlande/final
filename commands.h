@@ -34,7 +34,16 @@ int num_solutions(gameParams *game);
  * Post:
  * last command was undone
  * lists and nodes are updated properly */
-int undo(gameParams *game) ;
+int undo(gameParams *game);
 
+
+/* Pre:
+ * command is valid
+ * game is at edit or solve mode
+ *
+ * Post:
+ * last command that was undone is redone
+ * lists and nodes are updated properly */
+int redo(gameParams *game);
 
 #endif //FINAL_COMMANDS_H

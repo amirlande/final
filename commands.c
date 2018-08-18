@@ -69,7 +69,7 @@ int validate(gameParams *game) {
     }
 }
 
-
+#if 0
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
  * the function first checks whether there are erroneous values
@@ -95,6 +95,8 @@ int num_solutions(gameParams *game) {
     /* gets here in case num_of_sols == 0 */
     return 0;
 }
+
+#endif
 
 /* Sets new value Z for cell X Y
  *
@@ -126,8 +128,8 @@ int set(int x, int y, int z, gameParams *game) {
     getNewCurrentMove(game);
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
-    game->movesList->currentMove->change->currVal = z;
-    game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1]->value;
+    game->movesList->currentMove->change->currVal->value = z;
+    game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
 
     /* according to z value - increment or decrement game counter
      * if z was already set to (x,y) cell - don't change counter */
@@ -172,38 +174,82 @@ int set(int x, int y, int z, gameParams *game) {
  * lists and nodes are updated properly */
 int undo(gameParams *game) {
 
-    cellChangeRecNode *moveToUndo, *moveToPrint;
+    printf("#1");
 
-    //TODO: check what happens if we undo the first node
+    cellChangeRecNode *moveToUndo, *moveToPrint;
 
     if (game->movesList->size == 0) {
         printf("Error: no moves to undo\n");
         return 0;
     }
 
+    printf("#2");
+
     moveToUndo = game->movesList->currentMove->change;
     moveToPrint = moveToUndo;
-    game->movesList->currentMove = game->movesList->currentMove->prev;
 
+    game->movesList->currentMove = game->movesList->currentMove->prev;
+    game->movesList->size--;
+
+    printf("#3");
+
+    if(moveToUndo != NULL){
+        printf("%d\n",moveToUndo->currVal->value);
+    }
 
     while (moveToUndo != NULL) {
+
         game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
-        moveToUndo=moveToUndo->next;
+        moveToUndo = moveToUndo->next;
     }
 
+    printf("#4");
+    printBoard(game);
+    printChanges(game,moveToPrint,0);
+
+    printf("#5");
+// makeRecChanges(game, moveToUndo);  not used
+
+
+    return 1;
+
+
+}
+
+
+/* Pre:
+ * command is valid
+ * game is at edit or solve mode
+ *
+ * Post:
+ * last command that was undone is redone
+ * lists and nodes are updated properly */
+int redo(gameParams *game){
+    cellChangeRecNode *moveToRedo, *moveToPrint;
+
+    if(game->movesList->currentMove->next == NULL){
+        printf("Error: no moves to redo\n");
+        return 0;
+    }
+
+    moveToRedo = game->movesList->currentMove->change;
+    moveToPrint = moveToRedo;
+    game->movesList->currentMove = game->movesList->currentMove->next;
+    game->movesList->size++;
+
+
+    while(moveToRedo != NULL){
+        game->userBoard[moveToRedo->x - 1][moveToRedo->y - 1] = moveToRedo->currVal;
+        moveToRedo = moveToRedo->next;
+    }
     printBoard(game);
 
-    while(moveToPrint != NULL){
-        printf("Undo %d,%d: from %d to %d\n", moveToPrint->x, moveToPrint->y, moveToPrint->currVal->value, moveToPrint->prevVal->value);
-        moveToPrint = moveToPrint->next;
-    }
-
-
-   // makeRecChanges(game, moveToUndo);  not used
+    printChanges(game,moveToPrint,1);
 
 
     return 1;
 }
+
 
 
 #if 0

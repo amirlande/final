@@ -48,6 +48,8 @@ char *getLineSeparator(gameParams *game) {
     for (i = 0; i < 4 * N + m + 1; i++) {
         separator[i] = '-';
     }
+    separator[i]='\0';
+
 
     return separator;
 }
@@ -99,7 +101,7 @@ void getNewCurrentMove(gameParams *game) {
 int checkIfValid(int x, int y, int z, gameParams *game) {
 
     if (z == 0) return 1; /* always legal to set a non-fixed cell to 0 */
-
+/*TODO:
     if (!(checkIfSquareValid(x, y, z, userBoard))) {
         return 0;
     }
@@ -113,9 +115,12 @@ int checkIfValid(int x, int y, int z, gameParams *game) {
     }
 
     return 1;
-
+*/
 }
 
+
+
+#if 0
 /* Called by undo
  * implemented recursively for printing in thr right order:
  * make changes -> print board -> print changes
@@ -130,11 +135,46 @@ int makeRecChanges(gameParams *game, cellChangeRecNode *moveToUndo) {
 
     game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
     makeRecChanges(game, moveToUndo->next);
-    printf("Undo %d,%d: from %d to %d\n", moveToUndo->x, moveToUndo->y, moveToUndo->currVal->value, moveToUndo->prevVal->value);
+    printf("Undo %d,%d: from %d to %d\n", moveToUndo->x, moveToUndo->y, moveToUndo->currVal->value,
+           moveToUndo->prevVal->value);
 
     return 1;
 }
+#endif
 
+/* prints the changes after undo/redo */
+int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
+    int curr, prev, tmp;
+
+    while (moveToPrint != NULL) {
+        curr = moveToPrint->currVal->value;
+        prev = moveToPrint->prevVal->value;
+
+        /* switching vlues of prev and curr at redo */
+        if (isRedo){
+            tmp = curr;
+            curr = prev;
+            prev = tmp;
+        }
+        printf("Undo %d,%d: ", moveToPrint->x, moveToPrint->y);
+        if (!curr) { // curr is zero
+            if (!prev) { // both zeros
+                printf("from _ to _\n");
+            } else { // curr zero, prev non zero
+                printf("from _ to %d\n", prev);
+            }
+        } else { // curr is non zero
+            if (!prev) { // prev is zero
+                printf("from %d to _\n", curr);
+            } else { // both non zeros
+                printf("from %d to %d\n", curr, prev);
+            }
+        }
+        moveToPrint = moveToPrint->next;
+    }
+    return 1;
+
+}
 
 #if 0
 

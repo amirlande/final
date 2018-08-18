@@ -2,13 +2,14 @@
 // Created by eran on 18/08/18.
 //
 
-#include <zconf.h>
-
+#define NULL 0
 #include "etc.h"
 
 
 /* get an instance of a game if needed for tests */
 gameParams *getExampleGame(int n, int m) {
+
+    userMoveNode *head, *first, *second;
     gameParams *game2 = NULL;
     int i, j;
     game2 = (gameParams *) malloc(sizeof(gameParams));
@@ -19,7 +20,7 @@ gameParams *getExampleGame(int n, int m) {
     }
     game2->n = n;
     game2->m = m;
-    game2->mode = edit;
+    game2->mode = init;
     game2->markErrors = 1;
     game2->counter = 0;
     game2->userBoard = allocateCellMatrix(game2->userBoard, game2->n * game2->m);
@@ -39,10 +40,48 @@ gameParams *getExampleGame(int n, int m) {
         }
     }
 
+
     game2->solution = allocateCellMatrix(game2->solution, m * n);
-    game2->counter = 0;
+    game2->counter = 6;
+    game2->movesList = (listOfMoves *)malloc(sizeof(listOfMoves *));
+    game2->movesList->size = 1;
+    game2->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode*));
+    head = game2->movesList->head;
+    head->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+
+
+    head->prev = NULL;
+    head->next = (userMoveNode *) malloc(sizeof(userMoveNode*));
+
+    first = head -> next;
+    first->next = NULL;
+    first->prev = head;
+    first->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+    first->change->currVal = (cell*)malloc(sizeof(cell*));
+    first->change->prevVal = (cell*)malloc(sizeof(cell*));
+    first->change->next = NULL;
+    first->change->x = 1;
+    first->change->y = 1;
+
+    first->change->currVal = game2->userBoard[1][1];
+    first->change->prevVal = game2->userBoard[3][3];
+
+    game2->movesList->currentMove = first;
+
+
 
     return game2;
 
 }
 
+#if 0
+
+typedef struct cellChangeRecNode {
+    int x; /*x coordinate of cell*/
+    int y; /*y coordinate of cell*/
+    cell *prevVal;
+    cell *currVal;
+    struct cellChangeRecNode *next; /*pointer to next node*/
+} cellChangeRecNode;
+
+#endif
