@@ -6,7 +6,7 @@
 #ifndef FINAL_SOLVER_H
 #define FINAL_SOLVER_H
 
-#endif //FINAL_SOLVER_H
+
 
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function solves the board using ILP algorithm
@@ -19,3 +19,4 @@ int solveUsingILP(gameParams *game);
  * it is called by num_solutions (in commands.h) */
 int count_solutions(gameParams *game);
 
+#endif //FINAL_SOLVER_H

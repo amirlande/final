@@ -4,8 +4,6 @@
 #ifndef FINAL_GAMEUTILS_H
 #define FINAL_GAMEUTILS_H
 
-#endif //FINAL_GAMEUTILS_H
-
 /* part 1 - game structs and defines: */
 
 #define TRUE 1
@@ -82,3 +80,9 @@ cell **copy_board(cell **board_to_be_copied);
 
 /* frees memory of a given board */
 void free_board(cell **board_to_be_freed);
+
+int find_first_empty_cell(cell **board, int *, int *);
+
+
+
+#endif //FINAL_GAMEUTILS_H

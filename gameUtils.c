@@ -25,3 +25,8 @@ cell **copy_board(cell **board_to_be_copied) {
 void free_board(cell **board_to_be_freed) {
     /* to be implemented */
 }
+
+int find_first_empty_cell(cell **board, int *row, int *col) {
+    /* to implement */
+    return 1;
+}
