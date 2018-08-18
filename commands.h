@@ -9,7 +9,7 @@
 #include "input_output.h" /* gives access to edit, solve and save commands */
 
 /* prints the Sudoku board */
-void print_board(gameParams *game);
+void printBoard(gameParams *game);
 
 /* preconditions: 1. called only in SOLVE mode 2. X is either 0 or 1
  * (preconditions should be verified in parser module) */
@@ -25,6 +25,16 @@ int validate(gameParams *game);
  * the function first checks whether there are erroneous values
  * if no erroneous cells where found - counts the number of possible solutions */
 int num_solutions(gameParams *game);
+
+
+/* Pre:
+ * command is valid
+ * game is at edit or solve mode
+ *
+ * Post:
+ * last command was undone
+ * lists and nodes are updated properly */
+int undo(gameParams *game) ;
 
 
 #endif //FINAL_COMMANDS_H

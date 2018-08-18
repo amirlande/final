@@ -10,5 +10,5 @@
 
 int main() {
     gameParams *game = getExampleGame(5, 4);
-    print_board(game);
+    printBoard(game);
 }
