@@ -10,7 +10,7 @@
 
 int main() {
     int i;
-    gameParams *game = getExampleGame(2, 2);
+    gameParams *game = getExampleGame(5, 4);
     printBoard(game);
     undo(game);
     redo(game);
