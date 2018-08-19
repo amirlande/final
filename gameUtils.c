@@ -158,8 +158,6 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
 
 }
 
-
-
 /* Checks if value z does not appear his 3x3 square in the matrix */
 int checkIfSquareValid(int x, int y, int z, gameParams **game) {
 
