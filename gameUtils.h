@@ -115,6 +115,16 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
  * */
 int makeRecChanges(gameParams *game, cellChangeRecNode *moveToUndo);
 
+/* Checks if value z does not appear his 3x3 square in the matrix */
+int checkIfSquareValid(int x, int y, int z, gameParams **game);
+
+/* Checks if value z does not appear in row x */
+int checkIfRowValid(int x, int y, int z, gameParams **game);
+
+/* Checks if value z does not appear in column y */
+int checkIfColumnValid(int x, int y, int z, gameParams **game) ;
+
+
 
 #endif //FINAL_GAMEUTILS_H
 

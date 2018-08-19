@@ -69,7 +69,6 @@ int validate(gameParams *game) {
     }
 }
 
-#if 0
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
  * the function first checks whether there are erroneous values
@@ -96,7 +95,6 @@ int num_solutions(gameParams *game) {
     return 0;
 }
 
-#endif
 
 /* Sets new value Z for cell X Y
  *
@@ -109,15 +107,10 @@ int num_solutions(gameParams *game) {
  * lists and nodes are updated properly */
 int set(int x, int y, int z, gameParams *game) {
 
-#if 0
-    ~optional to check here~
-
-    if (!(checkIfValid(x - 1, y - 1, z, game->userBoard))) {
+    if (checkIfValid(x - 1, y - 1, z, game) == FALSE) {
         printf("Error: value is invalid\n");
         return 0;
     }
-
-#endif
 
     /* no cell is considered fixed when on edit mode, according to forum */
     if (game->mode != edit && game->userBoard[x][y]->isFixed) {
@@ -233,59 +226,4 @@ int redo(gameParams *game) {
 
     return 1;
 }
-
-
-#if 0
-previous implementation
-
-/* Checks if value z does not appear his 3x3 square in the matrix */
-int checkIfSquareValid(int x, int y, int z, int **userBoard) {
-
-    int i;
-    int j;
-
-    for (i = x - x % 3; i < x - x % 3 + 3; i++) {
-        for (j = y - y % 3; j < y - y % 3 + 3; j++) {
-
-            if (userBoard[i][j] == z) {
-                if (!((i == x) && (j == y))) { /* exclude cell (x,y) from the square check */
-                    return 0;
-                }
-            }
-        }
-    }
-    return 1;
-}
-
-/* Checks if value z does not appear in row x */
-int checkIfRowValid(int x, int y, int z, int **userBoard) {
-
-    int j;
-
-    for (j = 0; j < 9; j++) {
-        if (j != y) { /* exclude cell (x,y) from the square check */
-            if (userBoard[x][j] == z) {
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-/* Checks if value z does not appear in column y */
-int checkIfColumnValid(int x, int y, int z, int **userBoard) {
-
-    int i;
-
-    for (i = 0; i < 9; i++) {
-        if (i != x) { /* exclude cell (x,y) from the square check */
-            if (userBoard[i][y] == z) {
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-#endif
 
