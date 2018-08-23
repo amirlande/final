@@ -11,6 +11,16 @@
 #define VALID 1
 #define INVALID 0
 
+
+/* the struct that represents a cell in the Sudoku board
+ * each cell contains information regarding its value, whether it is fixed and whether it is valid*/
+typedef struct cell {
+    int value;
+    int isFixed;
+    int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
+} cell;
+
+
 /* cellChangeRecNode is a node of a single-linked list of all set operations
  * made by the user - in case of a "SET" operation the list includes only one node
  * in case of a "AUTOFILL" operation the list includes a cellChangeRecNode for each
@@ -18,8 +28,8 @@
 typedef struct cellChangeRecNode {
     int x; /*x coordinate of cell*/
     int y; /*y coordinate of cell*/
-    int prevVal;
-    int currVal;
+    cell *prevVal;
+    cell *currVal;
     struct cellChangeRecNode *next; /*pointer to next node*/
 } cellChangeRecNode;
 
@@ -36,6 +46,7 @@ typedef struct userMoveNode {
 
 /* a doubly linked list of nodes of type userMoveNode
  * head is pointer to the head of the list
+ * head of list is an empty node which is not counter at size
  * currentMove is a pointer to the last move made by the user*/
 typedef struct listOfMoves {
     userMoveNode *head;
@@ -43,13 +54,6 @@ typedef struct listOfMoves {
     int size; /* maybe unnecessary - to be decided later */
 } listOfMoves;
 
-/* the struct that represents a cell in the Sudoku board
- * each cell contains information regarding its value, whether it is fixed and whether it is valid*/
-typedef struct cell {
-    int value;
-    int isFixed;
-    int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
-} cell;
 
 enum gameMode {
     init, solve, edit
@@ -63,7 +67,7 @@ typedef struct gameParams {
     cell ***userBoard;
     cell ***solution;
     int counter;
-    listOfMoves movesList;
+    listOfMoves *movesList;
 
 } gameParams;
 
@@ -92,6 +96,34 @@ char *getLineSeparator(gameParams *game);
 
 /* Allocates memory for cell matrix mat with NxN values */
 cell ***allocateCellMatrix(cell ***mat, int N);
+
+/* Allocates memory to new nodes
+ * sets the curr and prev pointers
+ * -- no data is added -- */
+void getNewCurrentMove(gameParams *game);
+
+int checkIfValid(int x, int y, int z, gameParams *game);
+
+/* prints the changes after undo/redo */
+int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
+
+
+/* Called by undo
+ * implemented recursively for printing in thr right order:
+ * make changes -> print board -> print changes
+ * prints at the opposite order, MIGHT NOT BE USED!!
+ * */
+int makeRecChanges(gameParams *game, cellChangeRecNode *moveToUndo);
+
+/* Checks if value z does not appear his 3x3 square in the matrix */
+int checkIfSquareValid(int x, int y, int z, gameParams **game);
+
+/* Checks if value z does not appear in row x */
+int checkIfRowValid(int x, int y, int z, gameParams **game);
+
+/* Checks if value z does not appear in column y */
+int checkIfColumnValid(int x, int y, int z, gameParams **game) ;
+
 
 
 #endif //FINAL_GAMEUTILS_H

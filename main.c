@@ -9,6 +9,10 @@
 
 
 int main() {
+    int i;
     gameParams *game = getExampleGame(5, 4);
-    print_board(game);
+    printBoard(game);
+    undo(game);
+    redo(game);
+    return 1;
 }

@@ -8,7 +8,7 @@
 
 
 /* prints the Sudoku board */
-void print_board(gameParams *game) {
+void printBoard(gameParams *game) {
 
     int i, j, m, n, N;
     char cellRow, cellState, *separatorRow = NULL;
@@ -28,12 +28,12 @@ void print_board(gameParams *game) {
                 printf("%c", cellRow);
             }
             cellState = ' ';
-            if (game->userBoard[i][j]->isFixed) {
-                cellState = '.';
-            }
-                /* if cell is not fixed, we check if it's erroneous if we are in edit mode or markErrors */
-            else if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
+// TODO: check the new logic
+            if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
                 cellState = '*';
+            }
+            if ((game->userBoard[i][j]->isFixed) && (game->mode != edit)) {
+                cellState = '.';
             }
 
             printf(" %2d%c", game->userBoard[i][j]->value, cellState);
@@ -48,7 +48,7 @@ void print_board(gameParams *game) {
  * (preconditions should be verified in parser module) */
 void mark_errors(gameParams *game, int X) {
     game->markErrors = X;
-    print_board(game); /* prints the board with or without displaying erroneous cells - according to X */
+    printBoard(game); /* prints the board with or without displaying erroneous cells - according to X */
 }
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
@@ -68,7 +68,6 @@ int validate(gameParams *game) {
         return TRUE; /* returns 1 */
     }
 }
-
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
@@ -94,5 +93,137 @@ int num_solutions(gameParams *game) {
     }
     /* gets here in case num_of_sols == 0 */
     return 0;
+}
+
+
+/* Sets new value Z for cell X Y
+ *
+ * Preconditions:
+ * command is valid
+ * x,y,z are valid and integers
+ *
+ * Post:
+ * value z is set to [x][y], currentMove holds the right data with the change.
+ * lists and nodes are updated properly */
+int set(int x, int y, int z, gameParams *game) {
+
+    if (checkIfValid(x - 1, y - 1, z, game) == FALSE) {
+        printf("Error: value is invalid\n");
+        return 0;
+    }
+
+    /* no cell is considered fixed when on edit mode, according to forum */
+    if (game->mode != edit && game->userBoard[x][y]->isFixed) {
+        printf("Error: cell is fixed\n");
+        return 0;
+    }
+
+    getNewCurrentMove(game);
+    game->movesList->currentMove->change->x = x;
+    game->movesList->currentMove->change->y = y;
+    game->movesList->currentMove->change->currVal->value = z;
+    game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
+
+    /* according to z value - increment or decrement game counter
+     * if z was already set to (x,y) cell - don't change counter */
+    if ((z == 0) && (game->userBoard[x - 1][y - 1] != 0)) { /* when a non-zero cell is set back to zero (emptied) */
+        game->counter--;
+    } else if ((z != 0) && (game->userBoard[x - 1][y - 1] == 0)) { /* when a zero cell is set to z (!=0) */
+        game->counter++;
+    }
+
+
+    /* sets the value */
+    game->userBoard[x - 1][y - 1]->value = z;
+    game->userBoard[x - 1][y - 1]->isValid = 1;
+
+    if (game->markErrors == TRUE && checkIfValid(x, y, z, game) == FALSE) {
+        game->userBoard[x][y]->isValid = 0;
+    }
+
+    printBoard(game);
+
+    if ((game->mode == solve) && (game->counter == game->n * game->m)) {
+        if (validate(game) == TRUE) {
+            printf("Puzzle solved successfully\n");
+            game->mode = init;
+            // TODO should follow by "Enter your command:\n"
+        } else {
+            printf("Puzzle solution erroneous\n");
+            // TODO the user will have to undo the move to continue solving ?? where to implement
+        }
+    }
+    return 1;
+
+}
+
+
+/* Pre:
+ * command is valid
+ * game is at edit or solve mode
+ *
+ * Post:
+ * last command was undone
+ * lists and nodes are updated properly */
+int undo(gameParams *game) {
+
+    cellChangeRecNode *moveToUndo, *moveToPrint;
+
+    if (game->movesList->size == 0) {
+        printf("Error: no moves to undo\n");
+        return 0;
+    }
+
+    moveToUndo = game->movesList->currentMove->change;
+    moveToPrint = moveToUndo;
+    game->movesList->currentMove = game->movesList->currentMove->prev;
+    game->movesList->size--;
+
+    if (moveToUndo != NULL) {
+        printf("%d\n", moveToUndo->currVal->value);
+    }
+
+    while (moveToUndo != NULL) {
+
+        game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
+        moveToUndo = moveToUndo->next;
+    }
+
+    printBoard(game);
+    printChanges(game, moveToPrint, 0);
+
+    return 1;
+}
+
+
+/* Pre:
+ * command is valid
+ * game is at edit or solve mode
+ *
+ * Post:
+ * last command that was undone is redone
+ * lists and nodes are updated properly */
+int redo(gameParams *game) {
+
+    cellChangeRecNode *moveToRedo, *moveToPrint;
+
+    if (game->movesList->currentMove->next == NULL) {
+        printf("Error: no moves to redo\n");
+        return 0;
+    }
+    game->movesList->currentMove = game->movesList->currentMove->next;
+    moveToRedo = game->movesList->currentMove->change;
+    moveToPrint = moveToRedo;
+    game->movesList->size++;
+
+    while (moveToRedo != NULL) {
+        game->userBoard[moveToRedo->x - 1][moveToRedo->y - 1] = moveToRedo->currVal;
+        moveToRedo = moveToRedo->next;
+    }
+
+    printBoard(game);
+    printChanges(game, moveToPrint, 1);
+
+    return 1;
 }
 
