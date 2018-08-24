@@ -139,7 +139,12 @@ int doesCellHasASingleLegalValue(gameParams *game, int x, int y);
 /* sets a new value z to cell [x][y] */
 void setValue(gameParams *game, int x, int y, int z);
 
-cellChangeRecNode * getAutoFillChangeList(gameParams *game, int *numOfChanges);
+/* Called by autoFill
+ * returns the list of changes */
+cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
+
+/* Called by autoFill */
+void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 
 
 #endif //FINAL_GAMEUTILS_H

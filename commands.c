@@ -220,11 +220,8 @@ int redo(gameParams *game) {
 int autoFill(gameParams *game) {
 
     int numOfChanges;
-    userMoveNode *newMove;
     cellChangeRecNode *changeListHead;
     numOfChanges = 0;
-    /* TODO create Linked list change */
-
     if (checkErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return 0;
@@ -237,18 +234,10 @@ int autoFill(gameParams *game) {
         return 1;
     }
 
-    freeAllUserMoveNodes(game->movesList->currentMove->next);
-    newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
-    newMove->prev = game->movesList->currentMove;
-    newMove->next = NULL;
-    newMove->change = changeListHead;
-    game->movesList->currentMove->next = newMove;
-    game->movesList->currentMove = newMove;
-    game->movesList->size++;
+    setNewChangeListToGame(game, changeListHead);
 
     printBoard(game);
 
     return 1;
 }
-
 

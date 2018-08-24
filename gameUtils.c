@@ -305,8 +305,6 @@ int doesCellHasASingleLegalValue(gameParams *game, int x, int y) {
 }
 
 
-
-
 /* sets a new value z to cell [x][y] */
 void setValue(gameParams *game, int x, int y, int z) {
 
@@ -326,9 +324,10 @@ void setValue(gameParams *game, int x, int y, int z) {
 }
 
 
-
-cellChangeRecNode * getAutoFillChangeList(gameParams *game, int *numOfChanges) {
-    int i, j, N,legalValue,changes;
+/* Called by autoFill
+ * returns the list of changes */
+cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
+    int i, j, N, legalValue, changes;
     cellChangeRecNode *changeListHead, *currentChange;
     currentChange = NULL;
     changeListHead = NULL;
@@ -354,7 +353,7 @@ cellChangeRecNode * getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                 currentChange->y = j + 1;
                 currentChange->next = NULL;
                 changes++;
-                printf("Cell <%d,%d> set to %d\n",i+1,j+1,legalValue);
+                printf("Cell <%d,%d> set to %d\n", i + 1, j + 1, legalValue);
             }
         }
     }
@@ -364,6 +363,19 @@ cellChangeRecNode * getAutoFillChangeList(gameParams *game, int *numOfChanges) {
 }
 
 
+/* Called by autoFill */
+void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
+
+    userMoveNode *newMove;
+    freeAllUserMoveNodes(game->movesList->currentMove->next);
+    newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    newMove->prev = game->movesList->currentMove;
+    newMove->next = NULL;
+    newMove->change = changeListHead;
+    game->movesList->currentMove->next = newMove;
+    game->movesList->currentMove = newMove;
+    game->movesList->size++;
+}
 
 
 #if 0
