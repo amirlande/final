@@ -131,6 +131,16 @@ int checkIfRowValid(int x, int y, int z, gameParams **game);
 /* Checks if value z does not appear in column y */
 int checkIfColumnValid(int x, int y, int z, gameParams **game);
 
+/* Returns TRUE if the empty cell c
+ * has only one legal value */
+int doesCellHasASingleLegalValue(gameParams *game, int x, int y);
+
+
+/* sets a new value z to cell [x][y] */
+void setValue(gameParams *game, int x, int y, int z);
+
+cellChangeRecNode * getAutoFillChangeList(gameParams *game, int *numOfChanges);
+
 
 #endif //FINAL_GAMEUTILS_H
 
