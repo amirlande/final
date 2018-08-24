@@ -180,7 +180,6 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
     int curr, prev, tmp;
     char *command;
 
-
     while (moveToPrint != NULL) {
         curr = moveToPrint->currVal->value;
         prev = moveToPrint->prevVal->value;

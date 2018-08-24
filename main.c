@@ -9,6 +9,9 @@
 
 
 int main() {
+
+    /* testing */
+
     int i;
     gameParams *game = getExampleGame(5, 4);
     printBoard(game);
