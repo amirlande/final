@@ -102,6 +102,15 @@ cell ***allocateCellMatrix(cell ***mat, int N);
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game);
 
+/* frees all the userMoveNode
+ * starting from node to the end */
+void freeAllUserMoveNodes(userMoveNode *moveToFree);
+
+/* frees all the freeCellChangeRecNode
+ * starting from change to the end */
+void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
+
+
 int checkIfValid(int x, int y, int z, gameParams *game);
 
 /* prints the changes after undo/redo */
@@ -122,8 +131,7 @@ int checkIfSquareValid(int x, int y, int z, gameParams **game);
 int checkIfRowValid(int x, int y, int z, gameParams **game);
 
 /* Checks if value z does not appear in column y */
-int checkIfColumnValid(int x, int y, int z, gameParams **game) ;
-
+int checkIfColumnValid(int x, int y, int z, gameParams **game);
 
 
 #endif //FINAL_GAMEUTILS_H

@@ -83,18 +83,51 @@ int find_first_empty_cell(cell **board, int *row, int *col) {
 
 
 /* Allocates memory to new nodes
+ * frees all previous nodes that was next to current node
  * sets the curr and prev pointers
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game) {
 
-    userMoveNode *prev = game->movesList->currentMove;
-    userMoveNode *curr = (userMoveNode *) malloc(sizeof(userMoveNode *));
-    prev->next = curr;
-    curr->prev = prev;
-    curr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
-    game->movesList->currentMove = curr;
+    userMoveNode *newPrev = game->movesList->currentMove;
+    userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    freeAllUserMoveNodes(newPrev->next);
+    newPrev->next = newCurr;
+    newCurr->prev = newPrev;
+    newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+    game->movesList->currentMove = newCurr;
     game->movesList->size++;
 }
+
+/* frees all the userMoveNode
+ * starting from node to the end */
+void freeAllUserMoveNodes(userMoveNode *moveToFree) {
+
+    if (moveToFree == NULL) {
+        return;
+    }
+    userMoveNode *nextMove = moveToFree->next;
+    freeCellChangeRecNode(moveToFree->change);
+    freeAllUserMoveNodes(nextMove);
+    free(moveToFree);
+}
+
+/* frees all the freeCellChangeRecNode
+ * starting from change to the end */
+void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
+
+    if (changeToFree == NULL) {
+        return;
+    }
+
+    cellChangeRecNode *nextChange  = changeToFree->next;
+    free(changeToFree->prevVal);
+    free(changeToFree->currVal);
+    freeCellChangeRecNode(nextChange);
+    free(changeToFree);
+
+}
+
+
 
 
 /* Checks if Z is a valid value for non-fixed cell <X,Y> */
