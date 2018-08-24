@@ -81,16 +81,15 @@ int find_first_empty_cell(cell **board, int *row, int *col) {
     return 1;
 }
 
-
 /* Allocates memory to new nodes
  * frees all previous nodes that was next to current node
  * sets the curr and prev pointers
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game) {
 
+    freeAllUserMoveNodes(game->movesList->currentMove->next);
     userMoveNode *newPrev = game->movesList->currentMove;
     userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
-    freeAllUserMoveNodes(newPrev->next);
     newPrev->next = newCurr;
     newCurr->prev = newPrev;
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
@@ -119,16 +118,13 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
         return;
     }
 
-    cellChangeRecNode *nextChange  = changeToFree->next;
+    cellChangeRecNode *nextChange = changeToFree->next;
     free(changeToFree->prevVal);
     free(changeToFree->currVal);
     freeCellChangeRecNode(nextChange);
     free(changeToFree);
 
 }
-
-
-
 
 /* Checks if Z is a valid value for non-fixed cell <X,Y> */
 int checkIfValid(int x, int y, int z, gameParams *game) {
