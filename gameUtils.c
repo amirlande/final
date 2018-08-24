@@ -29,13 +29,11 @@ int checkErrCells(gameParams *game) {
     return 0;
 }
 
-
 /* allocates memory for a new board and copies values of
  * board_to_be_copied. returns pointer to the new board struct*/
 cell **copyBoard(cell **board_to_be_copied) {
     /* to be implemented */
 }
-
 
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
@@ -62,7 +60,6 @@ char *getLineSeparator(gameParams *game) {
     return separator;
 }
 
-
 /* Allocates memory for cell matrix mat with NxN values */
 cell ***allocateCellMatrix(cell ***mat, int N) {
 
@@ -86,7 +83,6 @@ cell ***allocateCellMatrix(cell ***mat, int N) {
     return mat;
 }
 
-
 /* Frees memory for cell matrix mat with NxN values */
 void freeCellMatrix(cell ***mat, int N) {
 
@@ -102,7 +98,6 @@ void freeCellMatrix(cell ***mat, int N) {
     }
     free(mat);
 }
-
 
 int find_first_empty_cell(cell **board, int *row, int *col) {
     /* to implement */
@@ -174,7 +169,6 @@ int checkIfValid(int x, int y, int z, gameParams *game) {
     return 1;
 
 }
-
 
 /* prints the changes after undo/redo */
 int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
@@ -304,7 +298,6 @@ int doesCellHasASingleLegalValue(gameParams *game, int x, int y) {
 
 }
 
-
 /* sets a new value z to cell [x][y] */
 void setValue(gameParams *game, int x, int y, int z) {
 
@@ -322,7 +315,6 @@ void setValue(gameParams *game, int x, int y, int z) {
     game->userBoard[x][y]->isValid = checkIfValid(x, y, z, game);
     game->userBoard[x][y]->isFixed = 0;
 }
-
 
 /* Called by autoFill
  * returns the list of changes */
@@ -361,7 +353,6 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
     *numOfChanges = changes;
     return changeListHead;
 }
-
 
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
