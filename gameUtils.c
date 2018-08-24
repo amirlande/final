@@ -282,7 +282,7 @@ int checkIfColumnValid(int x, int y, int z, gameParams **game) {
 }
 
 /* Returns the only legal value
- * for the empty Cell c
+ * for the empty Cell [x][y]
  * if has 0, or more than 1 values, returns FALSE */
 int doesCellHasASingleLegalValue(gameParams *game, int x, int y) {
 

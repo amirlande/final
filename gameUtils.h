@@ -131,8 +131,9 @@ int checkIfRowValid(int x, int y, int z, gameParams **game);
 /* Checks if value z does not appear in column y */
 int checkIfColumnValid(int x, int y, int z, gameParams **game);
 
-/* Returns TRUE if the empty cell c
- * has only one legal value */
+/* Returns the only legal value
+ * for the empty Cell [x][y]
+ * if has 0, or more than 1 values, returns FALSE */
 int doesCellHasASingleLegalValue(gameParams *game, int x, int y);
 
 
