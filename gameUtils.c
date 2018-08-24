@@ -14,7 +14,19 @@
  * returns TRUE (1) if an erroneous cell was found, and FALSE (0) otherwise
  * (used by validate command) */
 int checkErrCells(gameParams *game) {
-    /* to be implemented */
+
+    int i, j, N;
+    N = game->m * game->n;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j++; j < 0) {
+            cell *c = game->userBoard[i][j];
+            if (c->isValid == FALSE) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 
