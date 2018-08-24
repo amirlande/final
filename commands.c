@@ -55,7 +55,7 @@ void mark_errors(gameParams *game, int X) {
  * the function first checks whether there are erroneous values
  * if no erroneous cells where found - uses ILP to determine whether the board is solvable */
 int validate(gameParams *game) {
-    if (check_err_cells(game) == TRUE) {
+    if (checkErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return FALSE; /* returns 0 */
     }
@@ -73,10 +73,10 @@ int validate(gameParams *game) {
  * prints the number of solutions for the current board
  * the function first checks whether there are erroneous values
  * if no erroneous cells where found - counts the number of possible solutions */
-int num_solutions(gameParams *game) {
+int numSolutions(gameParams *game) {
     int num_of_sols;
 
-    if (check_err_cells(game) == TRUE) {
+    if (checkErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return FALSE; /* returns 0 */
     }
@@ -157,6 +157,21 @@ int set(int x, int y, int z, gameParams *game) {
 
 }
 
+
+/* Automatically fill "obvious" values
+ * cells which contain a single legal value
+ *
+ * Pre:
+ * game is at Solve mode */
+int autofill(gameParams *game){
+
+
+
+
+
+
+    return 1;
+}
 
 /* Pre:
  * command is valid

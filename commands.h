@@ -24,7 +24,7 @@ int validate(gameParams *game);
  * prints the number of solutions for the current board
  * the function first checks whether there are erroneous values
  * if no erroneous cells where found - counts the number of possible solutions */
-int num_solutions(gameParams *game);
+int numSolutions(gameParams *game);
 
 
 /* Pre:
