@@ -51,13 +51,19 @@ typedef struct cell {
     int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
 } cell;
 
-enum gameMode {init, solve, edit};
+enum gameMode {
+    INIT,
+    SOLVE,
+    EDIT
+};
+
 /* the main struct that represents the Sudoku game */
 typedef struct gameParams {
     enum gameMode mode;
     int markErrors;
     int n;
     int m;
+    int N;
     cell **userBoard;
     cell **solution;
     int counter;
@@ -82,6 +88,8 @@ cell **copy_board(cell **board_to_be_copied);
 void free_board(cell **board_to_be_freed);
 
 int find_first_empty_cell(cell **board, int *, int *);
+
+int valueInRange(int )
 
 
 

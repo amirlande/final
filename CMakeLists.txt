@@ -3,4 +3,4 @@ project(final C)
 
 set(CMAKE_C_STANDARD 90)
 
-add_executable(final main.c gameUtils.c gameUtils.h commands.c commands.h solver.h solver.c input_output.h input_output.c parser.c parser.h)
+add_executable(final main.c gameUtils.c gameUtils.h commands.c commands.h solver.h solver.c input_output.h input_output.c parser.c parser.h commandStruct.h commandStruct.c cmake-build-debug/parserTester.c errorMessages.c errorMessages.h)
