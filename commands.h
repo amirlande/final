@@ -26,6 +26,12 @@ int validate(gameParams *game);
  * if no erroneous cells where found - counts the number of possible solutions */
 int numSolutions(gameParams *game);
 
+/* Automatically fill "obvious" values
+ * cells which contain a single legal value
+ *
+ * Pre:
+ * game is at Solve mode */
+int autoFill(gameParams *game);
 
 /* Pre:
  * command is valid

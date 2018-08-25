@@ -113,7 +113,7 @@ int set(int x, int y, int z, gameParams *game) {
     }
 
     /* no cell is considered fixed when on edit mode, according to forum */
-    if (game->mode != edit && game->userBoard[x][y]->isFixed) {
+    if (game->mode != edit && game->userBoard[x - 1][y - 1]->isFixed) {
         printf("Error: cell is fixed\n");
         return 0;
     }
@@ -121,27 +121,14 @@ int set(int x, int y, int z, gameParams *game) {
     getNewCurrentMove(game);
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
-    game->movesList->currentMove->change->currVal->value = z;
     game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
+    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal;
 
-    /* according to z value - increment or decrement game counter
-     * if z was already set to (x,y) cell - don't change counter */
-    if ((z == 0) && (game->userBoard[x - 1][y - 1] != 0)) { /* when a non-zero cell is set back to zero (emptied) */
-        game->counter--;
-    } else if ((z != 0) && (game->userBoard[x - 1][y - 1] == 0)) { /* when a zero cell is set to z (!=0) */
-        game->counter++;
-    }
-
-
-    /* sets the value */
-    game->userBoard[x - 1][y - 1]->value = z;
-    game->userBoard[x - 1][y - 1]->isValid = 1;
-
-    if (game->markErrors == TRUE && checkIfValid(x, y, z, game) == FALSE) {
-        game->userBoard[x][y]->isValid = 0;
-    }
-
+    setValue(game, x - 1, y - 1, z);
     printBoard(game);
+
+
+    // TODO : handeling the game when it's done
 
     if ((game->mode == solve) && (game->counter == game->n * game->m)) {
         if (validate(game) == TRUE) {
@@ -153,25 +140,11 @@ int set(int x, int y, int z, gameParams *game) {
             // TODO the user will have to undo the move to continue solving ?? where to implement
         }
     }
+
     return 1;
 
 }
 
-
-/* Automatically fill "obvious" values
- * cells which contain a single legal value
- *
- * Pre:
- * game is at Solve mode */
-int autofill(gameParams *game){
-
-
-
-
-
-
-    return 1;
-}
 
 /* Pre:
  * command is valid
@@ -194,17 +167,14 @@ int undo(gameParams *game) {
     game->movesList->currentMove = game->movesList->currentMove->prev;
     game->movesList->size--;
 
-    if (moveToUndo != NULL) {
-        printf("%d\n", moveToUndo->currVal->value);
-    }
 
     while (moveToUndo != NULL) {
-
         game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
         moveToUndo = moveToUndo->next;
     }
 
     printBoard(game);
+
     printChanges(game, moveToPrint, 0);
 
     return 1;
@@ -238,6 +208,35 @@ int redo(gameParams *game) {
 
     printBoard(game);
     printChanges(game, moveToPrint, 1);
+
+    return 1;
+}
+
+/* Automatically fill "obvious" values
+ * cells which contain a single legal value
+ *
+ * Pre:
+ * game is at Solve mode */
+int autoFill(gameParams *game) {
+
+    int numOfChanges;
+    cellChangeRecNode *changeListHead;
+    numOfChanges = 0;
+    if (checkErrCells(game) == TRUE) {
+        printf("Error: board contains erroneous values\n");
+        return 0;
+    }
+
+    changeListHead = getAutoFillChangeList(game, &numOfChanges);
+
+    if (numOfChanges == 0) {
+        /* no alloc were made at this point */
+        return 1;
+    }
+
+    setNewChangeListToGame(game, changeListHead);
+
+    printBoard(game);
 
     return 1;
 }
