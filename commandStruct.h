@@ -14,7 +14,7 @@ enum commandType {
     INVALID_COMMAND = 0,
     SET = 1,
     HINT = 2,
-    VALIDATE = 3
+    VALIDATE = 3,
     RESET = 4,
     EXIT = 5,
     SOLVE = 6,
@@ -25,8 +25,8 @@ enum commandType {
     UNDO = 11,
     REDO = 12,
     SAVE = 13,
-    NUM_SOLS = 13,
-    AUTO_FILL = 14,
+    NUM_SOLS = 14,
+    AUTO_FILL = 15,
 };
 
 /* definition of a struct used to represent a command

@@ -56,9 +56,9 @@ typedef struct listOfMoves {
 
 
 enum gameMode {
-    INIT,
-    SOLVE,
-    EDIT
+    INIT_MODE,
+    SOLVE_MODE,
+    EDIT_MODE
 };
 
 /* the main struct that represents the Sudoku game */
@@ -127,13 +127,13 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
 int makeRecChanges(gameParams *game, cellChangeRecNode *moveToUndo);
 
 /* Checks if value z does not appear his 3x3 square in the matrix */
-int checkIfSquareValid(int x, int y, int z, gameParams **game);
+int checkIfSquareValid(int x, int y, int z, gameParams *game);
 
 /* Checks if value z does not appear in row x */
-int checkIfRowValid(int x, int y, int z, gameParams **game);
+int checkIfRowValid(int x, int y, int z, gameParams *game);
 
 /* Checks if value z does not appear in column y */
-int checkIfColumnValid(int x, int y, int z, gameParams **game);
+int checkIfColumnValid(int x, int y, int z, gameParams *game);
 
 /* Returns the only legal value
  * for the empty Cell [x][y]
@@ -149,6 +149,6 @@ void setValue(gameParams *game, int x, int y, int z);
 cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 
 /* Called by autoFill */
-void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
+void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
 #endif //FINAL_GAMEUTILS_H
