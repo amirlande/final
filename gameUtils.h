@@ -89,8 +89,4 @@ void free_board(cell **board_to_be_freed);
 
 int find_first_empty_cell(cell **board, int *, int *);
 
-int valueInRange(int )
-
-
-
 #endif //FINAL_GAMEUTILS_H
