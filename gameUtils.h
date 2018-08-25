@@ -11,6 +11,16 @@
 #define VALID 1
 #define INVALID 0
 
+
+/* the struct that represents a cell in the Sudoku board
+ * each cell contains information regarding its value, whether it is fixed and whether it is valid*/
+typedef struct cell {
+    int value;
+    int isFixed;
+    int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
+} cell;
+
+
 /* cellChangeRecNode is a node of a single-linked list of all set operations
  * made by the user - in case of a "SET" operation the list includes only one node
  * in case of a "AUTOFILL" operation the list includes a cellChangeRecNode for each
@@ -18,8 +28,8 @@
 typedef struct cellChangeRecNode {
     int x; /*x coordinate of cell*/
     int y; /*y coordinate of cell*/
-    int prevVal;
-    int currVal;
+    cell *prevVal;
+    cell *currVal;
     struct cellChangeRecNode *next; /*pointer to next node*/
 } cellChangeRecNode;
 
@@ -36,6 +46,7 @@ typedef struct userMoveNode {
 
 /* a doubly linked list of nodes of type userMoveNode
  * head is pointer to the head of the list
+ * head of list is an empty node which is not counter at size
  * currentMove is a pointer to the last move made by the user*/
 typedef struct listOfMoves {
     userMoveNode *head;
@@ -43,13 +54,6 @@ typedef struct listOfMoves {
     int size; /* maybe unnecessary - to be decided later */
 } listOfMoves;
 
-/* the struct that represents a cell in the Sudoku board
- * each cell contains information regarding its value, whether it is fixed and whether it is valid*/
-typedef struct cell {
-    int value;
-    int isFixed;
-    int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
-} cell;
 
 enum gameMode {
     INIT,
@@ -64,10 +68,10 @@ typedef struct gameParams {
     int n;
     int m;
     int N;
-    cell **userBoard;
-    cell **solution;
+    cell ***userBoard;
+    cell ***solution;
     int counter;
-    listOfMoves movesList;
+    listOfMoves *movesList;
 
 } gameParams;
 
@@ -78,15 +82,73 @@ typedef struct gameParams {
  * checks whether board has any erroneous cells
  * returns TRUE (1) if an erroneous cell was found, and FALSE (0) otherwise
  * (used by validate command) */
-int check_err_cells(gameParams *game);
+int checkErrCells(gameParams *game);
 
 /* allocates memory for a new board and copies values of
  * board_to_be_copied. returns pointer to the new board struct*/
-cell **copy_board(cell **board_to_be_copied);
+cell **copyBoard(cell **board_to_be_copied);
 
-/* frees memory of a given board */
-void free_board(cell **board_to_be_freed);
 
 int find_first_empty_cell(cell **board, int *, int *);
+
+/* returns the line separator for print_board
+ * consists 4N+m+1 dashes ('-')
+ * exits with exit(0) if failed to malloc */
+char *getLineSeparator(gameParams *game);
+
+/* Allocates memory for cell matrix mat with NxN values */
+cell ***allocateCellMatrix(cell ***mat, int N);
+
+/* Allocates memory to new nodes
+ * sets the curr and prev pointers
+ * -- no data is added -- */
+void getNewCurrentMove(gameParams *game);
+
+/* frees all the userMoveNode
+ * starting from node to the end */
+void freeAllUserMoveNodes(userMoveNode *moveToFree);
+
+/* frees all the freeCellChangeRecNode
+ * starting from change to the end */
+void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
+
+
+int checkIfValid(int x, int y, int z, gameParams *game);
+
+/* prints the changes after undo/redo */
+int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
+
+
+/* Called by undo
+ * implemented recursively for printing in thr right order:
+ * make changes -> print board -> print changes
+ * prints at the opposite order, MIGHT NOT BE USED!!
+ * */
+int makeRecChanges(gameParams *game, cellChangeRecNode *moveToUndo);
+
+/* Checks if value z does not appear his 3x3 square in the matrix */
+int checkIfSquareValid(int x, int y, int z, gameParams **game);
+
+/* Checks if value z does not appear in row x */
+int checkIfRowValid(int x, int y, int z, gameParams **game);
+
+/* Checks if value z does not appear in column y */
+int checkIfColumnValid(int x, int y, int z, gameParams **game);
+
+/* Returns the only legal value
+ * for the empty Cell [x][y]
+ * if has 0, or more than 1 values, returns FALSE */
+int doesCellHasASingleLegalValue(gameParams *game, int x, int y);
+
+
+/* sets a new value z to cell [x][y] */
+void setValue(gameParams *game, int x, int y, int z);
+
+/* Called by autoFill
+ * returns the list of changes */
+cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
+
+/* Called by autoFill */
+void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 
 #endif //FINAL_GAMEUTILS_H

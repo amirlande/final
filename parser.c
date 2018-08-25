@@ -396,5 +396,3 @@ int commandAvailable(enum commandType type, enum gameMode mode) {
 
 #endif
 
-
-

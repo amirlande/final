@@ -6,6 +6,7 @@
 #ifndef FINAL_SOLVER_H
 #define FINAL_SOLVER_H
 
+#include "gameUtils.h"
 
 
 /* precondition: board has no erroneous values (to be checked before calling this function)
