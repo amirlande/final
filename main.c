@@ -6,19 +6,20 @@
 
 
 
-#include "parser.c"
+#include "parser.h"
 #include "commands.h"
 #include "etc.h"
 
 int main() {
 
-    /* testing - merged from Amir's branch */
+
+    /* testing - merged from Amir's branch
     printf("%d", checkIfNumericString("345"));
     printf("%d", checkIfNumericString("345.5"));
     printf("%d", checkIfNumericString("4555a5"));
     printf("%d", checkIfNumericString(" "));
-    
-        /* testing - merged from Eran's branch */
+    */
+    /* testing - merged from Eran's branch */
 
     int i;
     gameParams *game = getExampleGame(5, 4);
@@ -26,4 +27,4 @@ int main() {
     undo(game);
     redo(game);
     return 1;
-    }
+}
