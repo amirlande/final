@@ -56,14 +56,18 @@ typedef struct listOfMoves {
 
 
 enum gameMode {
-    init, solve, edit
+    INIT,
+    SOLVE,
+    EDIT
 };
+
 /* the main struct that represents the Sudoku game */
 typedef struct gameParams {
     enum gameMode mode;
     int markErrors;
     int n;
     int m;
+    int N;
     cell ***userBoard;
     cell ***solution;
     int counter;
@@ -147,10 +151,4 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 
-
 #endif //FINAL_GAMEUTILS_H
-
-
-
-
-
