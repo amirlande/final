@@ -9,7 +9,7 @@
 
 /* for testing */
 void printCallingFunc(char *functionName) {
-    printf("Calling %s", functionName);
+    printf("Calling %s\n", functionName);
 }
 
 void printInvalidCommand() {
@@ -37,6 +37,7 @@ int checkIfNumericString(char *string){
             isNumeric = FALSE;
             break;
         }
+        i++;
     }
     return isNumeric;
 }
@@ -65,7 +66,8 @@ int checkIfZeroOrOne(char *string) {
 
 int commandAvailable(enum commandType type, enum gameMode mode) {
     /* TODO - implement logic using switch case */
-    printNotImplementedMessage("commandAvailable");
+    printNotImplementedMessage("commandAvailable\n");
+    return TRUE; /* temporary */
 }
 
 /* @params: command - pointer to the command to which this function gets parameters
@@ -175,12 +177,17 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             token = strtok(NULL, " \t\r\n"); /* according to project instructions - can assume it is legal TODO */
             command->fileName = (char *)malloc(strlen(token) + 1); /* allocate memory for fileName TODO free this memory */
             strcpy(command->fileName, token); /* copy string from token to fileName */
+            command->isValid = TRUE;
             break;
         case EDIT: /* the user may enter "edit" without a file path */
             token = strtok(NULL, " \t\r\n");
             if (token == NULL) {
                 command->fileName = NULL; /* TODO - remember to check fileName at edit() function at "commands.h" */
+            } else {
+                command->fileName = token;
             }
+            command->isValid = TRUE;
+            break;
         case MARK_ERRORS:
             token = strtok(NULL, " \t\r\n");
             number = checkIfZeroOrOne(token);
@@ -193,10 +200,12 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
                 return;
             }
             command->isValid = TRUE;
+            break;
         default:
             printErrorInCodeFlow("getParams", "parser.c");
     }
-    free(token);
+
+    /* free(token); TODO free this memory (causes program to crash!) */
 }
 
 /* parses command from user console input into a userCommand struct and then invokes relevant function from "commands.h"
@@ -323,8 +332,9 @@ commandStruct *getCommandFromUser(gameParams *game) {
         /* anything else is an invalid command: */
     else {
         command->isValid = FALSE;
+        printInvalidCommand();
     }
-    free(token);
+    /* free(token); TODO free this memory (causes program to crash!) */
     return command;
 }
 
@@ -390,6 +400,7 @@ int playTurn(gameParams *game) {
             case SAVE:
                 /* save(commandToPlay->fileName, game); */
                 printCallingFunc("SAVE");
+                break;
             case NUM_SOLS:
                 /* num_solutions(game); */
                 printCallingFunc("NUM_SOLS");
