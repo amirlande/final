@@ -21,10 +21,17 @@ int main() {
     */
     /* testing - merged from Eran's branch */
 
+#ifdef MAIN
     int i;
     gameParams *game = getExampleGame(5, 4);
     printBoard(game);
     undo(game);
     redo(game);
     return 1;
+#endif
+
+    gameParams *game = getExampleGame(5, 4);
+    while(TRUE) {
+        playTurn(game);
+    }
 }

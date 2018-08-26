@@ -20,6 +20,7 @@ gameParams *getExampleGame(int n, int m) {
     }
     game2->n = n;
     game2->m = m;
+    game2->N = m*n;
     game2->mode = INIT_MODE;
     game2->markErrors = 1;
     game2->counter = 0;
