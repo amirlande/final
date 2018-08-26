@@ -20,7 +20,7 @@ gameParams *getExampleGame(int n, int m) {
     }
     game2->n = n;
     game2->m = m;
-    game2->mode = init;
+    game2->mode = INIT_MODE;
     game2->markErrors = 1;
     game2->counter = 0;
     game2->userBoard = allocateCellMatrix(game2->userBoard, game2->n * game2->m);

@@ -32,7 +32,7 @@ void printBoard(gameParams *game) {
             if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
                 cellState = '*';
             }
-            if ((game->userBoard[i][j]->isFixed) && (game->mode != edit)) {
+            if ((game->userBoard[i][j]->isFixed) && (game->mode != EDIT_MODE)) {
                 cellState = '.';
             }
 
@@ -81,7 +81,7 @@ int numSolutions(gameParams *game) {
         return FALSE; /* returns 0 */
     }
     /* getting here means all cells aren't erroneous - count number of solutions */
-    num_of_sols = count_solutions(game);
+    /* num_of_sols = count_solutions(game); */
     printf("Number of solutions: %d\n", num_of_sols);
 
     if (num_of_sols == 1) {
@@ -113,7 +113,7 @@ int set(int x, int y, int z, gameParams *game) {
     }
 
     /* no cell is considered fixed when on edit mode, according to forum */
-    if (game->mode != edit && game->userBoard[x - 1][y - 1]->isFixed) {
+    if (game->mode != EDIT_MODE && game->userBoard[x - 1][y - 1]->isFixed) {
         printf("Error: cell is fixed\n");
         return 0;
     }
@@ -130,10 +130,10 @@ int set(int x, int y, int z, gameParams *game) {
 
     // TODO : handeling the game when it's done
 
-    if ((game->mode == solve) && (game->counter == game->n * game->m)) {
+    if ((game->mode == SOLVE_MODE) && (game->counter == game->n * game->m)) {
         if (validate(game) == TRUE) {
             printf("Puzzle solved successfully\n");
-            game->mode = init;
+            game->mode = INIT_MODE;
             // TODO should follow by "Enter your command:\n"
         } else {
             printf("Puzzle solution erroneous\n");
