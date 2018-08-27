@@ -268,3 +268,15 @@ int reset(gameParams *game) {
     freeAllUserMoveNodes(game->movesList->head->next);
     return 1;
 }
+
+
+
+/* Exits the game */
+void exitGame(gameParams *game) {
+
+    printf("Exiting...\n");
+    freeGame(game);
+    // TODO (Amir?) : close all open files
+}
+
+
