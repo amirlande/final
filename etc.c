@@ -8,7 +8,7 @@
 
 /* get an instance of a game if needed for tests */
 gameParams *getExampleGame(int n, int m) {
-
+    srand(5);
     userMoveNode *head, *first, *second;
     gameParams *game2 = NULL;
     int i, j;
@@ -29,7 +29,7 @@ gameParams *getExampleGame(int n, int m) {
     for (i = 0; i < m * n; i++) {
         for (j = 0; j < m * n; j++) {
             game2->userBoard[i][j] = (cell *) malloc(sizeof(cell *));
-            game2->userBoard[i][j]->value = i + j;
+            game2->userBoard[i][j]->value = rand() % (n*m) + 1;
             game2->userBoard[i][j]->isValid = 1;
 
             if (i % 3 == 0) {

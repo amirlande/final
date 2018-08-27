@@ -239,10 +239,10 @@ int checkIfSquareValid(int x, int y, int z, gameParams *game) {
 /* Checks if value z does not appear in row x */
 int checkIfRowValid(int x, int y, int z, gameParams *game) {
 
-    int j, n;
-    n = game->n;
+    int j, N;
+    N = game->n * game->m;
 
-    for (j = 0; j < n; j++) {
+    for (j = 0; j < N; j++) {
         if (j != y) { /* exclude cell (x,y) from the square check */
             if (game->userBoard[x][j]->value == z) {
                 return 0;
@@ -258,10 +258,10 @@ int checkIfRowValid(int x, int y, int z, gameParams *game) {
 int checkIfColumnValid(int x, int y, int z, gameParams *game) {
 
 
-    int i, m;
-    m = game->m;
+    int i, N;
+    N = game->n * game->m;
 
-    for (i = 0; i < m; i++) {
+    for (i = 0; i < N; i++) {
         if (i != x) { /* exclude cell (x,y) from the square check */
             if (game->userBoard[i][y]->value == z) {
                 return 0;
