@@ -270,7 +270,6 @@ int reset(gameParams *game) {
 }
 
 
-
 /* Exits the game */
 void exitGame(gameParams *game) {
 

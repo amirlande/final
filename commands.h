@@ -46,7 +46,7 @@ int undo(gameParams *game);
 /* the REAL undo.
  * enveloped by the func named "undo".
  * made this change for the reset func */
-int undoEnveloped(gameParams *game , int isReset);
+int undoEnveloped(gameParams *game, int isReset);
 
 /* Pre:
  * command is valid
@@ -68,5 +68,9 @@ int redo(gameParams *game);
  * all move nodes are freed except head node
  * */
 int reset(gameParams *game);
+
+
+/* Exits the game */
+void exitGame(gameParams *game);
 
 #endif //FINAL_COMMANDS_H
