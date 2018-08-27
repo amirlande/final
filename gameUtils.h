@@ -154,4 +154,8 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 /* frees all game components */
 int freeGame(gameParams *game) ;
 
+
+/* gets a gameParams instance after one malloc */
+int createNewGame(gameParams *game, int n, int m) ;
+
 #endif //FINAL_GAMEUTILS_H

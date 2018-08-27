@@ -120,8 +120,10 @@ void getNewCurrentMove(gameParams *game) {
     userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
     newPrev->next = newCurr;
     newCurr->prev = newPrev;
+    newCurr->next = NULL;
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
     newCurr->change->currVal = (cell *) malloc(sizeof(cell *));
+    newCurr->change->next = NULL;
     game->movesList->currentMove = newCurr;
     game->movesList->size++;
 }
@@ -353,7 +355,6 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
     return changeListHead;
 }
 
-
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
 
@@ -387,6 +388,38 @@ int freeGame(gameParams *game) {
 }
 
 
+/* gets a gameParams instance after one malloc */
+int createNewGame(gameParams *game, int n, int m) {
+// TODO : to be tested
+    game->n = n;
+    game->m = m;
+    game->N = m * n;
+    game->markErrors = 0;
+    game->counter = 0;
+    allocateCellMatrix(game->userBoard, game->N);
+    allocateCellMatrix(game->solution, game->N);
+    game->movesList = (listOfMoves *) malloc(sizeof(listOfMoves *));
+    if (game->movesList == NULL) {
+        printf("Error: malloc has failed\n");
+        free(game->movesList);
+        return 0;
+    }
+    game->movesList->size = 0;
+    game->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    if (game->movesList->head == NULL) {
+        printf("Error: malloc has failed\n");
+        free(game->movesList->head);
+        return 0;
+    }
+    game->movesList->head->prev = NULL;
+    game->movesList->head->next = NULL;
+    game->movesList->head->change = NULL;
+    game->movesList->currentMove = game->movesList->head;
+
+
+    return 1;
+
+}
 
 
 #if 0
