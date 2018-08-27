@@ -219,71 +219,62 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
 /* Checks if value z does not appear his 3x3 square in the matrix */
 int checkIfSquareValid(int x, int y, int z, gameParams *game) {
 
-// TODO: change from prev implementation
+    int i, j, m, n;
+    m = game->m;
+    n = game->n;
 
-#if 0
-    int i;
-    int j;
+    for (i = x - x % m; i < x - x % m + m; i++) {
+        for (j = y - y % n; j < y - y % n + n; j++) {
 
-    for (i = x - x % 3; i < x - x % 3 + 3; i++) {
-        for (j = y - y % 3; j < y - y % 3 + 3; j++) {
-
-            if (userBoard[i][j] == z) {
+            if (game->userBoard[i][j]->value == z) {
                 if (!((i == x) && (j == y))) { /* exclude cell (x,y) from the square check */
                     return 0;
                 }
             }
         }
     }
-
-#endif
-
     return 1;
 }
 
 /* Checks if value z does not appear in row x */
 int checkIfRowValid(int x, int y, int z, gameParams *game) {
 
-    // TODO: change from prev implementation
-#if 0
+    int j, n;
+    n = game->n;
 
-    int j;
-
-    for (j = 0; j < 9; j++) {
+    for (j = 0; j < n; j++) {
         if (j != y) { /* exclude cell (x,y) from the square check */
-            if (userBoard[x][j] == z) {
+            if (game->userBoard[x][j]->value == z) {
                 return 0;
             }
         }
     }
 
-#endif
+
     return 1;
 }
 
 /* Checks if value z does not appear in column y */
 int checkIfColumnValid(int x, int y, int z, gameParams *game) {
 
-    // TODO: change from prev implementation
-#if 0
 
-    int i;
+    int i, m;
+    m = game->m;
 
-    for (i = 0; i < 9; i++) {
+    for (i = 0; i < m; i++) {
         if (i != x) { /* exclude cell (x,y) from the square check */
-            if (userBoard[i][y] == z) {
+            if (game->userBoard[i][y]->value == z) {
                 return 0;
             }
         }
     }
 
-#endif
     return 1;
 }
 
 /* Returns the only legal value
  * for the empty Cell [x][y]
- * if has 0, or more than 1 values, returns FALSE */
+ * returns FALSE - iff has 0, or more than 1 values */
 int doesCellHasASingleLegalValue(gameParams *game, int x, int y) {
 
     int i, counter, N, value;
