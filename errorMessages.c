@@ -11,5 +11,5 @@ void printErrorInCodeFlow(char *functionName, char *moduleName) {
 }
 
 void printNotImplementedMessage(char *nameOfFunction){
-    printf("%s function hasn't been implemented yet!", nameOfFunction);
+    printf("%s function hasn't been implemented yet!\n", nameOfFunction);
 }
