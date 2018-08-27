@@ -151,4 +151,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
+/* frees all game components */
+int freeGame(gameParams *game) ;
+
 #endif //FINAL_GAMEUTILS_H

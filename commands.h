@@ -43,6 +43,11 @@ int autoFill(gameParams *game);
 int undo(gameParams *game);
 
 
+/* the REAL undo.
+ * enveloped by the func named "undo".
+ * made this change for the reset func */
+int undoEnveloped(gameParams *game , int isReset);
+
 /* Pre:
  * command is valid
  * game is at edit or solve mode
@@ -51,5 +56,17 @@ int undo(gameParams *game);
  * last command that was undone is redone
  * lists and nodes are updated properly */
 int redo(gameParams *game);
+
+
+/* resets all moves
+ *
+ * Pre:
+ * game is at Solve mode
+ *
+ * Post:
+ * all moves are undone
+ * all move nodes are freed except head node
+ * */
+int reset(gameParams *game);
 
 #endif //FINAL_COMMANDS_H

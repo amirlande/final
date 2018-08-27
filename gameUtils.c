@@ -368,6 +368,26 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     game->movesList->size++;
 }
 
+/* frees all game components */
+int freeGame(gameParams *game) {
+
+    if (game->userBoard != NULL) {
+        freeCellMatrix(game->userBoard, game->m * game->n);
+    }
+    if (game->solution != NULL) {
+        freeCellMatrix(game->solution, game->m * game->n);
+    }
+    if (game->movesList != NULL) {
+        freeAllUserMoveNodes(game->movesList->head);
+        free(game->movesList);
+    }
+    free(game);
+
+    return 1;
+}
+
+
+
 
 #if 0
 /* Called by undo

@@ -12,7 +12,7 @@ void printBoard(gameParams *game) {
 
     int i, j, m, n, N;
     char cellRow, cellState, *separatorRow = NULL;
-
+// TODO : check bug on 3X3
     n = game->n;
     m = game->m;
     N = n * m;
@@ -28,7 +28,6 @@ void printBoard(gameParams *game) {
                 printf("%c", cellRow);
             }
             cellState = ' ';
-// TODO: check the new logic
             if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
                 cellState = '*';
             }
@@ -145,7 +144,6 @@ int set(int x, int y, int z, gameParams *game) {
 
 }
 
-
 /* Pre:
  * command is valid
  * game is at edit or solve mode
@@ -154,6 +152,15 @@ int set(int x, int y, int z, gameParams *game) {
  * last command was undone
  * lists and nodes are updated properly */
 int undo(gameParams *game) {
+
+    return undoEnveloped(game, 0);
+}
+
+
+/* the REAL undo.
+ * enveloped by the func named "undo".
+ * made this change for the reset func */
+int undoEnveloped(gameParams *game, int isReset) {
 
     cellChangeRecNode *moveToUndo, *moveToPrint;
 
@@ -173,9 +180,11 @@ int undo(gameParams *game) {
         moveToUndo = moveToUndo->next;
     }
 
-    printBoard(game);
-
-    printChanges(game, moveToPrint, 0);
+    if (isReset == FALSE) {
+        /* not printing anything on reset */
+        printBoard(game);
+        printChanges(game, moveToPrint, 0);
+    }
 
     return 1;
 }
@@ -241,3 +250,21 @@ int autoFill(gameParams *game) {
     return 1;
 }
 
+/* resets all moves
+ *
+ * Pre:
+ * game is at Solve mode
+ *
+ * Post:
+ * all moves are undone
+ * all move nodes are freed except head node
+ * */
+int reset(gameParams *game) {
+    //TODO: not tested
+    while (game->movesList->currentMove != game->movesList->head){
+        undoEnveloped(game,1);
+    }
+
+    freeAllUserMoveNodes(game->movesList->head->next);
+    return 1;
+}
