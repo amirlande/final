@@ -137,7 +137,7 @@ int checkIfColumnValid(int x, int y, int z, gameParams *game);
 
 /* Returns the only legal value
  * for the empty Cell [x][y]
- * if has 0, or more than 1 values, returns FALSE */
+ * returns FALSE - iff has 0, or more than 1 values */
 int doesCellHasASingleLegalValue(gameParams *game, int x, int y);
 
 
@@ -150,5 +150,12 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
+
+/* frees all game components */
+int freeGame(gameParams *game) ;
+
+
+/* gets a gameParams instance after one malloc */
+int createNewGame(gameParams *game, int n, int m) ;
 
 #endif //FINAL_GAMEUTILS_H
