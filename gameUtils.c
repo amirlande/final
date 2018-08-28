@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <printf.h>
 #include "gameUtils.h"
 #include "commands.h"
 
@@ -24,6 +25,7 @@ int checkErrCells(gameParams *game) {
             }
         }
     }
+
     return 0;
 }
 
@@ -118,8 +120,10 @@ void getNewCurrentMove(gameParams *game) {
     userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
     newPrev->next = newCurr;
     newCurr->prev = newPrev;
+    newCurr->next = NULL;
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
     newCurr->change->currVal = (cell *) malloc(sizeof(cell *));
+    newCurr->change->next = NULL;
     game->movesList->currentMove = newCurr;
     game->movesList->size++;
 }
@@ -217,71 +221,62 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
 /* Checks if value z does not appear his 3x3 square in the matrix */
 int checkIfSquareValid(int x, int y, int z, gameParams *game) {
 
-// TODO: change from prev implementation
+    int i, j, m, n;
+    m = game->m;
+    n = game->n;
 
-#if 0
-    int i;
-    int j;
+    for (i = x - x % m; i < x - x % m + m; i++) {
+        for (j = y - y % n; j < y - y % n + n; j++) {
 
-    for (i = x - x % 3; i < x - x % 3 + 3; i++) {
-        for (j = y - y % 3; j < y - y % 3 + 3; j++) {
-
-            if (userBoard[i][j] == z) {
+            if (game->userBoard[i][j]->value == z) {
                 if (!((i == x) && (j == y))) { /* exclude cell (x,y) from the square check */
                     return 0;
                 }
             }
         }
     }
-
-#endif
-
     return 1;
 }
 
 /* Checks if value z does not appear in row x */
 int checkIfRowValid(int x, int y, int z, gameParams *game) {
 
-    // TODO: change from prev implementation
-#if 0
+    int j, N;
+    N = game->n * game->m;
 
-    int j;
-
-    for (j = 0; j < 9; j++) {
+    for (j = 0; j < N; j++) {
         if (j != y) { /* exclude cell (x,y) from the square check */
-            if (userBoard[x][j] == z) {
+            if (game->userBoard[x][j]->value == z) {
                 return 0;
             }
         }
     }
 
-#endif
+
     return 1;
 }
 
 /* Checks if value z does not appear in column y */
 int checkIfColumnValid(int x, int y, int z, gameParams *game) {
 
-    // TODO: change from prev implementation
-#if 0
 
-    int i;
+    int i, N;
+    N = game->n * game->m;
 
-    for (i = 0; i < 9; i++) {
+    for (i = 0; i < N; i++) {
         if (i != x) { /* exclude cell (x,y) from the square check */
-            if (userBoard[i][y] == z) {
+            if (game->userBoard[i][y]->value == z) {
                 return 0;
             }
         }
     }
 
-#endif
     return 1;
 }
 
 /* Returns the only legal value
  * for the empty Cell [x][y]
- * if has 0, or more than 1 values, returns FALSE */
+ * returns FALSE - iff has 0, or more than 1 values */
 int doesCellHasASingleLegalValue(gameParams *game, int x, int y) {
 
     int i, counter, N, value;
@@ -360,7 +355,6 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
     return changeListHead;
 }
 
-
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
 
@@ -373,6 +367,58 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     game->movesList->currentMove->next = newMove;
     game->movesList->currentMove = newMove;
     game->movesList->size++;
+}
+
+/* frees all game components */
+int freeGame(gameParams *game) {
+
+    if (game->userBoard != NULL) {
+        freeCellMatrix(game->userBoard, game->m * game->n);
+    }
+    if (game->solution != NULL) {
+        freeCellMatrix(game->solution, game->m * game->n);
+    }
+    if (game->movesList != NULL) {
+        freeAllUserMoveNodes(game->movesList->head);
+        free(game->movesList);
+    }
+    free(game);
+
+    return 1;
+}
+
+
+/* gets a gameParams instance after one malloc */
+int createNewGame(gameParams *game, int n, int m) {
+// TODO : to be tested
+    game->n = n;
+    game->m = m;
+    game->N = m * n;
+    game->markErrors = 0;
+    game->counter = 0;
+    allocateCellMatrix(game->userBoard, game->N);
+    allocateCellMatrix(game->solution, game->N);
+    game->movesList = (listOfMoves *) malloc(sizeof(listOfMoves *));
+    if (game->movesList == NULL) {
+        printf("Error: malloc has failed\n");
+        free(game->movesList);
+        return 0;
+    }
+    game->movesList->size = 0;
+    game->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    if (game->movesList->head == NULL) {
+        printf("Error: malloc has failed\n");
+        free(game->movesList->head);
+        return 0;
+    }
+    game->movesList->head->prev = NULL;
+    game->movesList->head->next = NULL;
+    game->movesList->head->change = NULL;
+    game->movesList->currentMove = game->movesList->head;
+
+
+    return 1;
+
 }
 
 
