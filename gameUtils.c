@@ -4,9 +4,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <printf.h>
 #include "gameUtils.h"
 #include "commands.h"
+#include "errorMessages.h"
 
 
 /* preconditions:
@@ -16,26 +16,43 @@
 int checkErrCells(gameParams *game) {
 
     int i, j, N;
-    N = game->m * game->n;
+    N = game->N;
     for (i = 0; i < N; i++) {
-        for (j = 0; j++; j < 0) {
+        for (j = 0; j < N; j++) {
             cell *c = game->userBoard[i][j];
             if (c->isValid == FALSE) {
-                return 1;
+                return TRUE; /* invalid cell found! */
             }
         }
     }
-
-    return 0;
+    /* All board cells are valid - therefore checkErrCells returns FALSE */
+    return FALSE;
 }
 
+/* Allocates memory for a new board and copies values of
+ * board_to_be_copied.
+ * Returns pointer to the new board struct (Notice - it is a cell ****) */
+BOARD *copyBoard(cell ***board_to_be_copied, int N) {
+    int i, j;
+    BOARD *pointerToBoard;
+    BOARD copyOfBoard;
 
-/* allocates memory for a new board and copies values of
- * board_to_be_copied. returns pointer to the new board struct */
-/*
-cell **copyBoard(cell **board_to_be_copied) {
+    pointerToBoard = (BOARD *)malloc(sizeof(BOARD));
+    copyOfBoard = allocateCellMatrix(N);
+
+    /* Copy cell by cell values: */
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            copyOfBoard[i][j]->value = board_to_be_copied[i][j]->value;
+            copyOfBoard[i][j]->isFixed = board_to_be_copied[i][j]->isFixed;
+            copyOfBoard[i][j]->isValid = board_to_be_copied[i][j]->isValid;
+        }
+    }
+    *pointerToBoard = copyOfBoard;
+    printNotImplementedMessage("copyBoard"); /* TODO remove this when we fix allocateCellMatrix */
+    return pointerToBoard;
 }
-*/
+
 
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
@@ -62,33 +79,51 @@ char *getLineSeparator(gameParams *game) {
     return separator;
 }
 
+/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
+cell* createCell(int value) {
+    cell *newCell = (cell *)malloc(sizeof(cell));
+    if (newCell == NULL) {
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
+    newCell->value = value;
+    newCell->isValid = TRUE;
+    newCell->isFixed = FALSE;
+    return newCell;
+}
 
-/* Allocates memory for cell matrix mat with NxN values */
-cell ***allocateCellMatrix(cell ***mat, int N) {
+
+/* Allocates memory for cell matrix mat with NxN values
+ * This call allocated memory for all cells, and it initializes each cell's fields to:
+ * cell->value = 0
+ * cell->isValid = TRUE (1)
+ * cell-isFixed = FALSE (0)*/
+cell ***allocateCellMatrix(int N) {
+    /* TODO Eran - we need to change this function (a bit) after you agree with me */
 
     int i, j;
-    mat = (cell ***) malloc(N * sizeof(cell ***));
+    cell ***mat;
+    mat = (cell ***) malloc(N * sizeof(cell **));
     if (mat == NULL) {
-        printf("Error: calloc has failed\n");
-        exit(0);
+        printMallocFailed();
+        exit(EXIT_FAILURE);
     }
     for (i = 0; i < N; i++) {
-        mat[i] = (cell **) malloc(N * sizeof(cell **));
+        mat[i] = (cell **) malloc(N * sizeof(cell *));
         if (mat[i] == NULL) {
-            printf("Error: calloc has failed\n");
-            exit(0);
+            printMallocFailed();
+            exit(EXIT_FAILURE);
         }
         for (j = 0; j < N; j++) {
-            mat[i][j] = (cell *) malloc(N * sizeof(cell *));
+            mat[i][j] = createCell(0);
         }
     }
-
     return mat;
 }
 
 
 /* Frees memory for cell matrix mat with NxN values */
-void freeCellMatrix(cell ***mat, int N) {
+void freeBoard(cell ***mat, int N) {
 
     int i, j;
     if (mat == NULL) {
@@ -101,12 +136,6 @@ void freeCellMatrix(cell ***mat, int N) {
         free(mat[i]);
     }
     free(mat);
-}
-
-
-int find_first_empty_cell(cell **board, int *row, int *col) {
-    /* to implement */
-    return 1;
 }
 
 /* Allocates memory to new nodes
@@ -373,10 +402,10 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 int freeGame(gameParams *game) {
 
     if (game->userBoard != NULL) {
-        freeCellMatrix(game->userBoard, game->m * game->n);
+        freeBoard(game->userBoard, game->m * game->n);
     }
     if (game->solution != NULL) {
-        freeCellMatrix(game->solution, game->m * game->n);
+        freeBoard(game->solution, game->m * game->n);
     }
     if (game->movesList != NULL) {
         freeAllUserMoveNodes(game->movesList->head);
@@ -396,8 +425,9 @@ int createNewGame(gameParams *game, int n, int m) {
     game->N = m * n;
     game->markErrors = 0;
     game->counter = 0;
-    allocateCellMatrix(game->userBoard, game->N);
-    allocateCellMatrix(game->solution, game->N);
+    /* TODO Amir changed the call to allocateCellMatrix */
+    allocateCellMatrix(game->N);
+    allocateCellMatrix(game->N);
     game->movesList = (listOfMoves *) malloc(sizeof(listOfMoves *));
     if (game->movesList == NULL) {
         printf("Error: malloc has failed\n");
