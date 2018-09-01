@@ -71,7 +71,7 @@ int validate(gameParams *game) {
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
  * the function first checks whether there are erroneous values
- * if no erroneous cells where found - counts the number of possible solutions */
+ * if no erroneous cells were found - counts the number of possible solutions */
 int numSolutions(gameParams *game) {
     int num_of_sols;
 
@@ -79,19 +79,19 @@ int numSolutions(gameParams *game) {
         printf("Error: board contains erroneous values\n");
         return FALSE; /* returns 0 */
     }
-    /* getting here means all cells aren't erroneous - count number of solutions */
-    /* num_of_sols = count_solutions(game); */
+    /* getting here means all cells are *not* erroneous - count number of solutions */
+    num_of_sols = countSolutions(game);
     printf("Number of solutions: %d\n", num_of_sols);
 
     if (num_of_sols == 1) {
         printf("This is a good board!\n");
-        return 1;
+        return TRUE;
     } else if (num_of_sols > 1) {
         printf("The puzzle has more than 1 solution, try to edit it further\n");
-        return 1;
+        return TRUE;
     }
-    /* gets here in case num_of_sols == 0 */
-    return 0;
+    /* gets here in case num_of_sols == 0, board isn't solvable */
+    return FALSE;
 }
 
 

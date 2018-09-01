@@ -10,6 +10,8 @@
 #define FALSE 0
 #define VALID 1
 #define INVALID 0
+#define EMPTY 0
+#define BOARD cell ***
 
 
 /* the struct that represents a cell in the Sudoku board
@@ -51,7 +53,7 @@ typedef struct userMoveNode {
 typedef struct listOfMoves {
     userMoveNode *head;
     userMoveNode *currentMove;
-    int size; /* maybe unnecessary - to be decided later */
+    int size; /* TODO maybe unnecessary - to be decided later */
 } listOfMoves;
 
 
@@ -72,7 +74,6 @@ typedef struct gameParams {
     cell ***solution;
     int counter;
     listOfMoves *movesList;
-
 } gameParams;
 
 
@@ -84,12 +85,10 @@ typedef struct gameParams {
  * (used by validate command) */
 int checkErrCells(gameParams *game);
 
-/* allocates memory for a new board and copies values of
- * board_to_be_copied. returns pointer to the new board struct*/
-cell **copyBoard(cell **board_to_be_copied);
-
-
-int find_first_empty_cell(cell **board, int *, int *);
+/* Allocates memory for a new board and copies values of
+ * board_to_be_copied.
+ * Returns pointer to the new board struct (Notice - it is a cell ****) */
+BOARD *copyBoard(cell ***board_to_be_copied, int N);
 
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
@@ -97,7 +96,7 @@ int find_first_empty_cell(cell **board, int *, int *);
 char *getLineSeparator(gameParams *game);
 
 /* Allocates memory for cell matrix mat with NxN values */
-cell ***allocateCellMatrix(cell ***mat, int N);
+cell ***allocateCellMatrix(int N);
 
 /* Allocates memory to new nodes
  * sets the curr and prev pointers
@@ -154,6 +153,8 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 /* frees all game components */
 int freeGame(gameParams *game) ;
 
+/* frees all memory allocated to the given board */
+void freeBoard(cell ***mat, int N);
 
 /* gets a gameParams instance after one malloc */
 int createNewGame(gameParams *game, int n, int m) ;

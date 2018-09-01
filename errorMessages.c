@@ -13,3 +13,7 @@ void printErrorInCodeFlow(char *functionName, char *moduleName) {
 void printNotImplementedMessage(char *nameOfFunction){
     printf("%s function hasn't been implemented yet!\n", nameOfFunction);
 }
+
+void printMallocFailed(){
+    printf("Error: malloc has failed\n");
+}

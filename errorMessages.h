@@ -12,4 +12,7 @@ void printErrorInCodeFlow(char *functionName, char *moduleName);
 
 void printNotImplementedMessage(char *nameOfFunction);
 
+void printMallocFailed();
+
+
 #endif //FINAL_ERRORMESSAGES_H
