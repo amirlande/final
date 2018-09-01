@@ -88,29 +88,17 @@ int checkErrCells(gameParams *game);
 /* Allocates memory for a new board and copies values of
  * board_to_be_copied.
  * Returns pointer to the new board struct (Notice - it is a cell ****) */
-BOARD *copyBoard(cell ***board_to_be_copied, int N);
+BOARD*copyBoard(cell ***board_to_be_copied, int N);
 
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
  * exits with exit(0) if failed to malloc */
 char *getLineSeparator(gameParams *game);
 
-/* Allocates memory for cell matrix mat with NxN values */
-cell ***allocateCellMatrix(int N);
-
 /* Allocates memory to new nodes
  * sets the curr and prev pointers
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game);
-
-/* frees all the userMoveNode
- * starting from node to the end */
-void freeAllUserMoveNodes(userMoveNode *moveToFree);
-
-/* frees all the freeCellChangeRecNode
- * starting from change to the end */
-void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
-
 
 int checkIfValid(int x, int y, int z, gameParams *game);
 
@@ -150,13 +138,11 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
-/* frees all game components */
-int freeGame(gameParams *game) ;
-
-/* frees all memory allocated to the given board */
-void freeBoard(cell ***mat, int N);
 
 /* gets a gameParams instance after one malloc */
-int createNewGame(gameParams *game, int n, int m) ;
+int createNewGame(gameParams *game, int n, int m);
+
+/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
+cell *createCell(int value);
 
 #endif //FINAL_GAMEUTILS_H
