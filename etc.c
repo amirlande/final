@@ -3,8 +3,9 @@
 //
 
 #define NULL 0
-#include "etc.h"
 
+#include "etc.h"
+#include "memoryAllocation.h"
 
 /* get an instance of a game if needed for tests */
 gameParams *getExampleGame(int n, int m) {
@@ -20,7 +21,7 @@ gameParams *getExampleGame(int n, int m) {
     }
     game2->n = n;
     game2->m = m;
-    game2->N = m*n;
+    game2->N = m * n;
     game2->mode = INIT_MODE;
     game2->markErrors = 1;
     game2->counter = 0;
@@ -29,7 +30,7 @@ gameParams *getExampleGame(int n, int m) {
     for (i = 0; i < m * n; i++) {
         for (j = 0; j < m * n; j++) {
             game2->userBoard[i][j] = (cell *) malloc(sizeof(cell *));
-            game2->userBoard[i][j]->value = rand() % (n*m) + 1;
+            game2->userBoard[i][j]->value = rand() % (n * m) + 1;
             game2->userBoard[i][j]->isValid = 1;
 
             if (i % 3 == 0) {
@@ -44,22 +45,22 @@ gameParams *getExampleGame(int n, int m) {
 
     game2->solution = allocateCellMatrix(game2->solution, m * n);
     game2->counter = 6;
-    game2->movesList = (listOfMoves *)malloc(sizeof(listOfMoves *));
+    game2->movesList = (listOfMoves *) malloc(sizeof(listOfMoves *));
     game2->movesList->size = 1;
-    game2->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode*));
+    game2->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode *));
     head = game2->movesList->head;
     head->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
 
 
     head->prev = NULL;
-    head->next = (userMoveNode *) malloc(sizeof(userMoveNode*));
+    head->next = (userMoveNode *) malloc(sizeof(userMoveNode *));
 
-    first = head -> next;
+    first = head->next;
     first->next = NULL;
     first->prev = head;
     first->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
-    first->change->currVal = (cell*)malloc(sizeof(cell*));
-    first->change->prevVal = (cell*)malloc(sizeof(cell*));
+    first->change->currVal = (cell *) malloc(sizeof(cell *));
+    first->change->prevVal = (cell *) malloc(sizeof(cell *));
     first->change->next = NULL;
     first->change->x = 1;
     first->change->y = 1;
@@ -68,7 +69,6 @@ gameParams *getExampleGame(int n, int m) {
     first->change->prevVal = game2->userBoard[0][0];
 
     game2->movesList->currentMove = first;
-
 
 
     return game2;

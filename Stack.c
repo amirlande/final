@@ -7,7 +7,7 @@
 /* Allocates memory for Stack and initializes top->NULL, count->0 */
 Stack *initializeStack() {
     Stack *stack;
-    stack = (Stack *)malloc(1 * sizeof(Stack)); /* TODO free memory */
+    stack = (Stack *) malloc(1 * sizeof(Stack)); /* TODO free memory */
     if (stack == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);
@@ -21,7 +21,7 @@ Stack *initializeStack() {
 /* Allocates memory for Stack element (doesn't initialize its fields!) */
 element *allocateMemoryForStackElement() {
     element *newElement;
-    newElement = (element *)malloc(1 * sizeof(element));
+    newElement = (element *) malloc(1 * sizeof(element));
     if (newElement == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);

@@ -11,7 +11,7 @@
 
 
 /* frees all game components */
-int freeGame(gameParams *game) ;
+int freeGame(gameParams *game);
 
 /* frees all memory allocated to the given board */
 void freeBoard(cell ***mat, int N);
@@ -27,6 +27,9 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
 /* Allocates memory for cell matrix mat with NxN values */
 cell ***allocateCellMatrix(int N);
 
+/* Allocates memory for int matrix
+ * with size N*N */
+int **allocateIntMatrix(int N);
 
 
 #endif //FINAL_MEMORYALLOCATION_H

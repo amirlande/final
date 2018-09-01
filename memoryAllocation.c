@@ -97,3 +97,23 @@ cell ***allocateCellMatrix(int N) {
 }
 
 
+/* Allocates memory for int matrix
+ * with size N*N */
+int **allocateIntMatrix(int N) {
+
+    int i, **mat;
+    mat = calloc(N, sizeof(int *));
+    if (mat == NULL) {
+        printf("Error: calloc has failed\n");
+        exit(0);
+    }
+    for (i = 0; i < N; i++) {
+        mat[i] = calloc(N, sizeof(int));
+        if (mat[i] == NULL) {
+            printf("Error: calloc has failed\n");
+            exit(0);
+        }
+    }
+
+    return mat;
+}

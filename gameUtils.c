@@ -33,12 +33,12 @@ int checkErrCells(gameParams *game) {
 /* Allocates memory for a new board and copies values of
  * board_to_be_copied.
  * Returns pointer to the new board struct (Notice - it is a cell ****) */
-BOARD *copyBoard(cell ***board_to_be_copied, int N) {
+BOARD*copyBoard(cell ***board_to_be_copied, int N) {
     int i, j;
-    BOARD *pointerToBoard;
+    BOARD*pointerToBoard;
     BOARD copyOfBoard;
 
-    pointerToBoard = (BOARD *)malloc(sizeof(BOARD));
+    pointerToBoard = (BOARD*) malloc(sizeof(BOARD));
     copyOfBoard = allocateCellMatrix(N);
 
     /* Copy cell by cell values: */
@@ -81,8 +81,8 @@ char *getLineSeparator(gameParams *game) {
 }
 
 /* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
-cell* createCell(int value) {
-    cell *newCell = (cell *)malloc(sizeof(cell));
+cell *createCell(int value) {
+    cell *newCell = (cell *) malloc(sizeof(cell));
     if (newCell == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);
@@ -92,8 +92,6 @@ cell* createCell(int value) {
     newCell->isFixed = FALSE;
     return newCell;
 }
-
-
 
 /* Allocates memory to new nodes
  * frees all previous nodes that was next to current node
@@ -113,8 +111,6 @@ void getNewCurrentMove(gameParams *game) {
     game->movesList->currentMove = newCurr;
     game->movesList->size++;
 }
-
-
 
 /* Checks if Z is a valid value for non-fixed cell <X,Y> */
 int checkIfValid(int x, int y, int z, gameParams *game) {
@@ -327,8 +323,6 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     game->movesList->currentMove = newMove;
     game->movesList->size++;
 }
-
-
 
 
 /* gets a gameParams instance after one malloc */
