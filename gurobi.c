@@ -10,36 +10,29 @@
 #include "gameUtils.h"
 
 
-
 /* Solves sudoku using ILP
  * res will hold the solved board values */
-int ILP(int ** board, int ** res, int n ,int m) {
+int ILP(int **board, int **res, int n, int m) {
 
-    int N, flag, error, zero, i, j, v, ig, jg, count;
-    GRBenv *env = NULL;
-    GRBmodel *model = NULL;
-    N = n*m;
 
-    //int **board = (int **) malloc(N * N * sizeof(int));
-    double *sol = (double *) malloc(N * N * N * sizeof(double));
-    int *obj = (int *) malloc(N * N * N * sizeof(int));
+    int N, error, i, j, v, ig, jg, count, *obj, *ind, optimstatus, tmp;
+    double *sol, *val, *lb, objval;
+    char *vtype;
+    GRBenv *env;
+    env = NULL;
     char inputline[100];
-    int *ind = (int *) malloc(N * sizeof(int));
-    double *val = (double *) malloc(N * sizeof(double));
-    double *lb = (double *) malloc(N * N * N * sizeof(double));
-    char *vtype = (char *) malloc(N * N * N * sizeof(char));
-    char *names = (char *) malloc(N * N * N * sizeof(char));
-    char *namestorage = (char *) malloc(10 * N * N * N * sizeof(char));
-    char *cursor;
-    int optimstatus;
-    double objval;
-    zero = 0;
-    error = 0;
-    flag = 0;
+    GRBmodel *model = NULL;
+    N = n * m;
+    /* int **board = (int **) malloc(N * N * sizeof(int));*/
+    sol = (double *) malloc(N * N * N * sizeof(double));
+    obj = (int *) malloc(N * N * N * sizeof(int));
+    ind = (int *) malloc(N * sizeof(int));
+    val = (double *) malloc(N * sizeof(double));
+    lb = (double *) malloc(N * N * N * sizeof(double));
+    vtype = (char *) malloc(N * N * N * sizeof(char));
 
 
     /* Create an empty model */
-    cursor = namestorage;
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
             for (v = 0; v < N; v++) {
@@ -49,8 +42,7 @@ int ILP(int ** board, int ** res, int n ,int m) {
                 else
                     lb[i * N * N + j * N + v] = 0;
                 vtype[i * N * N + j * N + v] = GRB_BINARY;
-                names[i * N * N + j * N + v] = cursor[0];
-                cursor += strlen(names + (i * N * N + j * N + v)) + 1;
+
             }
         }
     }
@@ -68,12 +60,16 @@ int ILP(int ** board, int ** res, int n ,int m) {
     /* Create new model */
 
     error = GRBnewmodel(env, &model, "sudoku", N * N * N, NULL, lb, NULL,
-                        vtype, &names);
+                        vtype, NULL);
     if (error) {
         //TODO : handle error
         printf("error");
         return 0;
     }
+
+
+
+
 
     /* Each cell gets a value */
     for (i = 0; i < N; i++) {
@@ -85,11 +81,37 @@ int ILP(int ** board, int ** res, int n ,int m) {
             error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
             if (error) {
                 //TODO : handle error
-                printf("error");
+                printf("ERROR %d 2 values for 1 cell GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
                 return 0;
             }
         }
     }
+
+
+#if 0
+
+    /* constrain that if cell had value != 0
+     * it will hold the same value */
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            tmp = board[i][j];
+            if (tmp != 0) {
+                for (v = 0; v < N; v++) {
+                    if (tmp == v + 1) {
+                        ind[v] = i * N * N + j * N + v;
+                        val[v] = 1.0;
+                    }
+                }
+                error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
+                if (error) {
+                    printf("ERROR %d value should not change GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                    return 0;
+                }
+            }
+        }
+    }
+
+#endif
 
     /* Each value must appear once in each row */
 
@@ -163,7 +185,7 @@ int ILP(int ** board, int ** res, int n ,int m) {
     error = GRBoptimize(model);
     if (error) {
         //TODO : handle error
-        printf("error");
+        printf("error 1\n");
         return 0;
     }
     /* Write model to 'sudoku.lp' */
@@ -171,7 +193,7 @@ int ILP(int ** board, int ** res, int n ,int m) {
     error = GRBwrite(model, "sudoku.lp");
     if (error) {
         //TODO : handle error
-        printf("error");
+        printf("error 2\n");
         return 0;
     }
     /* Capture solution information */
@@ -179,7 +201,7 @@ int ILP(int ** board, int ** res, int n ,int m) {
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
     if (error) {
         //TODO : handle error
-        printf("error");
+        printf("error 3\n");
         return 0;
     }
 
@@ -187,7 +209,7 @@ int ILP(int ** board, int ** res, int n ,int m) {
     error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     if (error) {
         //TODO : handle error
-        printf("error");
+        printf("error 4\n");
         return 0;
     }
 
@@ -205,18 +227,16 @@ int ILP(int ** board, int ** res, int n ,int m) {
 
 
     /* Free model */
-
     GRBfreemodel(model);
 
     /* Free environment */
-
     GRBfreeenv(env);
 
     return 0;
 }
 
 
-void updateSolved(double *sol ,int ** res, int N) {
+void updateSolved(double *sol, int **res, int N) {
     int i, j, k;
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
@@ -228,7 +248,6 @@ void updateSolved(double *sol ,int ** res, int N) {
         }
     }
 }
-
 
 int **fromCellMatToIntMat(cell ***src, int N) {
 
