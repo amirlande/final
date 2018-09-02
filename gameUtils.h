@@ -4,7 +4,12 @@
 #ifndef FINAL_GAMEUTILS_H
 #define FINAL_GAMEUTILS_H
 
-/* part 1 - game structs and defines: */
+#include "commands.h"
+#include "errorMessages.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "list.h"
+#include "gameParams.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -14,76 +19,48 @@
 #define BOARD cell ***
 
 
-/* the struct that represents a cell in the Sudoku board
- * each cell contains information regarding its value, whether it is fixed and whether it is valid*/
-typedef struct cell {
-    int value;
-    int isFixed;
-    int isValid; /* isValid == 1 means it's not erroneous, isValid == 0 means value is erroneous */
-} cell;
+/* Allocates memory for a new gameParams struct
+ * Initializes its fields to default values
+ * Called once by the play() function in the beginning of the program */
+gameParams *initSudokuGame();
+
+/* Pre:
+ * 1. Memory for game already allocated
+ * 2. Memory for game internal fields *not* allocated
+ * Post: Initializes game fields to a (m*n)*(m*n) sudoku game */
+void initializeSudokuGameFields(gameParams *game, int m, int n);
+
+/* Frees all memory allocated to game, including game itself
+ * (This is the complementary free function of initSudokuGame() */
+int freeSudokuGame(gameParams *game);
+
+/* Frees memory allocated to game fields, and initilizes its fields */
+void cleanSudokuGame(gameParams *game);
 
 
-/* cellChangeRecNode is a node of a single-linked list of all set operations
- * made by the user - in case of a "SET" operation the list includes only one node
- * in case of a "AUTOFILL" operation the list includes a cellChangeRecNode for each
- * cell that has been automatically set, with its previous value and current value*/
-typedef struct cellChangeRecNode {
-    int x; /*x coordinate of cell*/
-    int y; /*y coordinate of cell*/
-    cell *prevVal;
-    cell *currVal;
-    struct cellChangeRecNode *next; /*pointer to next node*/
-} cellChangeRecNode;
+/* Allocates memory for cell matrix mat with NxN values
+ * This call allocated memory for all cells, and it initializes each cell's fields to:
+ * cell->value = 0
+ * cell->isValid = TRUE (1)
+ * cell-isFixed = FALSE (0)*/
+cell ***allocateCellMatrix(int N);
 
+/* Frees all memory allocated to the given board
+ * (This is the complementary free function of allocateCellMatrix */
+void freeCellMatrix(cell ***mat, int N);
 
-/* a node of the doubly linked list listOfMoves
- * each node's "data" is a pointer to a cellChangeRecNode
- * (which is the first node of a linked list of cellChangeRecNode) */
-typedef struct userMoveNode {
-    cellChangeRecNode *change;
-    struct userMoveNode *next;
-    struct userMoveNode *prev;
-} userMoveNode;
+/* TODO - this function may need changes - when is it used? */
+/* gets a gameParams instance after one malloc */
+int createNewGame(gameParams *game, int n, int m) ;
 
-
-/* a doubly linked list of nodes of type userMoveNode
- * head is pointer to the head of the list
- * head of list is an empty node which is not counter at size
- * currentMove is a pointer to the last move made by the user*/
-typedef struct listOfMoves {
-    userMoveNode *head;
-    userMoveNode *currentMove;
-    int size; /* TODO maybe unnecessary - to be decided later */
-} listOfMoves;
-
-
-enum gameMode {
-    INIT_MODE,
-    SOLVE_MODE,
-    EDIT_MODE
-};
-
-/* the main struct that represents the Sudoku game */
-typedef struct gameParams {
-    enum gameMode mode;
-    int markErrors;
-    int n;
-    int m;
-    int N;
-    cell ***userBoard;
-    cell ***solution;
-    int counter;
-    listOfMoves *movesList;
-} gameParams;
-
-
-/* part 2 - function declarations: */
 
 /* preconditions:
  * checks whether board has any erroneous cells
  * returns TRUE (1) if an erroneous cell was found, and FALSE (0) otherwise
  * (used by validate command) */
-int checkErrCells(gameParams *game);
+int hasErrCells(gameParams *game);
+
+int boardIsEmpty(gameParams *game);
 
 /* Allocates memory for a new board and copies values of
  * board_to_be_copied.
@@ -94,22 +71,6 @@ BOARD *copyBoard(cell ***board_to_be_copied, int N);
  * consists 4N+m+1 dashes ('-')
  * exits with exit(0) if failed to malloc */
 char *getLineSeparator(gameParams *game);
-
-/* Allocates memory for cell matrix mat with NxN values */
-cell ***allocateCellMatrix(int N);
-
-/* Allocates memory to new nodes
- * sets the curr and prev pointers
- * -- no data is added -- */
-void getNewCurrentMove(gameParams *game);
-
-/* frees all the userMoveNode
- * starting from node to the end */
-void freeAllUserMoveNodes(userMoveNode *moveToFree);
-
-/* frees all the freeCellChangeRecNode
- * starting from change to the end */
-void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
 
 
 int checkIfValid(int x, int y, int z, gameParams *game);
@@ -137,7 +98,7 @@ int checkIfColumnValid(int x, int y, int z, gameParams *game);
 /* Returns the only legal value
  * for the empty Cell [x][y]
  * returns FALSE - iff has 0, or more than 1 values */
-int doesCellHasASingleLegalValue(gameParams *game, int x, int y);
+int doesCellHaveASingleLegalValue(gameParams *game, int x, int y);
 
 
 /* sets a new value z to cell [x][y] */
@@ -150,13 +111,6 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
-/* frees all game components */
-int freeGame(gameParams *game) ;
 
-/* frees all memory allocated to the given board */
-void freeBoard(cell ***mat, int N);
-
-/* gets a gameParams instance after one malloc */
-int createNewGame(gameParams *game, int n, int m) ;
 
 #endif //FINAL_GAMEUTILS_H

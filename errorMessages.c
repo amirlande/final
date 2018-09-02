@@ -17,3 +17,15 @@ void printNotImplementedMessage(char *nameOfFunction){
 void printMallocFailed(){
     printf("Error: malloc has failed\n");
 }
+
+void printErrorOpeningFile(enum gameMode mode) {
+    if (mode == SOLVE_MODE) {
+        printf("Error: File doesn't exist or cannot be opened\n");
+    }
+    else if (mode == EDIT_MODE) {
+        printf("Error: File cannot be opened\n");
+    }
+    else {
+        printErrorInCodeFlow("printErrorOpeningFile", "input_output.c");
+    }
+}
