@@ -1,14 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser.h" /* gives access to the parser functions */
-#include "gameUtils.h" /* gives access to functions required to initialize game
+#include "gameUtils.h" /* access to functions required to initialize game
  * (initGame, createNewBoard) */
-
-
-#include "parser.h"
-#include "commands.h"
 #include "etc.h"
+#include "mainAux.h"
 
+/* TODO main module should eventually just include mainAux.h and use its playTurn function (as an interface to the parser)
+ * */
+
+ void playSudoku() {
+     gameParams *game;
+     int continueGame;
+
+     printf("Sudoku\n------\n");
+     fflush(stdout); /* TODO check on fflush*/
+     game = initSudokuGame();
+
+     continueGame = TRUE;
+     while(continueGame) {
+         continueGame = playTurn(game); /* playTurn returns TRUE (1) on all commands except EXIT */
+     }
+
+     freeSudokuGame(game);
+ }
+
+ int main() {
+    /* Set srand and seed stuff and call play() */
+
+     playSudoku();
+     return  1;
+ }
+
+
+#ifdef OLDMAIN
 int main() {
 
 
@@ -40,3 +64,4 @@ int main() {
     return 1;
 
 }
+#endif

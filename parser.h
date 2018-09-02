@@ -21,7 +21,4 @@
  * the resolveCommand function should free this memory*/
 commandStruct *getCommandFromUser(gameParams *game);
 
-
-int playTurn(gameParams *game);
-
 #endif //FINAL_PARSER_H

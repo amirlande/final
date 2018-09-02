@@ -47,25 +47,37 @@ void printBoard(gameParams *game) {
  * (preconditions should be verified in parser module) */
 void mark_errors(gameParams *game, int X) {
     game->markErrors = X;
-    printBoard(game); /* prints the board with or without displaying erroneous cells - according to X */
 }
 
-/* preconditions: 1. called only on EDIT or SOLVE modes
+/* Preconditions: 1. called only on EDIT or SOLVE modes
  * the function first checks whether there are erroneous values
  * if no erroneous cells where found - uses ILP to determine whether the board is solvable */
 int validate(gameParams *game) {
-    if (checkErrCells(game) == TRUE) {
+    if (hasErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return FALSE; /* returns 0 */
     }
     /* getting here means all cells aren't erroneous - need to check if solvable */
-    if (solveUsingILP(game) == FALSE) {
+    if (solveUsingILP(game) == FALSE) { /* TODO Eran sim <3: solveUsingILP should return a boolean indication
+ * TODO if the board is solvable. If it is - game->solution should hold the ILP solution*/
         printf("Validation failed: board is unsolvable\n");
         return FALSE; /* returns 0 */
     } else {
         printf("Validation passed: board is solvable\n");
         return TRUE; /* returns 1 */
     }
+}
+
+/* Pre:
+ * Available in EDIT mode only
+ * x, y are valid integers */
+int generate(gameParams *game) {
+
+    if (!boardIsEmpty(game)) {
+        printf("Error: board is not empty\n");
+        return FALSE;
+    }
+
 }
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
@@ -75,7 +87,7 @@ int validate(gameParams *game) {
 int numSolutions(gameParams *game) {
     int num_of_sols;
 
-    if (checkErrCells(game) == TRUE) {
+    if (hasErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return FALSE; /* returns 0 */
     }
@@ -141,6 +153,34 @@ int set(int x, int y, int z, gameParams *game) {
     }
 
     return 1;
+
+}
+
+int hint(int x, int y, gameParams *game) {
+    int isSolvable;
+    int hint;
+
+    if (hasErrCells(game) == TRUE) {
+        printf("Error: board contains erroneous values\n");
+        return FALSE;
+    }
+    else if ((game->userBoard[x-1][y-1]->isFixed) == TRUE) {
+        printf("Error: cell is fixed\n");
+        return FALSE;
+    }
+    else if ((game->userBoard[x-1][y-1]->value != EMPTY)) {
+        printf("Error: cell already contains a value\n");
+        return FALSE;
+    }
+
+    isSolvable = solveUsingILP(game); /* TODO Eran sim <3: this is a call to solveUsingILP - returns boolean indication of solvability of board. solution is at game->solution */
+    if (!isSolvable) {
+        printf("Error: board is unsolvable\n");
+        return FALSE;
+    }
+    /* TODO may need to change this if solution is int** */
+    hint = game->solution[x-1][y-1]->value;
+    printf("Hint: set cell to %d\n", hint);
 
 }
 
@@ -231,7 +271,7 @@ int autoFill(gameParams *game) {
     int numOfChanges;
     cellChangeRecNode *changeListHead;
     numOfChanges = 0;
-    if (checkErrCells(game) == TRUE) {
+    if (hasErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return 0;
     }
@@ -250,6 +290,86 @@ int autoFill(gameParams *game) {
     return 1;
 }
 
+
+/* Starts a puzzle at SOLVE mode
+ * Pre:
+ * game is at SOLVE, EDIT or INIT mode (available in all modes)
+ * If the file exists - it is contains valid data ans is well formatted
+ * filePath is a well-formatted file path (not NULL)
+ *
+ * Post:
+ * If file does not exist or cannot be opened - print error
+ * If file exists - starts puzzle in solve mode
+ * All fields of game struct are updated according to new board (loaded from file)
+*/
+int solve(gameParams *game, char *filePath) {
+    FILE *file;
+
+    /* Try to open file */
+    file = fopen(filePath, "r");
+    if (file == NULL) {
+        printErrorOpeningFile(SOLVE_MODE); /* Prints the required error message according to mode */
+        return FALSE;
+    }
+    /* File successfully opened - get rid of old fields (including memory allocation) */
+    cleanSudokuGame(game);
+    /* Load new fields from file */
+    loadGameParamsFromFile(game, file, SOLVE_MODE);
+    /* At this point game should hold the new parameters of the loaded board */
+    fclose(file);
+    return TRUE;
+}
+
+int edit(gameParams *game, char *filePath) {
+    FILE *file;
+
+    if (filePath == NULL) { /* no path was provided by user - enter EDIT mode with an empty 9x9 board */
+        cleanSudokuGame(game);
+        initializeSudokuGameFields(game, 3, 3);
+        return TRUE;
+    }
+
+    file = fopen(filePath, "r");
+    if (file == NULL) {
+        printErrorOpeningFile(EDIT_MODE); /* Prints the required error message according to mode */
+        return FALSE;
+    }
+    /* File successfully opened - get rid of old fields (including memory allocation) */
+    cleanSudokuGame(game);
+    /* Load new fields from file */
+    loadGameParamsFromFile(game, file, EDIT_MODE);
+    /* At this point game should hold the new parameters of the loaded board */
+    fclose(file);
+    return TRUE;
+}
+
+
+int save(gameParams *game, char *filePath) {
+    FILE *file;
+
+    /* In EDIT mode we require that no erroneous cells exist and that board is solvable: */
+    if (game->mode == EDIT_MODE) {
+        if (hasErrCells(game) == TRUE) {
+            printf("Error: board contains erroneous values\n");
+            return FALSE;
+        }
+        if (validate(game) == FALSE) {
+            printf("Error: board validation failed\n");
+            return FALSE;
+        }
+    }
+    file = fopen(filePath, "w");
+    if (file == NULL) {
+        printf("Error: File cannot be created or modified\n");
+        return FALSE;
+    }
+    saveGameParamsToFile(game, file, game->mode);
+    printf("Saved to: %s\n", filePath);
+    fclose(file);
+    return TRUE;
+}
+
+
 /* resets all moves
  *
  * Pre:
@@ -266,15 +386,15 @@ int reset(gameParams *game) {
     }
 
     freeAllUserMoveNodes(game->movesList->head->next);
+    printf("Board reset\n");
     return 1;
 }
-
 
 /* Exits the game */
 void exitGame(gameParams *game) {
 
     printf("Exiting...\n");
-    freeGame(game);
+    freeSudokuGame(game);
     // TODO (Amir?) : close all open files
 }
 
