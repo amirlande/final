@@ -4,6 +4,7 @@
 
 
 #include "parser.h"
+
 #define COMMAND_LEN 257
 
 
@@ -28,11 +29,11 @@ void printNotZeroOrOne() {
 /* reads input's chars one by one and checks that all are valid digits
  * uses "ctype.h" library function isdigit
  * returns TRUE (1) or FALSE (0) */
-int checkIfNumericString(char *string){
-    int i=0, isNumeric = TRUE;
+int checkIfNumericString(char *string) {
+    int i = 0, isNumeric = TRUE;
     if (string == NULL) return FALSE;
 
-    while(string[i] != '\0'){
+    while (string[i] != '\0') {
         if (isdigit(string[i]) == FALSE) { /* isdigit returns 0 = FALSE if the passed char isn't an int */
             isNumeric = FALSE;
             break;
@@ -78,7 +79,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
     int number;
     char *token;
 
-    token = (char *)malloc(COMMAND_LEN * sizeof(char)); /* using COMMAND_LEN upper bound */
+    token = (char *) malloc(COMMAND_LEN * sizeof(char)); /* using COMMAND_LEN upper bound */
     token = strtok(copyOfInput, " \t\r\n"); /* gets rid of first word (already read before, in getCommandFromUser) */
 
     switch (typeOfCommand) {
@@ -88,8 +89,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             number = checkIfInRange(token, 1, N);
             if (number != -1) {
                 command->x = number;
-            }
-            else {
+            } else {
                 printErrorInRange(0, N);
                 command->isValid = FALSE;
                 return;
@@ -99,8 +99,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             number = checkIfInRange(token, 1, N);
             if (number != -1) {
                 command->y = number;
-            }
-            else {
+            } else {
                 printErrorInRange(0, N);
                 command->isValid = FALSE;
                 return;
@@ -110,8 +109,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             number = checkIfInRange(token, 0, N);
             if (number != -1) {
                 command->z = number;
-            }
-            else {
+            } else {
                 printErrorInRange(0, N);
                 command->isValid = FALSE;
                 return;
@@ -125,8 +123,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             number = checkIfInRange(token, 1, N);
             if (number != -1) {
                 command->x = number;
-            }
-            else {
+            } else {
                 printErrorInRange(1, N);
                 command->isValid = FALSE;
                 return;
@@ -136,8 +133,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             number = checkIfInRange(token, 1, N);
             if (number != -1) {
                 command->y = number;
-            }
-            else {
+            } else {
                 printErrorInRange(1, N);
                 command->isValid = FALSE;
                 return;
@@ -148,23 +144,21 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
         case GENERATE:
             /* first argument - must be between 0 to N*N */
             token = strtok(NULL, " \t\r\n");
-            number = checkIfInRange(token, 0, N*N); /* TODO check if the upper bound is N*N */
+            number = checkIfInRange(token, 0, N * N); /* TODO check if the upper bound is N*N */
             if (number != -1) {
                 command->x = number;
-            }
-            else {
-                printErrorInRange(0, N*N);
+            } else {
+                printErrorInRange(0, N * N);
                 command->isValid = FALSE;
                 return;
             }
             /* second argument - must be between 0 to N*N */
             token = strtok(NULL, " \t\r\n");
-            number = checkIfInRange(token, 0, N*N); /* TODO check if the upper bound is N*N */
+            number = checkIfInRange(token, 0, N * N); /* TODO check if the upper bound is N*N */
             if (number != -1) {
                 command->y = number;
-            }
-            else {
-                printErrorInRange(0, N*N);
+            } else {
+                printErrorInRange(0, N * N);
                 command->isValid = FALSE;
                 return;
             }
@@ -175,7 +169,8 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
         case SOLVE:
         case SAVE:
             token = strtok(NULL, " \t\r\n"); /* according to project instructions - can assume it is legal TODO */
-            command->fileName = (char *)malloc(strlen(token) + 1); /* allocate memory for fileName TODO free this memory */
+            command->fileName = (char *) malloc(
+                    strlen(token) + 1); /* allocate memory for fileName TODO free this memory */
             strcpy(command->fileName, token); /* copy string from token to fileName */
             command->isValid = TRUE;
             break;
@@ -193,8 +188,7 @@ void getParams(commandStruct *command, enum commandType typeOfCommand, char *cop
             number = checkIfZeroOrOne(token);
             if (number != -1) {
                 command->markError = number;
-            }
-            else {
+            } else {
                 printNotZeroOrOne();
                 command->isValid = FALSE;
                 return;
@@ -241,90 +235,77 @@ commandStruct *getCommandFromUser(gameParams *game) {
     if (strcmp(token, "set") == 0) {
         if (commandAvailable(SET, game->mode)) {
             command->type = SET;
-            getParams(command, SET, copyOfInput, game->N); /* getParams parses x,y and z and sets isValid tu TRUE if all are valid */
+            getParams(command, SET, copyOfInput,
+                      game->N); /* getParams parses x,y and z and sets isValid tu TRUE if all are valid */
         }
-    }
-    else if (strcmp(token, "hint") == 0) { /* hint command */
+    } else if (strcmp(token, "hint") == 0) { /* hint command */
         if (commandAvailable(HINT, game->mode)) {
             command->type = HINT;
             getParams(command, HINT, copyOfInput,
                       game->N); /* getParams parses x,y and sets isValid tu TRUE if all are valid */
         }
-    }
-    else if (strcmp(token, "validate") == 0) { /* validate command */
+    } else if (strcmp(token, "validate") == 0) { /* validate command */
         if (commandAvailable(VALIDATE, game->mode)) {
             command->type = VALIDATE;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "reset") == 0) { /* restart command */
+    } else if (strcmp(token, "reset") == 0) { /* restart command */
         if (commandAvailable(RESET, game->mode)) {
             command->type = RESET;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "exit") == 0) { /* exit command */
+    } else if (strcmp(token, "exit") == 0) { /* exit command */
         if (commandAvailable(EXIT, game->mode)) {
             command->type = EXIT;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "solve") == 0) { /* available modes : ALL */
+    } else if (strcmp(token, "solve") == 0) { /* available modes : ALL */
         if (commandAvailable(SOLVE, game->mode)) {
             command->type = SOLVE;
             getParams(command, SOLVE, copyOfInput, game->N);
         }
-    }
-    else if (strcmp(token, "edit") == 0) { /* available modes : ALL */
+    } else if (strcmp(token, "edit") == 0) { /* available modes : ALL */
         if (commandAvailable(EDIT, game->mode)) {
             command->type = EDIT;
             getParams(command, EDIT, copyOfInput, game->N);
         }
-    }
-    else if (strcmp(token, "mark_errors") == 0) { /* available modes: SOLVE */
+    } else if (strcmp(token, "mark_errors") == 0) { /* available modes: SOLVE */
         if (commandAvailable(MARK_ERRORS, game->mode)) {
             command->type = MARK_ERRORS;
             getParams(command, MARK_ERRORS, copyOfInput, game->N);
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "print_board") == 0) {
+    } else if (strcmp(token, "print_board") == 0) {
         if (commandAvailable(PRINT_BOARD, game->mode)) {
             command->type = PRINT_BOARD;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "generate") == 0) {
+    } else if (strcmp(token, "generate") == 0) {
         if (commandAvailable(GENERATE, game->mode)) {
             command->type = GENERATE;
             getParams(command, GENERATE, copyOfInput, game->N);
         }
-    }
-    else if (strcmp(token, "undo") == 0) {
+    } else if (strcmp(token, "undo") == 0) {
         if (commandAvailable(UNDO, game->mode)) {
             command->type = UNDO;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "redo") == 0) {
+    } else if (strcmp(token, "redo") == 0) {
         if (commandAvailable(REDO, game->mode)) {
             command->type = REDO;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "save") == 0) {
+    } else if (strcmp(token, "save") == 0) {
         if (commandAvailable(SAVE, game->mode)) {
             command->type = SAVE;
             getParams(command, SAVE, copyOfInput, game->N);
         }
-    }
-    else if (strcmp(token, "num_solutions") == 0) {
+    } else if (strcmp(token, "num_solutions") == 0) {
         if (commandAvailable(NUM_SOLS, game->mode)) {
             command->type = NUM_SOLS;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
-    }
-    else if (strcmp(token, "auto_fill") == 0) {
+    } else if (strcmp(token, "auto_fill") == 0) {
         if (commandAvailable(AUTO_FILL, game->mode)) {
             command->type = AUTO_FILL;
         }

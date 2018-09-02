@@ -261,8 +261,8 @@ int autoFill(gameParams *game) {
  * */
 int reset(gameParams *game) {
     //TODO: not tested
-    while (game->movesList->currentMove != game->movesList->head){
-        undoEnveloped(game,1);
+    while (game->movesList->currentMove != game->movesList->head) {
+        undoEnveloped(game, 1);
     }
 
     freeAllUserMoveNodes(game->movesList->head->next);
