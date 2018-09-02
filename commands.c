@@ -68,16 +68,55 @@ int validate(gameParams *game) {
     }
 }
 
+int randomlyFillXCells(gameParams *game, int x){
+    /* TODO implement */
+}
+
+/* Return TRUE (1) on success, FALSE (0) on failure */
+int randomlyFillXCellsAndSolve(gameParams *game, int x) {
+    int i, success;
+
+    for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
+        success = randomlyFillXCells(game, x); /* Works on game->userBoard */
+        if (!success) {
+            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
+            continue; /* Attempt failed - continue to next iteration */
+        }
+        /* TODO - Eran: I want the ILP to treat the X cells as fixed - should they all be marked as fixed? */
+        success = solveUsingILP(game); /* TODO - Eran this is a call to ILP! On success: game->solution holds the solution */
+        if (!success) {
+            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
+            continue; /* Attempt failed - continue to next iteration */
+        }
+        /* Getting here means solution holds a valid complete board */
+        break;
+    }
+    return ((success == TRUE) ? TRUE : FALSE);
+}
+
+void randomlyClearYCells(gameParams *game, int y) {
+    /* TODO - implement */
+}
+
 /* Pre:
  * Available in EDIT mode only
  * x, y are valid integers */
-int generate(gameParams *game) {
+int generate(gameParams *game, int x, int y) {
+    int succeeded;
 
     if (!boardIsEmpty(game)) {
         printf("Error: board is not empty\n");
         return FALSE;
     }
-
+    /* Try (at most) 1000 times to randomly fill X cells and solve the board: */
+    succeeded = randomlyFillXCellsAndSolve(game, x);
+    if (!succeeded) {
+        printf("Error: puzzle generator failed\n");
+        return  FALSE;
+    }
+    /* Randomly clear Y cells: */
+    randomlyClearYCells(game, y);
+    return TRUE;
 }
 
 /* preconditions: 1. called only on EDIT or SOLVE modes

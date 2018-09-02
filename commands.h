@@ -8,6 +8,8 @@
 #include "solver.h" /* gives access to solving functions */
 #include "input_output.h" /* gives access to edit, solve and save commands */
 
+#define MAX_NUMBER_OF_ATTEMPTS 1000
+
 /* prints the Sudoku board */
 void printBoard(gameParams *game);
 
@@ -23,7 +25,7 @@ int validate(gameParams *game);
 /* Pre:
  * Available in EDIT mode only
  * x, y are valid integers */
-int generate(gameParams *game);
+int generate(gameParams *game, int x, int y);
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
  * prints the number of solutions for the current board
