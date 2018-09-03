@@ -132,7 +132,6 @@ int checkIfValid(int x, int y, int z, gameParams *game) {
 
 }
 
-
 /* prints the changes after undo/redo */
 int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
     int curr, prev, tmp;
@@ -271,7 +270,6 @@ void setValue(gameParams *game, int x, int y, int z) {
     game->userBoard[x][y]->isFixed = 0;
 }
 
-
 /* Called by autoFill
  * returns the list of changes */
 cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
@@ -322,6 +320,7 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     game->movesList->currentMove->next = newMove;
     game->movesList->currentMove = newMove;
     game->movesList->size++;
+
 }
 
 

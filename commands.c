@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "commands.h"
+#include "memoryAllocation.h"
 
 
 /* prints the Sudoku board */

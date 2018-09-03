@@ -17,7 +17,7 @@ int freeGame(gameParams *game);
 void freeBoard(cell ***mat, int N);
 
 /* frees all the userMoveNode
- * starting from node to the end */
+ * starting from moveToFree to the end */
 void freeAllUserMoveNodes(userMoveNode *moveToFree);
 
 /* frees all the freeCellChangeRecNode
