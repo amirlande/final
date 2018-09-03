@@ -423,7 +423,7 @@ void cleanSudokuGame(gameParams *game) {
 gameParams *initSudokuGame() {
     gameParams *newGame;
 
-    newGame = (gameParams *)(malloc(sizeof(gameParams)));
+    newGame = (gameParams *) (malloc(sizeof(gameParams)));
     newGame->mode = INIT_MODE;
     newGame->markErrors = 1;
     newGame->m = 0;
@@ -435,10 +435,10 @@ gameParams *initSudokuGame() {
     newGame->movesList = allocateMoveList(); /* TODO - ask Eran how should be initialized here as well as in initializeSudokuGameFields */
 }
 
-void initializeSudokuGameFields(gameParams *game, int m, int n){
+void initializeSudokuGameFields(gameParams *game, int m, int n) {
     game->m = m;
     game->n = n;
-    game->N = m*n;
+    game->N = m * n;
     game->mode = INIT_MODE;
     game->markErrors = TRUE;
     game->counter = 0; /* TODO??? */
@@ -448,7 +448,9 @@ void initializeSudokuGameFields(gameParams *game, int m, int n){
 }
 
 
-/* TODO - this function may need changes - when is it used? */
+/* - this function may need changes - when is it used? */
+/* TODO : (AMIR) you can use your own implementation. pay attention to the logic. sets the head node. size == 0;
+
 /* gets a gameParams instance after one malloc */
 int createNewGame(gameParams *game, int n, int m) {
 // TODO : to be tested
@@ -484,8 +486,6 @@ int createNewGame(gameParams *game, int n, int m) {
 
 }
 
-
-
 /* the REAL undo.
  * enveloped by the func named "undo".
  * made this change for the reset func */
@@ -507,6 +507,7 @@ int undoEnveloped(gameParams *game, int isReset) {
     while (moveToUndo != NULL) {
         game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
         moveToUndo = moveToUndo->next;
+        game->counter--;
     }
 
     if (isReset == FALSE) {
@@ -548,10 +549,6 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
 void randomlyClearYCells(gameParams *game, int y) {
     /* TODO - implement */
 }
-
-
-
-
 
 
 #if 0

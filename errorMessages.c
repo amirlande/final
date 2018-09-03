@@ -4,6 +4,7 @@
 
 #include "errorMessages.h"
 
+
 /* serves as a "shouldn't get here" print function with function and module name */
 void printErrorInCodeFlow(char *functionName, char *moduleName) {
     printf("Error in code flow - shouldn't have got here\n"

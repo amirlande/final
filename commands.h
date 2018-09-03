@@ -4,9 +4,13 @@
 #ifndef FINAL_COMMANDS_H
 #define FINAL_COMMANDS_H
 
-#include "gameUtils.h" /* gives access to all struct definitions */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "gameUtils.h" /* gives access to all struct definitions */
 #include "input_output.h" /* gives access to edit, solve and save commands */
+#include "gurobi.h"
+#include "memoryAllocation.h"
 
 #define MAX_NUMBER_OF_ATTEMPTS 1000
 

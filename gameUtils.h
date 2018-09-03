@@ -4,7 +4,6 @@
 #ifndef FINAL_GAMEUTILS_H
 #define FINAL_GAMEUTILS_H
 
-#include "errorMessages.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "gameParams.h"

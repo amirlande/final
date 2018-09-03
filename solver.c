@@ -9,21 +9,21 @@
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function solves the board using ILP algorithm
  * returns TRUE (1) if solvable or FALSE (0) if unsolvable*/
-int solveUsingILP(gameParams *game, int commandNum) {
+int solveUsingILP(gameParams *game, ILPCommand cmd) {
 
     int **board, **sol, result;
     cell ***oldSol;
-    ILPCommand cmd;
 
     oldSol = game->solution;
     sol = allocateIntMatrix(game->N);
     board = fromCellMatToIntMat(game->userBoard, game->N);
-    cmd = (ILPCommand) commandNum;
     result = ILP(board, sol, game->n, game->m, cmd);
-    if (commandNum != 1) {
+    if (cmd != VALIDATE) {
         game->solution = fromIntMatToCellMat(sol, game->N);
         freeCellMatrix(oldSol, game->N);
     }
+
+    freeIntMatrix(sol, game->N);
     freeIntMatrix(board, game->N);
     return result;
 }
@@ -139,7 +139,6 @@ void countWithBacktracking(gameParams *partialGameParams, int *numOfSols) {
     }
     free(stack);
 }
-
 
 /* Precondition: board has no erroneous values (to be checked before calling this function).
  * This function returns the number of solutions for a given board using exhaustive backtracking,

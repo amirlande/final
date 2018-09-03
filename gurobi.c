@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "gurobi_c.h"
 #include "gameUtils.h"
 #include "memoryAllocation.h"
 
@@ -50,9 +49,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     /* Create environment */
     error = GRBloadenv(&env, "sudoku.log");
     if (error) {
-        //TODO : handle error
         printf("ERROR: %s\n", GRBgeterrormsg(env));
-        printf("error");
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
@@ -60,8 +58,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     error = GRBnewmodel(env, &model, "sudoku", N * N * N, NULL, lb, NULL,
                         vtype, NULL);
     if (error) {
-        //TODO : handle error
-        printf("error");
+        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
@@ -74,8 +72,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
             }
             error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
             if (error) {
-                //TODO : handle error
-                printf("ERROR %d 2 values for 1 cell GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                printf("ERROR %d GRBaddconstr1(): %s\n", error, GRBgeterrormsg(env));
+                freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
                 return result;
             }
         }
@@ -91,7 +89,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
                 val2[0] = 1;
                 error = GRBaddconstr(model, 1, ind2, val2, GRB_EQUAL, 1.0, NULL);
                 if (error) {
-                    printf("ERROR %d 4th GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                    printf("ERROR %d GRBaddconstr2(): %s\n", error, GRBgeterrormsg(env));
+                    freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
                     return result;
                 }
             }
@@ -133,8 +132,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
             error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
             if (error) {
-                //TODO : handle error
-                printf("error");
+                printf("ERROR %d GRBaddconstr3(): %s\n", error, GRBgeterrormsg(env));
+                freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
                 return result;
             }
         }
@@ -150,8 +149,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
             error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
             if (error) {
-                //TODO : handle error
-                printf("error");
+                printf("ERROR %d GRBaddconstr4(): %s\n", error, GRBgeterrormsg(env));
+                freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
                 return result;
             }
         }
@@ -175,8 +174,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
                 }
                 error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
                 if (error) {
-                    //TODO : handle error
-                    printf("error");
+                    printf("ERROR %d GRBaddconstr5(): %s\n", error, GRBgeterrormsg(env));
+                    freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
                     return result;
                 }
             }
@@ -186,39 +185,40 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     /* Optimize model */
     error = GRBoptimize(model);
     if (error) {
-        //TODO : handle error
-        printf("error 1\n");
+        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
     /* Write model to 'sudoku.lp' */
     error = GRBwrite(model, "sudoku.lp");
     if (error) {
-        //TODO : handle error
-        printf("error 2\n");
+        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
     /* Capture solution information */
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
     if (error) {
-        //TODO : handle error
-        printf("error 3\n");
+        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
     /* get the objective -- the optimal result of the function */
     error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     if (error) {
-        //TODO : handle error
-        printf("error 4\n");
+        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
     /* get the solution - the assignment to each variable */
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, N * N * N, sol);
     if (error) {
-        printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
+        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
@@ -230,10 +230,7 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         result = 1;
     }
 
-    /* Free model */
-    GRBfreemodel(model);
-    /* Free environment */
-    GRBfreeenv(env);
+    freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
 
     return result;
 }
@@ -279,4 +276,18 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     }
 
     return dst;
+}
+
+void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double *lb, char *vtype, GRBenv *env,
+             GRBmodel *model) {
+
+    free(sol);
+    free(ind);
+    free(ind2);
+    free(val);
+    free(val2);
+    free(lb);
+    free(vtype);
+    GRBfreemodel(model);
+    GRBfreeenv(env);
 }

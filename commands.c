@@ -2,11 +2,8 @@
 // Created by eran on 31/07/18.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "commands.h"
-#include "gurobi.h"
-#include "memoryAllocation.h"
 
 
 /* Starts a puzzle at SOLVE mode
@@ -228,6 +225,7 @@ int redo(gameParams *game) {
     while (moveToRedo != NULL) {
         game->userBoard[moveToRedo->x - 1][moveToRedo->y - 1] = moveToRedo->currVal;
         moveToRedo = moveToRedo->next;
+        game->counter++;
     }
 
     printBoard(game);
@@ -276,7 +274,8 @@ int hint(int x, int y, gameParams *game) {
         return FALSE;
     }
 
-    isSolvable = solveUsingILP(game ,3); /* returns boolean indication of solvability of board. solution is at game->solution */
+    isSolvable = solveUsingILP(game,
+                               3); /* returns boolean indication of solvability of board. solution is at game->solution */
     if (!isSolvable) {
         printf("Error: board is unsolvable\n");
         return FALSE;
@@ -336,7 +335,7 @@ int autoFill(gameParams *game) {
     }
 
     setNewChangeListToGame(game, changeListHead);
-
+    game->counter += numOfChanges;
     printBoard(game);
 
     return 1;

@@ -6,7 +6,6 @@
 #define FINAL_GAMEPARAMS_H
 
 #include <stdlib.h>
-#include "errorMessages.h"
 
 
 /* the struct that represents a cell in the Sudoku board
