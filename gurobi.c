@@ -97,31 +97,6 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         }
     }
 
-
-#if OLD
-    /* constrain that if cell had value != 0
-     * it will hold the same value */
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            if (board[i][j] != 0) {
-                for (v = 0; v < N; v++) {
-                    if (board[i][j] == v + 1) {
-                        ind[v] = i * N * N + j * N + v;
-                        val[v] = 1.0;
-                    }
-                }
-                error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
-                if (error) {
-                    //TODO : add free func
-                    printf("ERROR %d value should not change GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                    return result;
-                }
-            }
-        }
-    }
-
-#endif
-
     /* Each value must appear once in each row */
     for (v = 0; v < N; v++) {
         for (j = 0; j < N; j++) {

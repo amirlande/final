@@ -473,7 +473,7 @@ void initializeSudokuGameFields(gameParams *game, int m, int n) {
     game->N = m * n;
     game->mode = INIT_MODE;
     game->markErrors = TRUE;
-    game->counter = 0; /* TODO??? */
+    game->counter = 0;
     game->userBoard = allocateCellMatrix(game->N);
     game->solution = allocateCellMatrix(game->N);
     /* game->movesList = allocateMoveList(); no required since in cleanSudokuGame we don't free listOfMoves memory */
@@ -484,7 +484,7 @@ void initializeSudokuGameFields(gameParams *game, int m, int n) {
 
 /* gets a gameParams instance after one malloc */
 int createNewGame(gameParams *game, int n, int m) {
-// TODO : to be tested
+// TODO : wasn't tested
     game->n = n;
     game->m = m;
     game->N = m * n;
@@ -492,18 +492,22 @@ int createNewGame(gameParams *game, int n, int m) {
     game->counter = 0;
     game->mode = INIT_MODE;
 
-    /* TODO Amir changed the call to allocateCellMatrix */
+    /* TODO Amir changed the call to allocateCellMatrix -
+     *--- TODO  --   OK   --
+     * */
     game->userBoard = allocateCellMatrix(game->N);
     game->solution = allocateCellMatrix(game->N);
 
     game->movesList = (listOfMoves *) malloc(sizeof(listOfMoves));
     if (game->movesList == NULL) {
         printMallocFailed();
+        freeGame(game);
         exit(EXIT_FAILURE);
     }
     game->movesList->size = 0;
     game->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode));
     if (game->movesList->head == NULL) {
+        freeGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
@@ -512,9 +516,7 @@ int createNewGame(gameParams *game, int n, int m) {
     game->movesList->head->change = NULL;
     game->movesList->currentMove = game->movesList->head;
 
-
     return 1;
-
 }
 
 /* the REAL undo.

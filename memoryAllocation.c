@@ -132,7 +132,7 @@ void freeIntMatrix(int **mat, int n) {
 
 listOfMoves *allocateMoveList() {
     listOfMoves *list;
-    list = (listOfMoves *)malloc(sizeof(listOfMoves));
+    list = (listOfMoves *) malloc(sizeof(listOfMoves));
     if (list == NULL) {
         printMallocFailed();
         return NULL;
