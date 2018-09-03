@@ -8,35 +8,35 @@
 #include <string.h>
 #include "gurobi_c.h"
 #include "gameUtils.h"
+#include "memoryAllocation.h"
 
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
-int ILP(int **board, int **res, int n, int m) {
+int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
-
-    int N, error, i, j, v, ig, jg, count, *obj, *ind, optimstatus, tmp;
-    double *sol, *val, *lb, objval;
+    int N, error, i, j, v, ig, jg, count, *ind, *ind2, optimstatus, result;
+    double *sol, *val, *val2, *lb, objval;
     char *vtype;
     GRBenv *env;
     env = NULL;
-    char inputline[100];
     GRBmodel *model = NULL;
     N = n * m;
-    /* int **board = (int **) malloc(N * N * sizeof(int));*/
     sol = (double *) malloc(N * N * N * sizeof(double));
-    obj = (int *) malloc(N * N * N * sizeof(int));
     ind = (int *) malloc(N * sizeof(int));
+    ind2 = (int *) malloc(N * sizeof(int));
     val = (double *) malloc(N * sizeof(double));
+    val2 = (double *) malloc(N * sizeof(double));
     lb = (double *) malloc(N * N * N * sizeof(double));
     vtype = (char *) malloc(N * N * N * sizeof(char));
 
+
+    result = 0;
 
     /* Create an empty model */
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
             for (v = 0; v < N; v++) {
-                //TODO : check if v+1 is the correct way
                 if (board[i][j] == v + 1)
                     lb[i * N * N + j * N + v] = 1;
                 else
@@ -48,28 +48,22 @@ int ILP(int **board, int **res, int n, int m) {
     }
 
     /* Create environment */
-
     error = GRBloadenv(&env, "sudoku.log");
     if (error) {
         //TODO : handle error
         printf("ERROR: %s\n", GRBgeterrormsg(env));
         printf("error");
-        return 0;
+        return result;
     }
 
     /* Create new model */
-
     error = GRBnewmodel(env, &model, "sudoku", N * N * N, NULL, lb, NULL,
                         vtype, NULL);
     if (error) {
         //TODO : handle error
         printf("error");
-        return 0;
+        return result;
     }
-
-
-
-
 
     /* Each cell gets a value */
     for (i = 0; i < N; i++) {
@@ -82,30 +76,46 @@ int ILP(int **board, int **res, int n, int m) {
             if (error) {
                 //TODO : handle error
                 printf("ERROR %d 2 values for 1 cell GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                return 0;
+                return result;
             }
         }
     }
 
 
-#if 0
-
     /* constrain that if cell had value != 0
      * it will hold the same value */
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
-            tmp = board[i][j];
-            if (tmp != 0) {
+            if (board[i][j] != 0) {
+                ind2[0] = i * N * N + j * N + (board[i][j] - 1);
+                val2[0] = 1;
+                error = GRBaddconstr(model, 1, ind2, val2, GRB_EQUAL, 1.0, NULL);
+                if (error) {
+                    printf("ERROR %d 4th GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                    return result;
+                }
+            }
+        }
+    }
+
+
+#if OLD
+    /* constrain that if cell had value != 0
+     * it will hold the same value */
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            if (board[i][j] != 0) {
                 for (v = 0; v < N; v++) {
-                    if (tmp == v + 1) {
+                    if (board[i][j] == v + 1) {
                         ind[v] = i * N * N + j * N + v;
                         val[v] = 1.0;
                     }
                 }
                 error = GRBaddconstr(model, N, ind, val, GRB_EQUAL, 1.0, NULL);
                 if (error) {
+                    //TODO : add free func
                     printf("ERROR %d value should not change GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                    return 0;
+                    return result;
                 }
             }
         }
@@ -114,7 +124,6 @@ int ILP(int **board, int **res, int n, int m) {
 #endif
 
     /* Each value must appear once in each row */
-
     for (v = 0; v < N; v++) {
         for (j = 0; j < N; j++) {
             for (i = 0; i < N; i++) {
@@ -126,13 +135,12 @@ int ILP(int **board, int **res, int n, int m) {
             if (error) {
                 //TODO : handle error
                 printf("error");
-                return 0;
+                return result;
             }
         }
     }
 
     /* Each value must appear once in each column */
-
     for (v = 0; v < N; v++) {
         for (i = 0; i < N; i++) {
             for (j = 0; j < N; j++) {
@@ -144,24 +152,19 @@ int ILP(int **board, int **res, int n, int m) {
             if (error) {
                 //TODO : handle error
                 printf("error");
-                return 0;
+                return result;
             }
         }
     }
 
     /* Each value must appear once in each subgrid */
-
     for (v = 0; v < N; v++) {
-
         // defines what block are we at
         for (ig = 0; ig < n; ig++) {
             // number of blocks vertically (rows)
-
             for (jg = 0; jg < m; jg++) {
                 // number of block horizontally (cols)
-
                 count = 0;
-
                 // iterates over the cells in that block
                 for (i = ig * m; i < (ig + 1) * m; i++) {
                     for (j = jg * n; j < (jg + 1) * n; j++) {
@@ -174,35 +177,34 @@ int ILP(int **board, int **res, int n, int m) {
                 if (error) {
                     //TODO : handle error
                     printf("error");
-                    return 0;
+                    return result;
                 }
             }
         }
     }
 
     /* Optimize model */
-
     error = GRBoptimize(model);
     if (error) {
         //TODO : handle error
         printf("error 1\n");
-        return 0;
+        return result;
     }
-    /* Write model to 'sudoku.lp' */
 
+    /* Write model to 'sudoku.lp' */
     error = GRBwrite(model, "sudoku.lp");
     if (error) {
         //TODO : handle error
         printf("error 2\n");
-        return 0;
+        return result;
     }
-    /* Capture solution information */
 
+    /* Capture solution information */
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
     if (error) {
         //TODO : handle error
         printf("error 3\n");
-        return 0;
+        return result;
     }
 
     /* get the objective -- the optimal result of the function */
@@ -210,29 +212,30 @@ int ILP(int **board, int **res, int n, int m) {
     if (error) {
         //TODO : handle error
         printf("error 4\n");
-        return 0;
+        return result;
     }
 
     /* get the solution - the assignment to each variable */
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, N * N * N, sol);
     if (error) {
         printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return result;
     }
 
-
+    /* board is solved */
     if (optimstatus == GRB_OPTIMAL) {
-        updateSolved(sol, res, N);
+        if (command != VALIDATE) {
+            updateSolved(sol, res, N);
+        }
+        result = 1;
     }
-
 
     /* Free model */
     GRBfreemodel(model);
-
     /* Free environment */
     GRBfreeenv(env);
 
-    return 0;
+    return result;
 }
 
 

@@ -3,13 +3,29 @@
 //
 
 #include "solver.h"
+#include "memoryAllocation.h"
 
 
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function solves the board using ILP algorithm
  * returns TRUE (1) if solvable or FALSE (0) if unsolvable*/
-int solveUsingILP(gameParams *game) {
-    /* to be implemented */
+int solveUsingILP(gameParams *game, int commandNum) {
+
+    int **board, **sol, result;
+    cell ***oldSol;
+    ILPCommand cmd;
+
+    oldSol = game->solution;
+    sol = allocateIntMatrix(game->N);
+    board = fromCellMatToIntMat(game->userBoard, game->N);
+    cmd = (ILPCommand) commandNum;
+    result = ILP(board, sol, game->n, game->m, cmd);
+    if (commandNum != 1) {
+        game->solution = fromIntMatToCellMat(sol, game->N);
+        freeCellMatrix(oldSol, game->N);
+    }
+    freeIntMatrix(board, game->N);
+    return result;
 }
 
 /* This function is for module-internal use only.

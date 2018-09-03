@@ -485,6 +485,75 @@ int createNewGame(gameParams *game, int n, int m) {
 }
 
 
+
+/* the REAL undo.
+ * enveloped by the func named "undo".
+ * made this change for the reset func */
+int undoEnveloped(gameParams *game, int isReset) {
+
+    cellChangeRecNode *moveToUndo, *moveToPrint;
+
+    if (game->movesList->size == 0) {
+        printf("Error: no moves to undo\n");
+        return 0;
+    }
+
+    moveToUndo = game->movesList->currentMove->change;
+    moveToPrint = moveToUndo;
+    game->movesList->currentMove = game->movesList->currentMove->prev;
+    game->movesList->size--;
+
+
+    while (moveToUndo != NULL) {
+        game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
+        moveToUndo = moveToUndo->next;
+    }
+
+    if (isReset == FALSE) {
+        /* not printing anything on reset */
+        printBoard(game);
+        printChanges(game, moveToPrint, 0);
+    }
+
+    return 1;
+}
+
+int randomlyFillXCells(gameParams *game, int x) {
+    /* TODO implement */
+}
+
+/* Return TRUE (1) on success, FALSE (0) on failure */
+int randomlyFillXCellsAndSolve(gameParams *game, int x) {
+    int i, success;
+    for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
+        success = randomlyFillXCells(game, x); /* Works on game->userBoard */
+        if (!success) {
+            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
+            continue; /* Attempt failed - continue to next iteration */
+        }
+        /*- Eran: I want the ILP to treat the X cells as fixed - should they all be marked as fixed? */
+        /* TODO: Answer - IT'S YOURS MAMI */
+
+        success = solveUsingILP(game, 2);   /* On success: game->solution holds the solution */
+        if (!success) {
+            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
+            continue; /* Attempt failed - continue to next iteration */
+        }
+        /* Getting here means solution holds a valid complete board */
+        break;
+    }
+    return ((success == TRUE) ? TRUE : FALSE);
+}
+
+void randomlyClearYCells(gameParams *game, int y) {
+    /* TODO - implement */
+}
+
+
+
+
+
+
 #if 0
 /* Called by undo
  * implemented recursively for printing in thr right order:

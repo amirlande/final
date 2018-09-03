@@ -117,3 +117,13 @@ int **allocateIntMatrix(int N) {
 
     return mat;
 }
+
+
+/* Frees memory allocated for matrix mat of size n*/
+void freeIntMatrix(int **mat, int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        free(mat[i]);
+    }
+    free(mat);
+}

@@ -6,8 +6,8 @@
 #ifndef FINAL_SOLVER_H
 #define FINAL_SOLVER_H
 
-#include "gameUtils.h"
 #include "Stack.h"
+#include "gurobi.h"
 #include "errorMessages.h"
 #include <stdio.h>
 /* gives access to all struct definitions and utility functions
@@ -18,7 +18,7 @@
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function solves the board using ILP algorithm
  * returns TRUE (1) if solvable or FALSE (0) if unsolvable*/
-int solveUsingILP(gameParams *game);
+int solveUsingILP(gameParams *game, int commandNum) ;
 
 
 /* precondition: board has no erroneous values (to be checked before calling this function)
