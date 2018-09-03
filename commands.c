@@ -99,6 +99,8 @@ void printBoard(gameParams *game) {
     }
     printf("%s\n", separatorRow);
 
+    free(separatorRow);
+
 }
 
 /* Sets new value Z for cell X Y
@@ -159,7 +161,7 @@ int validate(gameParams *game) {
         return FALSE; /* returns 0 */
     }
     /* getting here means all cells aren't erroneous - need to check if solvable */
-    if (solveUsingILP(game, 1) == FALSE) {
+    if (solveUsingILP(game, VALIDATE) == FALSE) {
         printf("Validation failed: board is unsolvable\n");
         return FALSE; /* returns 0 */
     } else {
@@ -275,7 +277,7 @@ int hint(int x, int y, gameParams *game) {
     }
 
     isSolvable = solveUsingILP(game,
-                               3); /* returns boolean indication of solvability of board. solution is at game->solution */
+                               HINT); /* returns boolean indication of solvability of board. solution is at game->solution */
     if (!isSolvable) {
         printf("Error: board is unsolvable\n");
         return FALSE;

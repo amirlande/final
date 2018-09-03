@@ -74,7 +74,8 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
  * cell->isValid = TRUE (1)
  * cell-isFixed = FALSE (0)*/
 cell ***allocateCellMatrix(int N) {
-    /* TODO Eran - we need to change this function (a bit) after you agree with me */
+    /*  we need to change this function (a bit) after you agree with me */
+    /* TODO: ok (?) */
 
     int i, j;
     cell ***mat;

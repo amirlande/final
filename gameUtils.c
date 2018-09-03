@@ -75,22 +75,21 @@ BOARD*copyBoard(cell ***board_to_be_copied, int N) {
  * exits with exit(0) if failed to malloc */
 char *getLineSeparator(gameParams *game) {
     char *separator;
-    int N, n, m, i;
-    n = game->n;
+    int N, m, i;
     m = game->m;
-    N = m * n;
+    N = game->N;
 
     separator = malloc(sizeof(char) * (4 * N + m + 1));
     if (separator == NULL) {
-        printf("Error: malloc has failed\n");
-        exit(0);
+        freeGame(game);
+        printMallocFailed();
+        exit(EXIT_FAILURE);
     }
 
     for (i = 0; i < 4 * N + m + 1; i++) {
         separator[i] = '-';
     }
     separator[i] = '\0';
-
 
     return separator;
 }
@@ -164,11 +163,26 @@ void getNewCurrentMove(gameParams *game) {
     freeAllUserMoveNodes(game->movesList->currentMove->next);
     userMoveNode *newPrev = game->movesList->currentMove;
     userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    if (newCurr == NULL) {
+        freeGame(game);
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
     newPrev->next = newCurr;
     newCurr->prev = newPrev;
     newCurr->next = NULL;
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+    if (newCurr->change == NULL) {
+        freeGame(game);
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
     newCurr->change->currVal = (cell *) malloc(sizeof(cell *));
+    if (newCurr->change->currVal == NULL) {
+        freeGame(game);
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
     newCurr->change->next = NULL;
     game->movesList->currentMove = newCurr;
     game->movesList->size++;
@@ -335,6 +349,7 @@ void setValue(gameParams *game, int x, int y, int z) {
 /* Called by autoFill
  * returns the list of changes */
 cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
+
     int i, j, N, legalValue, changes;
     cellChangeRecNode *changeListHead, *currentChange;
     currentChange = NULL;
@@ -347,14 +362,29 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
             if (legalValue != FALSE) {
                 if (changes == 0) {
                     /* keep the first node */
-                    changeListHead = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+                    changeListHead = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
+                    if (changeListHead == NULL) {
+                        freeGame(game);
+                        printMallocFailed();
+                        exit(EXIT_FAILURE);
+                    }
                     currentChange = changeListHead;
                 } else {
-                    currentChange->next = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+                    currentChange->next = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
+                    if (currentChange->next == NULL) {
+                        freeGame(game);
+                        printMallocFailed();
+                        exit(EXIT_FAILURE);
+                    }
                     currentChange = currentChange->next;
                 }
                 currentChange->prevVal = game->userBoard[i][j];
-                game->userBoard[i][j] = (cell *) malloc(sizeof(cell *));
+                game->userBoard[i][j] = (cell *) malloc(sizeof(cell));
+                if (game->userBoard[i][j] == NULL) {
+                    freeGame(game);
+                    printMallocFailed();
+                    exit(EXIT_FAILURE);
+                }
                 setValue(game, i, j, legalValue);
                 currentChange->currVal = game->userBoard[i][j];
                 currentChange->x = i + 1;
@@ -376,6 +406,11 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     userMoveNode *newMove;
     freeAllUserMoveNodes(game->movesList->currentMove->next);
     newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    if (newMove == NULL) {
+        freeGame(game);
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
     newMove->prev = game->movesList->currentMove;
     newMove->next = NULL;
     newMove->change = changeListHead;
@@ -535,7 +570,7 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
         /*- Eran: I want the ILP to treat the X cells as fixed - should they all be marked as fixed? */
         /* TODO: Answer - IT'S YOURS MAMI */
 
-        success = solveUsingILP(game, 2);   /* On success: game->solution holds the solution */
+        success = solveUsingILP(game, GENERATE);   /* On success: game->solution holds the solution */
         if (!success) {
             cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
             continue; /* Attempt failed - continue to next iteration */

@@ -32,6 +32,6 @@ cell ***allocateCellMatrix(int N);
 int **allocateIntMatrix(int N);
 
 /* Frees memory allocated for matrix mat of size n*/
-void freeIntMatrix(int **mat, int n) ;
+void freeIntMatrix(int **mat, int n);
 
 #endif //FINAL_MEMORYALLOCATION_H
