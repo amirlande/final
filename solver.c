@@ -153,7 +153,7 @@ int countSolutions(gameParams *game) {
     countWithBacktracking(partialGameParams, &numOfSols);
 
     /* Free memory and return: */
-    freeGame(partialGameParams);
+    freeSudokuGame(partialGameParams);
     return numOfSols;
 }
 

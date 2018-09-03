@@ -6,6 +6,7 @@
 #define FINAL_ERRORMESSAGES_H
 
 #include <stdio.h>
+#include "gameParams.h"
 
 /* serves as a "shouldn't get here" print function with function and module name */
 void printErrorInCodeFlow(char *functionName, char *moduleName);
@@ -14,5 +15,6 @@ void printNotImplementedMessage(char *nameOfFunction);
 
 void printMallocFailed();
 
+void printErrorOpeningFile(enum gameMode mode);
 
 #endif //FINAL_ERRORMESSAGES_H
