@@ -25,16 +25,17 @@ int saveGameParamsToFile(gameParams *game, FILE *destFile, enum gameMode mode) {
     return TRUE;
 
 }
+
 /* Should explicitly update all game fields! */
-int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mode){
+int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mode) {
     int row, col, m, n, N;
     int c;
 
     /* Get new parameters for gameParams fields: */
     /* First get m, n (ignoring white spaces) */
-    while(isspace(c = fgetc(destFile))) {}
+    while (isspace(c = fgetc(destFile))) {}
     m = c - '0';
-    while(isspace(c = fgetc(destFile))) {}
+    while (isspace(c = fgetc(destFile))) {}
     n = c - '0';
     N = n * m;
 
@@ -54,6 +55,5 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
     game->markErrors = TRUE;
 
 
-
-   return TRUE;
+    return TRUE;
 }

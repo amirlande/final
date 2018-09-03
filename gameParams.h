@@ -36,8 +36,6 @@ typedef struct cellChangeRecNode {
 } cellChangeRecNode;
 
 
-
-
 /* a node of the doubly linked list listOfMoves
  * each node's "data" is a pointer to a cellChangeRecNode
  * (which is the first node of a linked list of cellChangeRecNode) */
@@ -74,22 +72,6 @@ typedef struct gameParams {
 
 
 
-
-
-listOfMoves *allocateMoveList();
-
-/* Allocates memory to new nodes
- * sets the curr and prev pointers
- * -- no data is added -- */
-void getNewCurrentMove(gameParams *game);
-
-/* frees all the userMoveNode
- * starting from node to the end */
-void freeAllUserMoveNodes(userMoveNode *moveToFree);
-
-/* frees all the freeCellChangeRecNode
- * starting from change to the end */
-void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
 
 
 #endif //FINAL_GAMEPARAMS_H

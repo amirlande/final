@@ -48,7 +48,7 @@ void freeCellMatrix(cell ***mat, int N);
 
 /* TODO - this function may need changes - when is it used? */
 /* gets a gameParams instance after one malloc */
-int createNewGame(gameParams *game, int n, int m) ;
+int createNewGame(gameParams *game, int n, int m);
 
 
 /* preconditions:
@@ -125,6 +125,13 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x);
 void randomlyClearYCells(gameParams *game, int y);
 
 
+
+
+
+/* Allocates memory to new nodes
+ * sets the curr and prev pointers
+ * -- no data is added -- */
+void getNewCurrentMove(gameParams *game);
 
 
 

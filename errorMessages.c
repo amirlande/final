@@ -11,22 +11,20 @@ void printErrorInCodeFlow(char *functionName, char *moduleName) {
            "Location: %s function at %s module\n");
 }
 
-void printNotImplementedMessage(char *nameOfFunction){
+void printNotImplementedMessage(char *nameOfFunction) {
     printf("%s function hasn't been implemented yet!\n", nameOfFunction);
 }
 
-void printMallocFailed(){
+void printMallocFailed() {
     printf("Error: malloc has failed\n");
 }
 
 void printErrorOpeningFile(enum gameMode mode) {
     if (mode == SOLVE_MODE) {
         printf("Error: File doesn't exist or cannot be opened\n");
-    }
-    else if (mode == EDIT_MODE) {
+    } else if (mode == EDIT_MODE) {
         printf("Error: File cannot be opened\n");
-    }
-    else {
+    } else {
         printErrorInCodeFlow("printErrorOpeningFile", "input_output.c");
     }
 }

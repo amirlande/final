@@ -31,7 +31,7 @@ enum commandType {
 
 /* definition of a struct used to represent a command
  * it holds type of command, arguments and indication of validity */
-typedef struct commandStruct{
+typedef struct commandStruct {
     int isValid;
     enum commandType type;
     int x;

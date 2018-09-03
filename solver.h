@@ -18,7 +18,7 @@
 /* precondition: board has no erroneous values (to be checked before calling this function)
  * the function solves the board using ILP algorithm
  * returns TRUE (1) if solvable or FALSE (0) if unsolvable*/
-int solveUsingILP(gameParams *game, ILPCommand cmd) ;
+int solveUsingILP(gameParams *game, ILPCommand cmd);
 
 
 /* precondition: board has no erroneous values (to be checked before calling this function)

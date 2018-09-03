@@ -128,3 +128,14 @@ void freeIntMatrix(int **mat, int n) {
     }
     free(mat);
 }
+
+
+listOfMoves *allocateMoveList() {
+    listOfMoves *list;
+    list = (listOfMoves *)malloc(sizeof(listOfMoves));
+    if (list == NULL) {
+        printMallocFailed();
+        return NULL;
+    }
+    return list;
+}

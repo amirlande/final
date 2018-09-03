@@ -8,28 +8,28 @@
 /* TODO main module should eventually just include mainAux.h and use its playTurn function (as an interface to the parser)
  * */
 
- void playSudoku() {
-     gameParams *game;
-     int continueGame;
+void playSudoku() {
+    gameParams *game;
+    int continueGame;
 
-     printf("Sudoku\n------\n");
-     fflush(stdout); /* TODO check on fflush*/
-     game = initSudokuGame();
+    printf("Sudoku\n------\n");
+    fflush(stdout); /* TODO check on fflush*/
+    game = initSudokuGame();
 
-     continueGame = TRUE;
-     while(continueGame) {
-         continueGame = playTurn(game); /* playTurn returns TRUE (1) on all commands except EXIT */
-     }
+    continueGame = TRUE;
+    while (continueGame) {
+        continueGame = playTurn(game); /* playTurn returns TRUE (1) on all commands except EXIT */
+    }
 
-     freeSudokuGame(game);
- }
+    freeSudokuGame(game);
+}
 
- int main() {
+int main() {
     /* Set srand and seed stuff and call play() */
 
-     playSudoku();
-     return  1;
- }
+    playSudoku();
+    return 1;
+}
 
 
 #ifdef OLDMAIN

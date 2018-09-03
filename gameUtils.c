@@ -69,7 +69,6 @@ BOARD*copyBoard(cell ***board_to_be_copied, int N) {
     return pointerToBoard;
 }
 
-
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
  * exits with exit(0) if failed to malloc */
@@ -107,7 +106,6 @@ cell *createCell(int value) {
     return newCell;
 }
 
-
 /* Allocates memory for cell matrix mat with NxN values
  * This call allocated memory for all cells, and it initializes each cell's fields to:
  * cell->value = 0
@@ -135,7 +133,6 @@ cell ***allocateCellMatrix(int N) {
     }
     return mat;
 }
-
 
 /* Frees all memory allocated to the given board
  * (This is the complementary free function of allocateCellMatrix */
@@ -481,7 +478,6 @@ void initializeSudokuGameFields(gameParams *game, int m, int n) {
     game->solution = allocateCellMatrix(game->N);
     /* game->movesList = allocateMoveList(); no required since in cleanSudokuGame we don't free listOfMoves memory */
 }
-
 
 /* - this function may need changes - when is it used? */
 /* TODO : (AMIR) you can use your own implementation. pay attention to the logic. sets the head node. size == 0;
