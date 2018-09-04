@@ -86,4 +86,10 @@ void setToEmpty(int **matrix, int N);
 
 void markFullCellsAsFixed(cell ***board, int N);
 
+
+/* Iterates over each cell
+ * and check if it is valid
+ * or erroneous */
+void updateErrors(gameParams *game);
+
 #endif //FINAL_GAMEUTILS_H
