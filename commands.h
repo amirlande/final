@@ -4,34 +4,39 @@
 #ifndef FINAL_COMMANDS_H
 #define FINAL_COMMANDS_H
 
+
+#include <stdio.h>
+#include <stdlib.h>
 #include "gameUtils.h" /* gives access to all struct definitions */
-#include "solver.h" /* gives access to solving functions */
 #include "input_output.h" /* gives access to edit, solve and save commands */
+#include "gurobi.h"
+#include "memoryAllocation.h"
 
 #define MAX_NUMBER_OF_ATTEMPTS 1000
 
-/* prints the Sudoku board */
-void printBoard(gameParams *game);
+
+/* Starts a puzzle at SOLVE mode
+ * Pre:
+ * game is at SOLVE, EDIT or INIT mode (available in all modes)
+ * If the file exists - it is contains valid data ans is well formatted
+ * filePath is a well-formatted file path (not NULL)
+ *
+ * Post:
+ * If file does not exist or cannot be opened - print error
+ * If file exists - starts puzzle in solve mode
+ * All fields of game struct are updated according to new board (loaded from file)
+*/
+int solve(gameParams *game, char *filePath);
+
+
+int edit(gameParams *game, char *filePath);
 
 /* preconditions: 1. called only in SOLVE mode 2. X is either 0 or 1
  * (preconditions should be verified in parser module) */
 void mark_errors(gameParams *game, int X);
 
-/* preconditions: 1. called only on EDIT or SOLVE modes
- * the function first checks whether there are erroneous values
- * if no erroneous cells where found - uses ILP to determine whether the board is solvable */
-int validate(gameParams *game);
-
-/* Pre:
- * Available in EDIT mode only
- * x, y are valid integers */
-int generate(gameParams *game, int x, int y);
-
-/* preconditions: 1. called only on EDIT or SOLVE modes
- * prints the number of solutions for the current board
- * the function first checks whether there are erroneous values
- * if no erroneous cells where found - counts the number of possible solutions */
-int numSolutions(gameParams *game);
+/* prints the Sudoku board */
+void printBoard(gameParams *game);
 
 /* Sets new value Z for cell X Y
  *
@@ -44,14 +49,15 @@ int numSolutions(gameParams *game);
  * lists and nodes are updated properly */
 int set(int x, int y, int z, gameParams *game);
 
-int hint(int x, int y, gameParams *game);
+/* Preconditions: 1. called only on EDIT or SOLVE modes
+ * the function first checks whether there are erroneous values
+ * if no erroneous cells where found - uses ILP to determine whether the board is solvable */
+int validate(gameParams *game);
 
-/* Automatically fill "obvious" values
- * cells which contain a single legal value
- *
- * Pre:
- * game is at Solve mode */
-int autoFill(gameParams *game);
+/* Pre:
+ * Available in EDIT mode only
+ * x, y are valid integers */
+int generate(gameParams *game, int x, int y);
 
 /* Pre:
  * command is valid
@@ -63,11 +69,6 @@ int autoFill(gameParams *game);
 int undo(gameParams *game);
 
 
-/* the REAL undo.
- * enveloped by the func named "undo".
- * made this change for the reset func */
-int undoEnveloped(gameParams *game, int isReset);
-
 /* Pre:
  * command is valid
  * game is at edit or solve mode
@@ -77,21 +78,22 @@ int undoEnveloped(gameParams *game, int isReset);
  * lists and nodes are updated properly */
 int redo(gameParams *game);
 
-/* Starts a puzzle at SOLVE mode
- * Pre:
- * game is at SOLVE, EDIT or INIT mode (available in all modes)
- * If the file exists - it is contains valid data ans is well formatted
- *
- * Post:
- * If file does not exist or cannot be opened - print error
- * If file exists - starts puzzle in solve mode
-*/
-int solve(gameParams *game, char *filePath);
-
-
-int edit(gameParams *game, char *filePath);
-
 int save(gameParams *game, char *filePath);
+
+int hint(int x, int y, gameParams *game);
+
+/* preconditions: 1. called only on EDIT or SOLVE modes
+ * prints the number of solutions for the current board
+ * the function first checks whether there are erroneous values
+ * if no erroneous cells were found - counts the number of possible solutions */
+int numSolutions(gameParams *game);
+
+/* Automatically fill "obvious" values
+ * cells which contain a single legal value
+ *
+ * Pre:
+ * game is at Solve mode */
+int autoFill(gameParams *game);
 
 /* resets all moves
  *
@@ -104,8 +106,8 @@ int save(gameParams *game, char *filePath);
  * */
 int reset(gameParams *game);
 
-
 /* Exits the game */
 void exitGame(gameParams *game);
+
 
 #endif //FINAL_COMMANDS_H

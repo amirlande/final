@@ -2,10 +2,68 @@
 // Created by eran on 31/07/18.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "commands.h"
 
+
+/* Starts a puzzle at SOLVE mode
+ * Pre:
+ * game is at SOLVE, EDIT or INIT mode (available in all modes)
+ * If the file exists - it is contains valid data ans is well formatted
+ * filePath is a well-formatted file path (not NULL)
+ *
+ * Post:
+ * If file does not exist or cannot be opened - print error
+ * If file exists - starts puzzle in solve mode
+ * All fields of game struct are updated according to new board (loaded from file)
+*/
+int solve(gameParams *game, char *filePath) {
+    FILE *file;
+
+    /* Try to open file */
+    file = fopen(filePath, "r");
+    if (file == NULL) {
+        printErrorOpeningFile(SOLVE_MODE); /* Prints the required error message according to mode */
+        return FALSE;
+    }
+    /* File successfully opened - get rid of old fields (including memory allocation) */
+    cleanSudokuGame(game);
+    /* Load new fields from file */
+    loadGameParamsFromFile(game, file, SOLVE_MODE);
+    /* At this point game should hold the new parameters of the loaded board */
+    fclose(file);
+    return TRUE;
+}
+
+
+int edit(gameParams *game, char *filePath) {
+    FILE *file;
+
+    if (filePath == NULL) { /* no path was provided by user - enter EDIT mode with an empty 9x9 board */
+        cleanSudokuGame(game);
+        initializeSudokuGameFields(game, 3, 3);
+        return TRUE;
+    }
+
+    file = fopen(filePath, "r");
+    if (file == NULL) {
+        printErrorOpeningFile(EDIT_MODE); /* Prints the required error message according to mode */
+        return FALSE;
+    }
+    /* File successfully opened - get rid of old fields (including memory allocation) */
+    cleanSudokuGame(game);
+    /* Load new fields from file */
+    loadGameParamsFromFile(game, file, EDIT_MODE);
+    /* At this point game should hold the new parameters of the loaded board */
+    fclose(file);
+    return TRUE;
+}
+
+/* preconditions: 1. called only in SOLVE mode 2. X is either 0 or 1
+ * (preconditions should be verified in parser module) */
+void mark_errors(gameParams *game, int X) {
+    game->markErrors = X;
+}
 
 /* prints the Sudoku board */
 void printBoard(gameParams *game) {
@@ -41,110 +99,9 @@ void printBoard(gameParams *game) {
     }
     printf("%s\n", separatorRow);
 
+    free(separatorRow);
+
 }
-
-/* preconditions: 1. called only in SOLVE mode 2. X is either 0 or 1
- * (preconditions should be verified in parser module) */
-void mark_errors(gameParams *game, int X) {
-    game->markErrors = X;
-}
-
-/* Preconditions: 1. called only on EDIT or SOLVE modes
- * the function first checks whether there are erroneous values
- * if no erroneous cells where found - uses ILP to determine whether the board is solvable */
-int validate(gameParams *game) {
-    if (hasErrCells(game) == TRUE) {
-        printf("Error: board contains erroneous values\n");
-        return FALSE; /* returns 0 */
-    }
-    /* getting here means all cells aren't erroneous - need to check if solvable */
-    if (solveUsingILP(game) == FALSE) { /* TODO Eran sim <3: solveUsingILP should return a boolean indication
- * TODO if the board is solvable. If it is - game->solution should hold the ILP solution*/
-        printf("Validation failed: board is unsolvable\n");
-        return FALSE; /* returns 0 */
-    } else {
-        printf("Validation passed: board is solvable\n");
-        return TRUE; /* returns 1 */
-    }
-}
-
-int randomlyFillXCells(gameParams *game, int x){
-    /* TODO implement */
-}
-
-/* Return TRUE (1) on success, FALSE (0) on failure */
-int randomlyFillXCellsAndSolve(gameParams *game, int x) {
-    int i, success;
-
-    for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
-        success = randomlyFillXCells(game, x); /* Works on game->userBoard */
-        if (!success) {
-            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
-            continue; /* Attempt failed - continue to next iteration */
-        }
-        /* TODO - Eran: I want the ILP to treat the X cells as fixed - should they all be marked as fixed? */
-        success = solveUsingILP(game); /* TODO - Eran this is a call to ILP! On success: game->solution holds the solution */
-        if (!success) {
-            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
-            continue; /* Attempt failed - continue to next iteration */
-        }
-        /* Getting here means solution holds a valid complete board */
-        break;
-    }
-    return ((success == TRUE) ? TRUE : FALSE);
-}
-
-void randomlyClearYCells(gameParams *game, int y) {
-    /* TODO - implement */
-}
-
-/* Pre:
- * Available in EDIT mode only
- * x, y are valid integers */
-int generate(gameParams *game, int x, int y) {
-    int succeeded;
-
-    if (!boardIsEmpty(game)) {
-        printf("Error: board is not empty\n");
-        return FALSE;
-    }
-    /* Try (at most) 1000 times to randomly fill X cells and solve the board: */
-    succeeded = randomlyFillXCellsAndSolve(game, x);
-    if (!succeeded) {
-        printf("Error: puzzle generator failed\n");
-        return  FALSE;
-    }
-    /* Randomly clear Y cells: */
-    randomlyClearYCells(game, y);
-    return TRUE;
-}
-
-/* preconditions: 1. called only on EDIT or SOLVE modes
- * prints the number of solutions for the current board
- * the function first checks whether there are erroneous values
- * if no erroneous cells were found - counts the number of possible solutions */
-int numSolutions(gameParams *game) {
-    int num_of_sols;
-
-    if (hasErrCells(game) == TRUE) {
-        printf("Error: board contains erroneous values\n");
-        return FALSE; /* returns 0 */
-    }
-    /* getting here means all cells are *not* erroneous - count number of solutions */
-    num_of_sols = countSolutions(game);
-    printf("Number of solutions: %d\n", num_of_sols);
-
-    if (num_of_sols == 1) {
-        printf("This is a good board!\n");
-        return TRUE;
-    } else if (num_of_sols > 1) {
-        printf("The puzzle has more than 1 solution, try to edit it further\n");
-        return TRUE;
-    }
-    /* gets here in case num_of_sols == 0, board isn't solvable */
-    return FALSE;
-}
-
 
 /* Sets new value Z for cell X Y
  *
@@ -180,7 +137,7 @@ int set(int x, int y, int z, gameParams *game) {
 
     // TODO : handeling the game when it's done
 
-    if ((game->mode == SOLVE_MODE) && (game->counter == game->n * game->m)) {
+    if ((game->mode == SOLVE_MODE) && (game->counter == game->N)) {
         if (validate(game) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
@@ -195,32 +152,43 @@ int set(int x, int y, int z, gameParams *game) {
 
 }
 
-int hint(int x, int y, gameParams *game) {
-    int isSolvable;
-    int hint;
-
+/* Preconditions: 1. called only on EDIT or SOLVE modes
+ * the function first checks whether there are erroneous values
+ * if no erroneous cells where found - uses ILP to determine whether the board is solvable */
+int validate(gameParams *game) {
     if (hasErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
-        return FALSE;
+        return FALSE; /* returns 0 */
     }
-    else if ((game->userBoard[x-1][y-1]->isFixed) == TRUE) {
-        printf("Error: cell is fixed\n");
-        return FALSE;
+    /* getting here means all cells aren't erroneous - need to check if solvable */
+    if (solveUsingILP(game, VALIDATE) == FALSE) {
+        printf("Validation failed: board is unsolvable\n");
+        return FALSE; /* returns 0 */
+    } else {
+        printf("Validation passed: board is solvable\n");
+        return TRUE; /* returns 1 */
     }
-    else if ((game->userBoard[x-1][y-1]->value != EMPTY)) {
-        printf("Error: cell already contains a value\n");
-        return FALSE;
-    }
+}
 
-    isSolvable = solveUsingILP(game); /* TODO Eran sim <3: this is a call to solveUsingILP - returns boolean indication of solvability of board. solution is at game->solution */
-    if (!isSolvable) {
-        printf("Error: board is unsolvable\n");
+/* Pre:
+ * Available in EDIT mode only
+ * x, y are valid integers */
+int generate(gameParams *game, int x, int y) {
+    int succeeded;
+
+    if (!boardIsEmpty(game)) {
+        printf("Error: board is not empty\n");
         return FALSE;
     }
-    /* TODO may need to change this if solution is int** */
-    hint = game->solution[x-1][y-1]->value;
-    printf("Hint: set cell to %d\n", hint);
-
+    /* Try (at most) 1000 times to randomly fill X cells and solve the board: */
+    succeeded = randomlyFillXCellsAndSolve(game, x);
+    if (!succeeded) {
+        printf("Error: puzzle generator failed\n");
+        return FALSE;
+    }
+    /* Randomly clear Y cells: */
+    randomlyClearYCells(game, y);
+    return TRUE;
 }
 
 /* Pre:
@@ -233,39 +201,6 @@ int hint(int x, int y, gameParams *game) {
 int undo(gameParams *game) {
 
     return undoEnveloped(game, 0);
-}
-
-
-/* the REAL undo.
- * enveloped by the func named "undo".
- * made this change for the reset func */
-int undoEnveloped(gameParams *game, int isReset) {
-
-    cellChangeRecNode *moveToUndo, *moveToPrint;
-
-    if (game->movesList->size == 0) {
-        printf("Error: no moves to undo\n");
-        return 0;
-    }
-
-    moveToUndo = game->movesList->currentMove->change;
-    moveToPrint = moveToUndo;
-    game->movesList->currentMove = game->movesList->currentMove->prev;
-    game->movesList->size--;
-
-
-    while (moveToUndo != NULL) {
-        game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
-        moveToUndo = moveToUndo->next;
-    }
-
-    if (isReset == FALSE) {
-        /* not printing anything on reset */
-        printBoard(game);
-        printChanges(game, moveToPrint, 0);
-    }
-
-    return 1;
 }
 
 
@@ -292,6 +227,7 @@ int redo(gameParams *game) {
     while (moveToRedo != NULL) {
         game->userBoard[moveToRedo->x - 1][moveToRedo->y - 1] = moveToRedo->currVal;
         moveToRedo = moveToRedo->next;
+        game->counter++;
     }
 
     printBoard(game);
@@ -299,89 +235,6 @@ int redo(gameParams *game) {
 
     return 1;
 }
-
-/* Automatically fill "obvious" values
- * cells which contain a single legal value
- *
- * Pre:
- * game is at Solve mode */
-int autoFill(gameParams *game) {
-
-    int numOfChanges;
-    cellChangeRecNode *changeListHead;
-    numOfChanges = 0;
-    if (hasErrCells(game) == TRUE) {
-        printf("Error: board contains erroneous values\n");
-        return 0;
-    }
-
-    changeListHead = getAutoFillChangeList(game, &numOfChanges);
-
-    if (numOfChanges == 0) {
-        /* no alloc were made at this point */
-        return 1;
-    }
-
-    setNewChangeListToGame(game, changeListHead);
-
-    printBoard(game);
-
-    return 1;
-}
-
-
-/* Starts a puzzle at SOLVE mode
- * Pre:
- * game is at SOLVE, EDIT or INIT mode (available in all modes)
- * If the file exists - it is contains valid data ans is well formatted
- * filePath is a well-formatted file path (not NULL)
- *
- * Post:
- * If file does not exist or cannot be opened - print error
- * If file exists - starts puzzle in solve mode
- * All fields of game struct are updated according to new board (loaded from file)
-*/
-int solve(gameParams *game, char *filePath) {
-    FILE *file;
-
-    /* Try to open file */
-    file = fopen(filePath, "r");
-    if (file == NULL) {
-        printErrorOpeningFile(SOLVE_MODE); /* Prints the required error message according to mode */
-        return FALSE;
-    }
-    /* File successfully opened - get rid of old fields (including memory allocation) */
-    cleanSudokuGame(game);
-    /* Load new fields from file */
-    loadGameParamsFromFile(game, file, SOLVE_MODE);
-    /* At this point game should hold the new parameters of the loaded board */
-    fclose(file);
-    return TRUE;
-}
-
-int edit(gameParams *game, char *filePath) {
-    FILE *file;
-
-    if (filePath == NULL) { /* no path was provided by user - enter EDIT mode with an empty 9x9 board */
-        cleanSudokuGame(game);
-        initializeSudokuGameFields(game, 3, 3);
-        return TRUE;
-    }
-
-    file = fopen(filePath, "r");
-    if (file == NULL) {
-        printErrorOpeningFile(EDIT_MODE); /* Prints the required error message according to mode */
-        return FALSE;
-    }
-    /* File successfully opened - get rid of old fields (including memory allocation) */
-    cleanSudokuGame(game);
-    /* Load new fields from file */
-    loadGameParamsFromFile(game, file, EDIT_MODE);
-    /* At this point game should hold the new parameters of the loaded board */
-    fclose(file);
-    return TRUE;
-}
-
 
 int save(gameParams *game, char *filePath) {
     FILE *file;
@@ -408,6 +261,87 @@ int save(gameParams *game, char *filePath) {
     return TRUE;
 }
 
+int hint(int x, int y, gameParams *game) {
+    int isSolvable;
+    int hint;
+
+    if (hasErrCells(game) == TRUE) {
+        printf("Error: board contains erroneous values\n");
+        return FALSE;
+    } else if ((game->userBoard[x - 1][y - 1]->isFixed) == TRUE) {
+        printf("Error: cell is fixed\n");
+        return FALSE;
+    } else if ((game->userBoard[x - 1][y - 1]->value != EMPTY)) {
+        printf("Error: cell already contains a value\n");
+        return FALSE;
+    }
+
+    isSolvable = solveUsingILP(game,
+                               HINT); /* returns boolean indication of solvability of board. solution is at game->solution */
+    if (!isSolvable) {
+        printf("Error: board is unsolvable\n");
+        return FALSE;
+    }
+    /* TODO may need to change this if solution is int** */
+    hint = game->solution[x - 1][y - 1]->value;
+    printf("Hint: set cell to %d\n", hint);
+
+}
+
+/* preconditions: 1. called only on EDIT or SOLVE modes
+ * prints the number of solutions for the current board
+ * the function first checks whether there are erroneous values
+ * if no erroneous cells were found - counts the number of possible solutions */
+int numSolutions(gameParams *game) {
+    int num_of_sols;
+
+    if (hasErrCells(game) == TRUE) {
+        printf("Error: board contains erroneous values\n");
+        return FALSE; /* returns 0 */
+    }
+    /* getting here means all cells are *not* erroneous - count number of solutions */
+    num_of_sols = countSolutions(game);
+    printf("Number of solutions: %d\n", num_of_sols);
+
+    if (num_of_sols == 1) {
+        printf("This is a good board!\n");
+        return TRUE;
+    } else if (num_of_sols > 1) {
+        printf("The puzzle has more than 1 solution, try to edit it further\n");
+        return TRUE;
+    }
+    /* gets here in case num_of_sols == 0, board isn't solvable */
+    return FALSE;
+}
+
+/* Automatically fill "obvious" values
+ * cells which contain a single legal value
+ *
+ * Pre:
+ * game is at Solve mode */
+int autoFill(gameParams *game) {
+
+    int numOfChanges;
+    cellChangeRecNode *changeListHead;
+    numOfChanges = 0;
+    if (hasErrCells(game) == TRUE) {
+        printf("Error: board contains erroneous values\n");
+        return 0;
+    }
+
+    changeListHead = getAutoFillChangeList(game, &numOfChanges);
+
+    if (numOfChanges == 0) {
+        /* no alloc were made at this point */
+        return 1;
+    }
+
+    setNewChangeListToGame(game, changeListHead);
+    game->counter += numOfChanges;
+    printBoard(game);
+
+    return 1;
+}
 
 /* resets all moves
  *
@@ -436,5 +370,13 @@ void exitGame(gameParams *game) {
     freeSudokuGame(game);
     // TODO (Amir?) : close all open files
 }
+
+
+
+
+
+
+
+
 
 

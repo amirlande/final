@@ -4,11 +4,8 @@
 #ifndef FINAL_GAMEUTILS_H
 #define FINAL_GAMEUTILS_H
 
-#include "commands.h"
-#include "errorMessages.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "list.h"
 #include "gameParams.h"
 
 #define TRUE 1
@@ -51,7 +48,7 @@ void freeCellMatrix(cell ***mat, int N);
 
 /* TODO - this function may need changes - when is it used? */
 /* gets a gameParams instance after one malloc */
-int createNewGame(gameParams *game, int n, int m) ;
+int createNewGame(gameParams *game, int n, int m);
 
 
 /* preconditions:
@@ -111,9 +108,31 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
-
-
 /* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
 cell *createCell(int value);
+
+
+/* the REAL undo.
+ * enveloped by the func named "undo".
+ * made this change for the reset func */
+int undoEnveloped(gameParams *game, int isReset);
+
+int randomlyFillXCells(gameParams *game, int x);
+
+/* Return TRUE (1) on success, FALSE (0) on failure */
+int randomlyFillXCellsAndSolve(gameParams *game, int x);
+
+void randomlyClearYCells(gameParams *game, int y);
+
+
+
+
+
+/* Allocates memory to new nodes
+ * sets the curr and prev pointers
+ * -- no data is added -- */
+void getNewCurrentMove(gameParams *game);
+
+
 
 #endif //FINAL_GAMEUTILS_H

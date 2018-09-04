@@ -14,12 +14,12 @@ typedef struct element {
     int col;
     int value;
     struct element *next;
-}element;
+} element;
 
 typedef struct Stack {
     int count;
     element *top;
-}Stack;
+} Stack;
 
 /* Allocates memory for Stack and initializes top->NULL, count->0 */
 Stack *initializeStack();
@@ -37,3 +37,5 @@ element *pop(Stack *stack);
 int isEmpty(Stack *stack);
 
 #endif //FINAL_STACK_H
+
+

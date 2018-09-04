@@ -117,89 +117,120 @@ typedef struct _GRBenv GRBenv;
 int __stdcall
 GRBgetattrinfo(GRBmodel *model, const char *attrname, int *datatypeP,
                int *sizeP, int *settableP);
+
 int __stdcall
 GRBisattravailable(GRBmodel *model, const char *attrname);
+
 int __stdcall
 GRBgetintattr(GRBmodel *model, const char *attrname, int *valueP);
+
 int __stdcall
 GRBsetintattr(GRBmodel *model, const char *attrname, int newvalue);
+
 int __stdcall
 GRBgetintattrelement(GRBmodel *model, const char *attrname,
                      int element, int *valueP);
+
 int __stdcall
 GRBsetintattrelement(GRBmodel *model, const char *attrname,
                      int element, int newvalue);
+
 int __stdcall
 GRBgetintattrarray(GRBmodel *model, const char *attrname,
                    int first, int len, int *values);
+
 int __stdcall
 GRBsetintattrarray(GRBmodel *model, const char *attrname,
                    int first, int len, int *newvalues);
+
 int __stdcall
 GRBgetintattrlist(GRBmodel *model, const char *attrname,
                   int len, int *ind, int *values);
+
 int __stdcall
 GRBsetintattrlist(GRBmodel *model, const char *attrname,
                   int len, int *ind, int *newvalues);
+
 int __stdcall
 GRBgetcharattrelement(GRBmodel *model, const char *attrname,
                       int element, char *valueP);
+
 int __stdcall
 GRBsetcharattrelement(GRBmodel *model, const char *attrname,
                       int element, char newvalue);
+
 int __stdcall
 GRBgetcharattrarray(GRBmodel *model, const char *attrname,
                     int first, int len, char *values);
+
 int __stdcall
 GRBsetcharattrarray(GRBmodel *model, const char *attrname,
                     int first, int len, char *newvalues);
+
 int __stdcall
 GRBgetcharattrlist(GRBmodel *model, const char *attrname,
                    int len, int *ind, char *values);
+
 int __stdcall
 GRBsetcharattrlist(GRBmodel *model, const char *attrname,
                    int len, int *ind, char *newvalues);
+
 int __stdcall
 GRBgetdblattr(GRBmodel *model, const char *attrname, double *valueP);
+
 int __stdcall
 GRBsetdblattr(GRBmodel *model, const char *attrname, double newvalue);
+
 int __stdcall
 GRBgetdblattrelement(GRBmodel *model, const char *attrname,
                      int element, double *valueP);
+
 int __stdcall
 GRBsetdblattrelement(GRBmodel *model, const char *attrname,
                      int element, double newvalue);
+
 int __stdcall
 GRBgetdblattrarray(GRBmodel *model, const char *attrname,
                    int first, int len, double *values);
+
 int __stdcall
 GRBsetdblattrarray(GRBmodel *model, const char *attrname,
                    int first, int len, double *newvalues);
+
 int __stdcall
 GRBgetdblattrlist(GRBmodel *model, const char *attrname,
                   int len, int *ind, double *values);
+
 int __stdcall
 GRBsetdblattrlist(GRBmodel *model, const char *attrname,
                   int len, int *ind, double *newvalues);
+
 int __stdcall
 GRBgetstrattr(GRBmodel *model, const char *attrname, char **valueP);
+
 int __stdcall
 GRBsetstrattr(GRBmodel *model, const char *attrname, const char *newvalue);
+
 int __stdcall
 GRBgetstrattrelement(GRBmodel *model, const char *attrname,
                      int element, char **valueP);
+
 int __stdcall
 GRBsetstrattrelement(GRBmodel *model, const char *attrname,
                      int element, const char *newvalue);
+
 int __stdcall
 GRBgetstrattrarray(GRBmodel *model, const char *attrname,
                    int first, int len, char **values);
+
 int __stdcall
 GRBsetstrattrarray(GRBmodel *model, const char *attrname,
                    int first, int len, char **newvalues);
+
 int __stdcall
 GRBgetstrattrlist(GRBmodel *model, const char *attrname,
                   int len, int *ind, char **values);
+
 int __stdcall
 GRBsetstrattrlist(GRBmodel *model, const char *attrname,
                   int len, int *ind, char **newvalues);
@@ -210,25 +241,33 @@ GRBsetstrattrlist(GRBmodel *model, const char *attrname,
 int __stdcall
 GRBsetcallbackfunc(GRBmodel *model,
                    int (__stdcall *cb)(CB_ARGS),
-                   void  *usrdata);
+                   void *usrdata);
+
 int __stdcall
 GRBgetcallbackfunc(GRBmodel *model,
                    int (__stdcall **cbP)(CB_ARGS));
+
 int __stdcall
 GRBsetlogcallbackfunc(GRBmodel *model,
                       int (__stdcall *cb)(char *msg));
+
 int __stdcall
 GRBsetlogcallbackfuncenv(GRBenv *env,
                          int (__stdcall *cb)(char *msg));
+
 int __stdcall
 GRBcbget(void *cbdata, int where, int what, void *resultP);
+
 int __stdcall
 GRBcbsetparam(void *cbdata, const char *paramname, const char *newvalue);
+
 int __stdcall
 GRBcbsolution(void *cbdata, const double *solution, double *objvalP);
+
 int __stdcall
 GRBcbcut(void *cbdata, int cutlen, const int *cutind, const double *cutval,
          char cutsense, double cutrhs);
+
 int __stdcall
 GRBcblazy(void *cbdata, int lazylen, const int *lazyind,
           const double *lazyval, char lazysense, double lazyrhs);
@@ -536,62 +575,81 @@ GRBcblazy(void *cbdata, int lazylen, const int *lazyind,
 
 int __stdcall
 GRBgetcoeff(GRBmodel *model, int constr, int var, double *valP);
+
 int __stdcall
 GRBgetconstrs(GRBmodel *model, int *numnzP, int *cbeg,
               int *cind, double *cval, int start, int len);
+
 int __stdcall
 GRBXgetconstrs(GRBmodel *model, size_t *numnzP, size_t *cbeg,
                int *cind, double *cval, int start, int len);
+
 int __stdcall
 GRBgetvars(GRBmodel *model, int *numnzP, int *vbeg, int *vind,
            double *vval, int start, int len);
+
 int __stdcall
 GRBXgetvars(GRBmodel *model, size_t *numnzP, size_t *vbeg, int *vind,
             double *vval, int start, int len);
+
 int __stdcall
 GRBgetsos(GRBmodel *model, int *nummembersP, int *sostype, int *beg,
           int *ind, double *weight, int start, int len);
+
 int __stdcall
 GRBgetgenconstrMax(GRBmodel *model, int genconstr, int *resvarP,
                    int *nvarsP, int *vars, double *constantP);
+
 int __stdcall
 GRBgetgenconstrMin(GRBmodel *model, int genconstr, int *resvarP,
                    int *nvarsP, int *vars, double *constantP);
+
 int __stdcall
 GRBgetgenconstrAbs(GRBmodel *model, int genconstr, int *resvarP, int *argvarP);
+
 int __stdcall
 GRBgetgenconstrAnd(GRBmodel *model, int genconstr, int *resvarP,
                    int *nvarsP, int *vars);
+
 int __stdcall
 GRBgetgenconstrOr(GRBmodel *model, int genconstr, int *resvarP,
                   int *nvarsP, int *vars);
+
 int __stdcall
 GRBgetgenconstrIndicator(GRBmodel *model, int genconstr, int *binvarP, int *binvalP,
                          int *nvarsP, int *vars, double *vals,
                          char *senseP, double *rhsP);
+
 int __stdcall
 GRBgetq(GRBmodel *model, int *numqnzP, int *qrow, int *qcol, double *qval);
+
 int __stdcall
 GRBgetqconstr(GRBmodel *model, int qconstr,
               int *numlnzP, int *lind, double *lval,
               int *numqnzP, int *qrow, int *qcol, double *qval);
+
 int __stdcall
 GRBgetvarbyname(GRBmodel *model, const char *name, int *indexP);
+
 int __stdcall
 GRBgetconstrbyname(GRBmodel *model, const char *name, int *indexP);
+
 int __stdcall
 GRBgetpwlobj(GRBmodel *model, int var, int *pointsP,
              double *x, double *y);
 
 int __stdcall
 GRBoptimize(GRBmodel *model);
+
 int __stdcall
 GRBoptimizeasync(GRBmodel *model);
 
-GRBmodel * __stdcall
+GRBmodel *__stdcall
 GRBcopymodel(GRBmodel *model);
-GRBmodel * __stdcall
+
+GRBmodel *__stdcall
 GRBfixedmodel(GRBmodel *model);
+
 int __stdcall
 GRBfeasrelax(GRBmodel *model, int relaxobjtype, int minrelax,
              double *lbpen, double *ubpen, double *rhspen,
@@ -601,17 +659,23 @@ GRBfeasrelax(GRBmodel *model, int relaxobjtype, int minrelax,
 
 int __stdcall
 GRBgetcbwhatinfo(void *cbdata, int what, int *typeP, int *sizeP);
-GRBmodel * __stdcall
+
+GRBmodel *__stdcall
 GRBrelaxmodel(GRBmodel *model);
+
 int __stdcall
 GRBconverttofixed(GRBmodel *model);
-GRBmodel * __stdcall
+
+GRBmodel *__stdcall
 GRBpresolvemodel(GRBmodel *model);
-GRBmodel * __stdcall
+
+GRBmodel *__stdcall
 GRBiismodel(GRBmodel *model);
-GRBmodel * __stdcall
+
+GRBmodel *__stdcall
 GRBfeasibility(GRBmodel *model);
-GRBmodel * __stdcall
+
+GRBmodel *__stdcall
 GRBlinearizemodel(GRBmodel *model);
 
 #define MALLOCCB_ARGS size_t size, void *syscbusrdata
@@ -623,9 +687,9 @@ GRBlinearizemodel(GRBmodel *model);
 
 int __stdcall
 GRBloadenvsyscb(GRBenv **envP, const char *logfilename,
-                void * (__stdcall *malloccb)(MALLOCCB_ARGS),
-                void * (__stdcall *calloccb)(CALLOCCB_ARGS),
-                void * (__stdcall *realloccb)(REALLOCCB_ARGS),
+                void *(__stdcall *malloccb)(MALLOCCB_ARGS),
+                void *(__stdcall *calloccb)(CALLOCCB_ARGS),
+                void *(__stdcall *realloccb)(REALLOCCB_ARGS),
                 void (__stdcall *freecb)(FREECB_ARGS),
                 int (__stdcall *threadcreatecb)(THREADCREATECB_ARGS),
                 void (__stdcall *threadjoincb)(THREADJOINCB_ARGS),
@@ -633,14 +697,19 @@ GRBloadenvsyscb(GRBenv **envP, const char *logfilename,
 
 int __stdcall
 GRBreadmodel(GRBenv *env, const char *filename, GRBmodel **modelP);
+
 int __stdcall
 GRBread(GRBmodel *model, const char *filename);
+
 int __stdcall
 GRBwrite(GRBmodel *model, const char *filename);
+
 int __stdcall
 GRBismodelfile(const char *filename);
+
 int __stdcall
 GRBfiletype(const char *filename);
+
 int __stdcall
 GRBisrecordfile(const char *filename);
 
@@ -671,87 +740,114 @@ int __stdcall
 GRBaddvar(GRBmodel *model, int numnz, int *vind, double *vval,
           double obj, double lb, double ub, char vtype,
           const char *varname);
+
 int __stdcall
 GRBaddvars(GRBmodel *model, int numvars, int numnz,
            int *vbeg, int *vind, double *vval,
            double *obj, double *lb, double *ub, char *vtype,
            char **varnames);
+
 int __stdcall
 GRBXaddvars(GRBmodel *model, int numvars, size_t numnz,
             size_t *vbeg, int *vind, double *vval,
             double *obj, double *lb, double *ub, char *vtype,
             char **varnames);
+
 int __stdcall
 GRBaddconstr(GRBmodel *model, int numnz, int *cind, double *cval,
              char sense, double rhs, const char *constrname);
+
 int __stdcall
 GRBaddconstrs(GRBmodel *model, int numconstrs, int numnz,
               int *cbeg, int *cind, double *cval,
               char *sense, double *rhs, char **constrnames);
+
 int __stdcall
 GRBXaddconstrs(GRBmodel *model, int numconstrs, size_t numnz,
                size_t *cbeg, int *cind, double *cval,
                char *sense, double *rhs, char **constrnames);
+
 int __stdcall
 GRBaddrangeconstr(GRBmodel *model, int numnz, int *cind, double *cval,
                   double lower, double upper, const char *constrname);
+
 int __stdcall
 GRBaddrangeconstrs(GRBmodel *model, int numconstrs, int numnz,
                    int *cbeg, int *cind, double *cval,
                    double *lower, double *upper, char **constrnames);
+
 int __stdcall
 GRBXaddrangeconstrs(GRBmodel *model, int numconstrs, size_t numnz,
                     size_t *cbeg, int *cind, double *cval,
                     double *lower, double *upper, char **constrnames);
+
 int __stdcall
 GRBaddsos(GRBmodel *model, int numsos, int nummembers, int *types,
           int *beg, int *ind, double *weight);
+
 int __stdcall
 GRBaddgenconstrMax(GRBmodel *model, const char *name,
                    int resvar, int nvars, const int *vars,
                    double constant);
+
 int __stdcall
 GRBaddgenconstrMin(GRBmodel *model, const char *name,
                    int resvar, int nvars, const int *vars,
                    double constant);
+
 int __stdcall
 GRBaddgenconstrAbs(GRBmodel *model, const char *name,
                    int resvar, int argvar);
+
 int __stdcall
 GRBaddgenconstrAnd(GRBmodel *model, const char *name,
                    int resvar, int nvars, const int *vars);
+
 int __stdcall
 GRBaddgenconstrOr(GRBmodel *model, const char *name,
                   int resvar, int nvars, const int *vars);
+
 int __stdcall
 GRBaddgenconstrIndicator(GRBmodel *lp, const char *name,
                          int binvar, int binval, int nvars, const int *vars,
                          const double *vals, char sense, double rhs);
+
 int __stdcall
 GRBaddqconstr(GRBmodel *model, int numlnz, int *lind, double *lval,
               int numqnz, int *qrow, int *qcol, double *qval,
               char sense, double rhs, const char *QCname);
+
 int __stdcall
 GRBaddcone(GRBmodel *model, int nummembers, int *members);
+
 int __stdcall
 GRBaddqpterms(GRBmodel *model, int numqnz, int *qrow, int *qcol,
               double *qval);
+
 int __stdcall
 GRBdelvars(GRBmodel *model, int len, int *ind);
+
 int __stdcall
 GRBdelconstrs(GRBmodel *model, int len, int *ind);
+
 int __stdcall
 GRBdelsos(GRBmodel *model, int len, int *ind);
+
 int __stdcall
 GRBdelgenconstrs(GRBmodel *model, int len, int *ind);
+
 int __stdcall
 GRBdelqconstrs(GRBmodel *model, int len, int *ind);
+
 int __stdcall
 GRBdelq(GRBmodel *model);
+
 int __stdcall
 GRBchgcoeffs(GRBmodel *model, int cnt, int *cind, int *vind, double *val);
+
 int __stdcall
 GRBXchgcoeffs(GRBmodel *model, size_t cnt, int *cind, int *vind, double *val);
+
 int __stdcall
 GRBsetpwlobj(GRBmodel *model, int var, int points, double *x,
              double *y);
@@ -773,10 +869,9 @@ GRBcomputeIIS(GRBmodel *model);
 
 /* simplex advanced routines */
 
-typedef struct _GRBsvec
-{
-    int     len; /* sparse vector length */
-    int    *ind; /* indices array of the sparse vector */
+typedef struct _GRBsvec {
+    int len; /* sparse vector length */
+    int *ind; /* indices array of the sparse vector */
     double *val; /* value array of the sparse vector */
 } GRBsvec;
 
@@ -1050,22 +1145,29 @@ GRBstrongbranch(GRBmodel *model, int num, int *cand,
 
 int __stdcall
 GRBcheckmodel(GRBmodel *model);
+
 void __stdcall
 GRBsetsignal(GRBmodel *model);
+
 void __stdcall
 GRBterminate(GRBmodel *model);
+
 int __stdcall
 GRBreplay(const char *filename);
+
 int __stdcall
 GRBsetobjective(GRBmodel *model, int sense, double constant,
                 int lnz, int *lind, double *lval,
                 int qnz, int *qrow, int *qcol, double *qval);
+
 int __stdcall
 GRBsetobjectiven(GRBmodel *model, int index, int priority, double weight,
                  double abstol, double reltol, const char *name,
                  double constant, int lnz, int *lind, double *lval);
+
 void __stdcall
 GRBclean2(int *lenP, int *ind, double *val);
+
 void __stdcall
 GRBclean3(int *lenP, int *ind0, int *ind1, double *val);
 
@@ -1080,6 +1182,7 @@ GRBmsg(GRBenv *env, const char *message);
 
 int __stdcall
 GRBgetlogfile(GRBenv *env, FILE **logfileP);
+
 int __stdcall
 GRBsetlogfile(GRBenv *env, FILE *logfile);
 
@@ -1088,43 +1191,61 @@ GRBsetlogfile(GRBenv *env, FILE *logfile);
 
 int __stdcall
 GRBgetintparam(GRBenv *env, const char *paramname, int *valueP);
+
 int __stdcall
 GRBgetdblparam(GRBenv *env, const char *paramname, double *valueP);
+
 int __stdcall
 GRBgetstrparam(GRBenv *env, const char *paramname, char *valueP);
+
 int __stdcall
 GRBgetintparaminfo(GRBenv *env, const char *paramname, int *valueP,
                    int *minP, int *maxP, int *defP);
+
 int __stdcall
 GRBgetdblparaminfo(GRBenv *env, const char *paramname, double *valueP,
                    double *minP, double *maxP, double *defP);
+
 int __stdcall
 GRBgetstrparaminfo(GRBenv *env, const char *paramname, char *valueP,
                    char *defP);
+
 int __stdcall
 GRBsetparam(GRBenv *env, const char *paramname, const char *value);
+
 int __stdcall
 GRBsetintparam(GRBenv *env, const char *paramname, int value);
+
 int __stdcall
 GRBsetdblparam(GRBenv *env, const char *paramname, double value);
+
 int __stdcall
 GRBsetstrparam(GRBenv *env, const char *paramname, const char *value);
+
 int __stdcall
 GRBgetparamtype(GRBenv *env, const char *paramname);
+
 int __stdcall
 GRBresetparams(GRBenv *env);
+
 int __stdcall
 GRBcopyparams(GRBenv *dest, GRBenv *src);
+
 int __stdcall
 GRBwriteparams(GRBenv *env, const char *filename);
+
 int __stdcall
 GRBreadparams(GRBenv *env, const char *filename);
+
 int __stdcall
 GRBgetnumparams(GRBenv *env);
+
 int __stdcall
 GRBgetparamname(GRBenv *env, int i, char **paramnameP);
+
 int __stdcall
 GRBgetnumattributes(GRBmodel *model);
+
 int __stdcall
 GRBgetattrname(GRBmodel *model, int i, char **attrnameP);
 
@@ -1132,12 +1253,16 @@ GRBgetattrname(GRBmodel *model, int i, char **attrnameP);
 
 int __stdcall
 GRBloadenv(GRBenv **envP, const char *logfilename);
+
 int __stdcall
 GRBemptyenv(GRBenv **envP);
+
 int __stdcall
 GRBemptyenvadv(GRBenv **envP, int apitype, int major, int minor, int tech);
+
 int __stdcall
 GRBstartenv(GRBenv *env);
+
 int __stdcall
 GRBloadenvadv(GRBenv **envP, const char *logfilename,
               int apitype, int major, int minor, int tech,
@@ -1146,6 +1271,7 @@ GRBloadenvadv(GRBenv **envP, const char *logfilename,
               int priority, int idletimeout,
               const char *accessid, const char *secretkey,
               int (__stdcall *cb)(CB_ARGS), void *usrdata);
+
 int __stdcall
 GRBloadenvadv2(GRBenv **envP, const char *logfilename,
                int apitype, int major, int minor, int tech,
@@ -1155,11 +1281,13 @@ GRBloadenvadv2(GRBenv **envP, const char *logfilename,
                const char *accessid, const char *secretkey,
                int (__stdcall *cb)(CB_ARGS), void *usrdata,
                int (__stdcall *logcb)(char *msg));
+
 int __stdcall
 GRBloadclientenv(GRBenv **envP, const char *logfilename,
                  const char *computeserver, const char *router,
                  const char *password, const char *group, int tls_insecure,
                  int priority, double timeout);
+
 int __stdcall
 GRBloadclientenvadv(GRBenv **envP, const char *logfilename,
                     const char *computeserver, const char *router,
@@ -1167,33 +1295,44 @@ GRBloadclientenvadv(GRBenv **envP, const char *logfilename,
                     int priority, double timeout, int apitype,
                     int major, int minor, int tech,
                     int (__stdcall *cb)(CB_ARGS), void *usrdata);
+
 int __stdcall
 GRBloadcloudenv(GRBenv **envP, const char *logfilename,
                 const char *accessID, const char *secretKey,
                 const char *pool, int priority);
+
 int __stdcall
 GRBloadcloudenvadv(GRBenv **envP, const char *logfilename,
                    const char *accessID, const char *secretKey,
                    const char *pool, int priority, int apitype, int major,
                    int minor, int tech,
                    int (__stdcall *cb)(CB_ARGS), void *usrdata);
+
 GRBenv *__stdcall
 GRBgetenv(GRBmodel *model);
+
 GRBenv *__stdcall
 GRBgetconcurrentenv(GRBmodel *model, int num);
+
 void __stdcall
 GRBdiscardconcurrentenvs(GRBmodel *model);
+
 GRBenv *__stdcall
 GRBgetmultiobjenv(GRBmodel *model, int num);
+
 void __stdcall
 GRBdiscardmultiobjenvs(GRBmodel *model);
+
 void __stdcall
 GRBreleaselicense(GRBenv *env);
+
 void __stdcall
 GRBfreeenv(GRBenv *env);
-const char * __stdcall
+
+const char *__stdcall
 GRBgeterrormsg(GRBenv *env);
-const char * __stdcall
+
+const char *__stdcall
 GRBgetmerrormsg(GRBmodel *model);
 
 /* Version info */
@@ -1201,7 +1340,7 @@ GRBgetmerrormsg(GRBmodel *model);
 void __stdcall
 GRBversion(int *majorP, int *minorP, int *technicalP);
 
-char * __stdcall
+char *__stdcall
 GRBplatform(void);
 
 int __stdcall
@@ -1211,15 +1350,20 @@ GRBlisttokens(void);
 
 int __stdcall
 GRBtunemodel(GRBmodel *model);
+
 int __stdcall
 GRBtunemodels(int nummodels, GRBmodel **models,
               GRBmodel *ignore, GRBmodel *hint);
+
 int __stdcall
 GRBgettuneresult(GRBmodel *model, int i);
+
 int __stdcall
 GRBgettunelog(GRBmodel *model, int i, char **logP);
+
 int __stdcall
 GRBtunemodeladv(GRBmodel *model, GRBmodel *ignore, GRBmodel *hint);
+
 /* Async interface */
 
 int __stdcall

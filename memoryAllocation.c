@@ -40,7 +40,7 @@ void freeBoard(cell ***mat, int N) {
 }
 
 /* frees all the userMoveNode
- * starting from node to the end */
+ * starting from moveToFree to the end */
 void freeAllUserMoveNodes(userMoveNode *moveToFree) {
 
     if (moveToFree == NULL) {
@@ -74,7 +74,8 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
  * cell->isValid = TRUE (1)
  * cell-isFixed = FALSE (0)*/
 cell ***allocateCellMatrix(int N) {
-    /* TODO Eran - we need to change this function (a bit) after you agree with me */
+    /*  we need to change this function (a bit) after you agree with me */
+    /* TODO: ok (?) */
 
     int i, j;
     cell ***mat;
@@ -116,4 +117,25 @@ int **allocateIntMatrix(int N) {
     }
 
     return mat;
+}
+
+
+/* Frees memory allocated for matrix mat of size n*/
+void freeIntMatrix(int **mat, int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        free(mat[i]);
+    }
+    free(mat);
+}
+
+
+listOfMoves *allocateMoveList() {
+    listOfMoves *list;
+    list = (listOfMoves *) malloc(sizeof(listOfMoves));
+    if (list == NULL) {
+        printMallocFailed();
+        return NULL;
+    }
+    return list;
 }
