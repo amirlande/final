@@ -5,25 +5,49 @@
 #include "gurobi.h"
 
 
-void updateSolved(double *sol, int **res, int N){}
-
-int ILP(int **board, int **res, int n, int m, ILPCommand command) {
-    return 1;
+void updateSolved(double *sol, int **res, int N) {
+    int i, j, k;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            for (k = 0; k < N; k++) {
+                if (sol[i * N * N + j * N + k] == 1) {
+                    res[i][j] = k + 1;
+                }
+            }
+        }
+    }
 }
 
 int **fromCellMatToIntMat(cell ***src, int N) {
-    return allocateIntMatrix(N);
+
+    int **dst, i, j;
+    dst = allocateIntMatrix(N);
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            dst[i][j] = src[i][j]->value;
+        }
+    }
+
+    return dst;
 }
+
 
 cell ***fromIntMatToCellMat(int **src, int N) {
-    return allocateCellMatrix(N);
+
+    int i, j;
+    cell ***dst;
+    dst = allocateCellMatrix(N);
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+
+            dst[i][j]->value = src[i][j];
+        }
+    }
+
+    return dst;
 }
 
-void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double *lb, char *vtype, GRBenv *env,
-             GRBmodel *model){}
-
 #if REALGUROBI
-
 /* Solves sudoku using ILP
  * res will hold the solved board values */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
@@ -225,48 +249,6 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 }
 
 
-void updateSolved(double *sol, int **res, int N) {
-    int i, j, k;
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            for (k = 0; k < N; k++) {
-                if (sol[i * N * N + j * N + k] == 1) {
-                    res[i][j] = k + 1;
-                }
-            }
-        }
-    }
-}
-
-int **fromCellMatToIntMat(cell ***src, int N) {
-
-    int **dst, i, j;
-    dst = allocateIntMatrix(N);
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            dst[i][j] = src[i][j]->value;
-        }
-    }
-
-    return dst;
-}
-
-
-cell ***fromIntMatToCellMat(int **src, int N) {
-
-    int i, j;
-    cell ***dst;
-    dst = allocateCellMatrix(N);
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-
-            dst[i][j]->value = src[i][j];
-        }
-    }
-
-    return dst;
-}
-
 void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double *lb, char *vtype, GRBenv *env,
              GRBmodel *model) {
 
@@ -282,3 +264,140 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
 }
 
 #endif
+
+
+/* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
+ * returns "1" if solvable, "0" otherwise
+ * */
+int ILP(int **board, int **res, int n, int m, ILPCommand command) {
+    int row, col, val, N, i, j;
+    N = n * m;
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            res[i][j] = board[i][j];
+        }
+    }
+
+    /* if no empty cells exist then board is legally full - return 1 (true)
+     * otherwise - (row, col) holds the first unassigned cell from (left to right and top to bottom) */
+    if (findEmptyCell(res, N, &row, &col) == 0) {
+        return 1;
+    }
+
+    /* check 1-N values for (row,col) */
+    for (val = 1; val <= N; val++) {
+        /* use checkIfValid function to check validity of assignment */
+        if (tempCheckIfValid(row, col, val, res, n, m)) {
+            res[row][col] = val;
+            /* if assigning (row, col) = val resulted in success return 1 (true), otherwise - remove val */
+            if (ILP(board,res,n,m,command)) {
+                return 1;
+            } else {
+                res[row][col] = 0;
+            }
+
+        }
+    }
+
+
+    /* return 0 (false) if 1-N assignments to (row,col) returned false (an unsolvable board)
+     * and backtrack (this return serves as one piece of the if (solveUsingDetBacktrackting(userBoard)) recursion chain */
+    return 0;
+}
+
+/* userBoard is a 9x9 matrix (sudoku board), row and col are pointers to ints
+ * finds first empty cell and assigns its coordinates to row and col
+ * */
+int findEmptyCell(int **userBoard, int N, int *row, int *col) {
+    int i, j;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            if (userBoard[i][j] == 0) {
+                *row = i;
+                *col = j;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+
+/* Checks if Z is a valid value for non-fixed cell <X,Y> */
+int tempCheckIfValid(int x, int y, int z, int **board, int n, int m) {
+
+    if (z == 0) return 1; /* always legal to set a non-fixed cell to 0 */
+    if (tempCheckIfSquareValid(x, y, z, board, n, m) == FALSE) {
+        return 0;
+    }
+
+    if (tempCheckIfRowValid(x, y, z, board, n, m) == FALSE) {
+        return 0;
+    }
+
+    if (tempCheckIfColumnValid(x, y, z, board, n, m) == FALSE) {
+        return 0;
+    }
+
+    return 1;
+
+}
+
+
+/* Checks if value z does not appear his 3x3 square in the matrix */
+int tempCheckIfSquareValid(int x, int y, int z, int **board, int n, int m) {
+
+    int i, j;
+
+    for (i = x - x % m; i < x - x % m + m; i++) {
+        for (j = y - y % n; j < y - y % n + n; j++) {
+
+            if (board[i][j] == z) {
+                if (!((i == x) && (j == y))) { /* exclude cell (x,y) from the square check */
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+/* Checks if value z does not appear in row x */
+int tempCheckIfRowValid(int x, int y, int z, int **board, int n, int m) {
+
+    int j, N;
+    N = n * m;
+
+    for (j = 0; j < N; j++) {
+        if (j != y) { /* exclude cell (x,y) from the square check */
+            if (board[x][j] == z) {
+                return 0;
+            }
+        }
+    }
+
+
+    return 1;
+}
+
+/* Checks if value z does not appear in column y */
+int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
+
+
+    int i, N;
+    N = n * m;
+
+    for (i = 0; i < N; i++) {
+        if (i != x) { /* exclude cell (x,y) from the square check */
+            if (board[i][y] == z) {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+/* Used to deep copy a matrix */
+
