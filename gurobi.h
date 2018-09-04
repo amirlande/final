@@ -5,15 +5,19 @@
 #ifndef FINAL_GUROBI_H
 #define FINAL_GUROBI_H
 
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "gameUtils.h"
+#include "memoryAllocation.h"
 #include "gurobi_c.h"
 #include "gameParams.h"
 
 typedef enum ILPCommand {
-    VALIDATE = 1,
-    GENERATE = 2,
-    HINT = 3,
-
-
+    ILP_COMMAND_VALIDATE = 1,
+    ILP_COMMAND_GENERATE = 2,
+    ILP_COMMAND_HINT = 3,
 } ILPCommand;
 
 

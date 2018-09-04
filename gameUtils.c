@@ -3,9 +3,6 @@
 //
 
 #include "gameUtils.h"
-#include "commands.h"
-#include "errorMessages.h"
-#include "memoryAllocation.h"
 
 
 /* preconditions:
@@ -80,7 +77,7 @@ char *getLineSeparator(gameParams *game) {
 
     separator = malloc(sizeof(char) * (4 * N + m + 1));
     if (separator == NULL) {
-        freeGame(game);
+        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
@@ -93,63 +90,6 @@ char *getLineSeparator(gameParams *game) {
     return separator;
 }
 
-/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
-cell *createCell(int value) {
-    cell *newCell = (cell *) malloc(sizeof(cell));
-    if (newCell == NULL) {
-        printMallocFailed();
-        exit(EXIT_FAILURE);
-    }
-    newCell->value = value;
-    newCell->isValid = TRUE;
-    newCell->isFixed = FALSE;
-    return newCell;
-}
-
-/* Allocates memory for cell matrix mat with NxN values
- * This call allocated memory for all cells, and it initializes each cell's fields to:
- * cell->value = 0
- * cell->isValid = TRUE (1)
- * cell-isFixed = FALSE (0)*/
-cell ***allocateCellMatrix(int N) {
-    /* TODO Eran - we need to change this function (a bit) after you agree with me */
-
-    int i, j;
-    cell ***mat;
-    mat = (cell ***) malloc(N * sizeof(cell **));
-    if (mat == NULL) {
-        printMallocFailed();
-        exit(EXIT_FAILURE);
-    }
-    for (i = 0; i < N; i++) {
-        mat[i] = (cell **) malloc(N * sizeof(cell *));
-        if (mat[i] == NULL) {
-            printMallocFailed();
-            exit(EXIT_FAILURE);
-        }
-        for (j = 0; j < N; j++) {
-            mat[i][j] = createCell(0);
-        }
-    }
-    return mat;
-}
-
-/* Frees all memory allocated to the given board
- * (This is the complementary free function of allocateCellMatrix */
-void freeCellMatrix(cell ***mat, int N) {
-
-    int i, j;
-    if (mat == NULL) {
-        return;
-    }
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            free(mat[i][j]);
-        }
-        free(mat[i]);
-    }
-    free(mat);
-}
 
 /* Allocates memory to new nodes
  * frees all previous nodes that was next to current node
@@ -161,7 +101,7 @@ void getNewCurrentMove(gameParams *game) {
     userMoveNode *newPrev = game->movesList->currentMove;
     userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
     if (newCurr == NULL) {
-        freeGame(game);
+        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
@@ -170,13 +110,13 @@ void getNewCurrentMove(gameParams *game) {
     newCurr->next = NULL;
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
     if (newCurr->change == NULL) {
-        freeGame(game);
+        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
     newCurr->change->currVal = (cell *) malloc(sizeof(cell *));
     if (newCurr->change->currVal == NULL) {
-        freeGame(game);
+        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
@@ -361,7 +301,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                     /* keep the first node */
                     changeListHead = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
                     if (changeListHead == NULL) {
-                        freeGame(game);
+                        freeSudokuGame(game);
                         printMallocFailed();
                         exit(EXIT_FAILURE);
                     }
@@ -369,7 +309,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                 } else {
                     currentChange->next = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
                     if (currentChange->next == NULL) {
-                        freeGame(game);
+                        freeSudokuGame(game);
                         printMallocFailed();
                         exit(EXIT_FAILURE);
                     }
@@ -378,7 +318,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                 currentChange->prevVal = game->userBoard[i][j];
                 game->userBoard[i][j] = (cell *) malloc(sizeof(cell));
                 if (game->userBoard[i][j] == NULL) {
-                    freeGame(game);
+                    freeSudokuGame(game);
                     printMallocFailed();
                     exit(EXIT_FAILURE);
                 }
@@ -404,7 +344,7 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     freeAllUserMoveNodes(game->movesList->currentMove->next);
     newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
     if (newMove == NULL) {
-        freeGame(game);
+        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
@@ -417,170 +357,42 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 
 }
 
-/* Frees all memory allocated to game parameter
- * (This is the complementary free function of initSudokuGame() */
-int freeSudokuGame(gameParams *game) {
+/* Cleans game->userBoard and game->solution */
+void cleanUserBoardAndSolution(gameParams *game) {
+    int i, j;
 
-    if (game->userBoard != NULL) {
-        freeCellMatrix(game->userBoard, game->m * game->n);
-    }
-    if (game->solution != NULL) {
-        freeCellMatrix(game->solution, game->m * game->n);
-    }
-    if (game->movesList != NULL) {
-        freeAllUserMoveNodes(game->movesList->head);
-        free(game->movesList);
-    }
-    free(game);
-
-    return 1;
-}
-
-/* Frees memory allocated to game fields, and initilizes its fields */
-void cleanSudokuGame(gameParams *game) {
-    game->markErrors = TRUE;
-    game->m = 0;
-    game->n = 0;
-    game->N = 0;
-    game->mode = INIT_MODE;
-    game->counter = 0;
-    freeCellMatrix(game->userBoard, game->N);
-    freeCellMatrix(game->solution, game->N);
-    freeAllUserMoveNodes(game->movesList->head); /* TODO ask Eran about this */
-}
-
-/* Allocates memory for a new gameParams struct
- * Initializes its fields to default values
- * Called once by the play() function in the beginning of the program */
-gameParams *initSudokuGame() {
-    gameParams *newGame;
-
-    newGame = (gameParams *) (malloc(sizeof(gameParams)));
-    newGame->mode = INIT_MODE;
-    newGame->markErrors = 1;
-    newGame->m = 0;
-    newGame->n = 0;
-    newGame->N = 0;
-    newGame->solution = NULL;
-    newGame->userBoard = NULL;
-    newGame->counter = 0;
-    newGame->movesList = allocateMoveList(); /* TODO - ask Eran how should be initialized here as well as in initializeSudokuGameFields */
-}
-
-void initializeSudokuGameFields(gameParams *game, int m, int n) {
-    game->m = m;
-    game->n = n;
-    game->N = m * n;
-    game->mode = INIT_MODE;
-    game->markErrors = TRUE;
-    game->counter = 0;
-    game->userBoard = allocateCellMatrix(game->N);
-    game->solution = allocateCellMatrix(game->N);
-    /* game->movesList = allocateMoveList(); no required since in cleanSudokuGame we don't free listOfMoves memory */
-}
-
-/* - this function may need changes - when is it used? */
-/* TODO : (AMIR) you can use your own implementation. pay attention to the logic. sets the head node. size == 0;
-
-/* gets a gameParams instance after one malloc */
-int createNewGame(gameParams *game, int n, int m) {
-// TODO : wasn't tested
-    game->n = n;
-    game->m = m;
-    game->N = m * n;
-    game->markErrors = 0;
-    game->counter = 0;
-    game->mode = INIT_MODE;
-
-    /* TODO Amir changed the call to allocateCellMatrix -
-     *--- TODO  --   OK   --
-     * */
-    game->userBoard = allocateCellMatrix(game->N);
-    game->solution = allocateCellMatrix(game->N);
-
-    game->movesList = (listOfMoves *) malloc(sizeof(listOfMoves));
-    if (game->movesList == NULL) {
-        printMallocFailed();
-        freeGame(game);
-        exit(EXIT_FAILURE);
-    }
-    game->movesList->size = 0;
-    game->movesList->head = (userMoveNode *) malloc(sizeof(userMoveNode));
-    if (game->movesList->head == NULL) {
-        freeGame(game);
-        printMallocFailed();
-        exit(EXIT_FAILURE);
-    }
-    game->movesList->head->prev = NULL;
-    game->movesList->head->next = NULL;
-    game->movesList->head->change = NULL;
-    game->movesList->currentMove = game->movesList->head;
-
-    return 1;
-}
-
-/* the REAL undo.
- * enveloped by the func named "undo".
- * made this change for the reset func */
-int undoEnveloped(gameParams *game, int isReset) {
-
-    cellChangeRecNode *moveToUndo, *moveToPrint;
-
-    if (game->movesList->size == 0) {
-        printf("Error: no moves to undo\n");
-        return 0;
-    }
-
-    moveToUndo = game->movesList->currentMove->change;
-    moveToPrint = moveToUndo;
-    game->movesList->currentMove = game->movesList->currentMove->prev;
-    game->movesList->size--;
-
-
-    while (moveToUndo != NULL) {
-        game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
-        moveToUndo = moveToUndo->next;
-        game->counter--;
-    }
-
-    if (isReset == FALSE) {
-        /* not printing anything on reset */
-        printBoard(game);
-        printChanges(game, moveToPrint, 0);
-    }
-
-    return 1;
-}
-
-int randomlyFillXCells(gameParams *game, int x) {
-    /* TODO implement */
-}
-
-/* Return TRUE (1) on success, FALSE (0) on failure */
-int randomlyFillXCellsAndSolve(gameParams *game, int x) {
-    int i, success;
-    for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
-        success = randomlyFillXCells(game, x); /* Works on game->userBoard */
-        if (!success) {
-            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
-            continue; /* Attempt failed - continue to next iteration */
+    for (i = 0; i < game->N; i++) {
+        for (j = 0; j < game->N; j++) {
+            game->userBoard[i][j]->value = EMPTY;
+            game->userBoard[i][j]->isFixed = FALSE;
+            game->userBoard[i][j]->isValid = TRUE;
+            game->solution[i][j]->value = EMPTY;
+            game->solution[i][j]->isFixed = FALSE;
+            game->solution[i][j]->isValid = TRUE;
         }
-        /*- Eran: I want the ILP to treat the X cells as fixed - should they all be marked as fixed? */
-        /* TODO: Answer - IT'S YOURS MAMI */
-
-        success = solveUsingILP(game, GENERATE);   /* On success: game->solution holds the solution */
-        if (!success) {
-            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
-            continue; /* Attempt failed - continue to next iteration */
-        }
-        /* Getting here means solution holds a valid complete board */
-        break;
     }
-    return ((success == TRUE) ? TRUE : FALSE);
 }
 
-void randomlyClearYCells(gameParams *game, int y) {
-    /* TODO - implement */
+void setToEmpty(int **matrix, int N) {
+    int i, j;
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            matrix[i][j] = EMPTY;
+        }
+    }
+}
+
+void markFullCellsAsFixed(cell ***board, int N) {
+    int i, j;
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            if (board[i][j]->value != EMPTY) {
+                board[i][j]->isFixed = TRUE;
+            }
+        }
+    }
 }
 
 

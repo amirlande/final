@@ -10,9 +10,6 @@
 #include "gurobi.h"
 #include "errorMessages.h"
 #include <stdio.h>
-/* gives access to all struct definitions and utility functions
- * used by the solving algorithms */
-
 
 
 /* precondition: board has no erroneous values (to be checked before calling this function)

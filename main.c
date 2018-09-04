@@ -1,12 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "gameUtils.h" /* access to functions required to initialize game
- * (initGame, createNewBoard) */
-#include "etc.h"
+#include "gameParams.h"
 #include "mainAux.h"
-
-/* TODO main module should eventually just include mainAux.h and use its playTurn function (as an interface to the parser)
- * */
+#include "memoryAllocation.h"
 
 void playSudoku() {
     gameParams *game;

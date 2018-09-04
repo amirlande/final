@@ -3,12 +3,26 @@
 //
 
 #include "gurobi.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "gameUtils.h"
-#include "memoryAllocation.h"
 
+
+void updateSolved(double *sol, int **res, int N){}
+
+int ILP(int **board, int **res, int n, int m, ILPCommand command) {
+    return 1;
+}
+
+int **fromCellMatToIntMat(cell ***src, int N) {
+    return allocateIntMatrix(N);
+}
+
+cell ***fromIntMatToCellMat(int **src, int N) {
+    return allocateCellMatrix(N);
+}
+
+void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double *lb, char *vtype, GRBenv *env,
+             GRBmodel *model){}
+
+#if REALGUROBI
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
@@ -199,7 +213,7 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
     /* board is solved */
     if (optimstatus == GRB_OPTIMAL) {
-        if (command != VALIDATE) {
+        if (command != ILP_COMMAND_VALIDATE) {
             updateSolved(sol, res, N);
         }
         result = 1;
@@ -266,3 +280,5 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreemodel(model);
     GRBfreeenv(env);
 }
+
+#endif

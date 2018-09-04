@@ -8,6 +8,15 @@
 #include <stdlib.h>
 
 
+#define TRUE 1
+#define FALSE 0
+#define VALID 1
+#define INVALID 0
+#define EMPTY 0
+#define FULL 1
+#define BOARD cell ***
+#define MAX_NUMBER_OF_ATTEMPTS 1000
+
 /* the struct that represents a cell in the Sudoku board
  * each cell contains information regarding its value, whether it is fixed and whether it is valid*/
 typedef struct cell {
@@ -17,11 +26,11 @@ typedef struct cell {
 } cell;
 
 
-enum gameMode {
+typedef enum gameMode {
     INIT_MODE,
     SOLVE_MODE,
     EDIT_MODE
-};
+} gameMode;
 
 /* cellChangeRecNode is a node of a single-linked list of all set operations
  * made by the user - in case of a "SET" operation the list includes only one node

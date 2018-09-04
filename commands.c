@@ -161,13 +161,109 @@ int validate(gameParams *game) {
         return FALSE; /* returns 0 */
     }
     /* getting here means all cells aren't erroneous - need to check if solvable */
-    if (solveUsingILP(game, VALIDATE) == FALSE) {
+    if (solveUsingILP(game, ILP_COMMAND_VALIDATE) == FALSE) {
         printf("Validation failed: board is unsolvable\n");
         return FALSE; /* returns 0 */
     } else {
         printf("Validation passed: board is solvable\n");
         return TRUE; /* returns 1 */
     }
+}
+
+/* Assigns to possibleLegalVals all the legal values for cell <row,col>
+ * Returns the number of legal values that were found */
+int getPossibleValues(gameParams *game, int row, int col, int *possibleLegalVals) {
+    int counter;
+    int val;
+
+    counter = 0;
+    for (val = 0; val < game->N; val++) {
+        if (checkIfValid(row, col, val, game)) {
+            possibleLegalVals[counter] = val;
+            counter++;
+        }
+    }
+    return counter;
+}
+
+int getRandomLegalValue(gameParams *game, int row, int col) {
+    int *possibleLegalVals;
+    int N, numberOfLegalValues, randomIndex, randomValue;
+
+    N = game->N;
+    possibleLegalVals = (int *)calloc((size_t)N, sizeof(int));
+    if (possibleLegalVals == NULL) {
+        printCallocFailed();
+        exit(EXIT_FAILURE);
+    }
+
+    numberOfLegalValues = getPossibleValues(game, row, col, possibleLegalVals);
+    if (numberOfLegalValues == 0) { /* No possible values for cell <row, col> */
+        return INVALID;
+    }
+    /* Randomly choose an index between 0 to (numberOfLegalValues - 1) inclusive */
+    randomIndex = rand() % numberOfLegalValues;
+    randomValue = possibleLegalVals[randomIndex];
+
+    free(possibleLegalVals);
+    return randomValue;
+}
+
+/* On success (1) game->userBoard holds a valid board with X FIXED cells */
+int randomlyFillXCells(gameParams *game, int x) {
+    int **matrixOfChoices; /* To track already-chosen cells */
+    int counter, randomRow, randomCol, randomVal, N;
+
+    N = game->N;
+    matrixOfChoices = allocateIntMatrix(game->N);
+    setToEmpty(matrixOfChoices, N);
+
+    counter = 0;
+    while (counter < x) {
+        randomRow = rand() % N;
+        randomCol = rand() % N;
+
+        while (matrixOfChoices[randomRow][randomCol] == FULL) {
+            randomRow = rand() % N;
+            randomCol = rand() % N;
+        }
+        randomVal = getRandomLegalValue(game, randomRow, randomCol);
+        if (randomVal == INVALID) { /*  */
+            freeIntMatrix(matrixOfChoices, N);
+            return FALSE;
+        }
+        game->userBoard[randomRow][randomCol]->value = randomVal;
+        counter++;
+    }
+    freeIntMatrix(matrixOfChoices, N);
+    return TRUE;
+
+}
+
+/* Return TRUE (1) on success, FALSE (0) on failure */
+int randomlyFillXCellsAndSolve(gameParams *game, int x) {
+    int i, success;
+    for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
+        success = randomlyFillXCells(game, x); /* Works on game->userBoard */
+        if (!success) {
+            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution values to zeros */
+            continue; /* Attempt failed - continue to next iteration */
+        }
+        markFullCellsAsFixed(game->userBoard, game->N); /* Mark all x chosen cells as fixed before passing to ILP solver */
+        /* At this point randomlyFillXCells should have filled X cells and marked them as FIXED */
+        success = solveUsingILP(game, ILP_COMMAND_GENERATE);   /* On success: game->solution holds the solution */
+        if (!success) {
+            cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution */
+            continue; /* Attempt failed - continue to next iteration */
+        }
+        /* Getting here means solution holds a valid complete board */
+        break;
+    }
+    return ((success == TRUE) ? TRUE : FALSE);
+}
+
+void randomlyClearYCells(gameParams *game, int y) {
+    /* TODO - implement */
 }
 
 /* Pre:
@@ -188,7 +284,42 @@ int generate(gameParams *game, int x, int y) {
     }
     /* Randomly clear Y cells: */
     randomlyClearYCells(game, y);
+    markFullCellsAsFixed(game->userBoard, game->N); /* Mark as FIXED all remaining cells */
+
     return TRUE;
+}
+
+/* the REAL undo.
+ * enveloped by the func named "undo".
+ * made this change for the reset func */
+int undoEnveloped(gameParams *game, int isReset) {
+
+    cellChangeRecNode *moveToUndo, *moveToPrint;
+
+    if (game->movesList->size == 0) {
+        printf("Error: no moves to undo\n");
+        return 0;
+    }
+
+    moveToUndo = game->movesList->currentMove->change;
+    moveToPrint = moveToUndo;
+    game->movesList->currentMove = game->movesList->currentMove->prev;
+    game->movesList->size--;
+
+
+    while (moveToUndo != NULL) {
+        game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
+        moveToUndo = moveToUndo->next;
+        game->counter--;
+    }
+
+    if (isReset == FALSE) {
+        /* not printing anything on reset */
+        printBoard(game);
+        printChanges(game, moveToPrint, 0);
+    }
+
+    return 1;
 }
 
 /* Pre:
@@ -202,7 +333,6 @@ int undo(gameParams *game) {
 
     return undoEnveloped(game, 0);
 }
-
 
 /* Pre:
  * command is valid
@@ -277,7 +407,7 @@ int hint(int x, int y, gameParams *game) {
     }
 
     isSolvable = solveUsingILP(game,
-                               HINT); /* returns boolean indication of solvability of board. solution is at game->solution */
+                               ILP_COMMAND_HINT); /* returns boolean indication of solvability of board. solution is at game->solution */
     if (!isSolvable) {
         printf("Error: board is unsolvable\n");
         return FALSE;
