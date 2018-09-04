@@ -399,5 +399,4 @@ int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
     return 1;
 }
 
-/* Used to deep copy a matrix */
 
