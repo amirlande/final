@@ -60,17 +60,50 @@ int checkIfZeroOrOne(char *string) {
     return -1;
 }
 
-int commandAvailable(enum commandType type, enum gameMode mode) {
+int commandAvailable(commandType type, enum gameMode mode) {
     /* TODO - implement logic using switch case */
     printNotImplementedMessage("commandAvailable\n");
-    return TRUE; /* temporary */
+
+    switch (type) {
+        case SET:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case HINT:
+            return (mode == SOLVE_MODE);
+        case VALIDATE:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case RESET:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case EXIT:
+        case SOLVE:
+        case EDIT:
+            return TRUE;
+        case MARK_ERRORS:
+            return (mode == SOLVE_MODE);
+        case PRINT_BOARD:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case GENERATE:
+            return (mode == EDIT_MODE);
+        case UNDO:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case REDO:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case SAVE:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case NUM_SOLS:
+            return ((mode == SOLVE_MODE) || (mode == EDIT_MODE));
+        case AUTO_FILL:
+            return (mode == SOLVE_MODE);
+        default:
+            printErrorInCodeFlow("commandAvailable", "parser.c");
+            return TRUE;
+    }
 }
 
 /* @params: command - pointer to the command to which this function gets parameters
  * typeOfCommand - enum representing the command type
  * copyOfInput - a copy of the original string that the user entered as a command (including the first token, such as "set")
  * N - the N parameter of the sudoku board (sudoku has 1-N digits) */
-void getParams(commandStruct *command, enum commandType typeOfCommand, char *copyOfInput, int N) {
+void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfInput, int N) {
     int number;
     char *token;
 
@@ -219,8 +252,11 @@ commandStruct *getCommandFromUser(gameParams *game) {
         /* read command from console (at most 256 chars) */
         printf("Enter your command:\n");
         if (fgets(input, COMMAND_LEN, stdin) == NULL) {
-            printCallingFunc("exitCleanly");
             /* exitCleanly(); */
+            freeCommand(command);
+            free(token);
+            freeSudokuGame(game);
+            exit(EXIT_FAILURE);
         } /* TODO reached EOF - exit cleanly - to be implemented */
         strcpy(copyOfInput, input);
         token = strtok(input, " \t\r\n"); /* read first token */

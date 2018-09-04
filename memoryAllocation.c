@@ -5,14 +5,45 @@
 #include "memoryAllocation.h"
 
 
-/* frees all game components */
-int freeGame(gameParams *game) {
+/* Allocates memory for a new gameParams struct
+ * Initializes its fields to default values
+ * Called once by the play() function in the beginning of the program */
+gameParams *initSudokuGame() {
+    gameParams *newGame;
+
+    newGame = (gameParams *) (malloc(sizeof(gameParams)));
+    newGame->mode = INIT_MODE;
+    newGame->markErrors = 1;
+    newGame->m = 0;
+    newGame->n = 0;
+    newGame->N = 0;
+    newGame->solution = NULL;
+    newGame->userBoard = NULL;
+    newGame->counter = 0;
+    newGame->movesList = allocateMoveList(); /* TODO - ask Eran how should be initialized here as well as in initializeSudokuGameFields */
+}
+
+void initializeSudokuGameFields(gameParams *game, int m, int n) {
+    game->m = m;
+    game->n = n;
+    game->N = m * n;
+    game->mode = INIT_MODE;
+    game->markErrors = TRUE;
+    game->counter = 0;
+    game->userBoard = allocateCellMatrix(game->N);
+    game->solution = allocateCellMatrix(game->N);
+    /* game->movesList = allocateMoveList(); no required since in cleanSudokuGame we don't free listOfMoves memory */
+}
+
+/* Frees all memory allocated to game parameter
+ * (This is the complementary free function of initSudokuGame() */
+int freeSudokuGame(gameParams *game) {
 
     if (game->userBoard != NULL) {
-        freeBoard(game->userBoard, game->m * game->n);
+        freeCellMatrix(game->userBoard, game->m * game->n);
     }
     if (game->solution != NULL) {
-        freeBoard(game->solution, game->m * game->n);
+        freeCellMatrix(game->solution, game->m * game->n);
     }
     if (game->movesList != NULL) {
         freeAllUserMoveNodes(game->movesList->head);
@@ -23,8 +54,22 @@ int freeGame(gameParams *game) {
     return 1;
 }
 
-/* Frees memory for cell matrix mat with NxN values */
-void freeBoard(cell ***mat, int N) {
+/* Frees memory allocated to game fields, and initilizes its fields */
+void cleanSudokuGame(gameParams *game) {
+    game->markErrors = TRUE;
+    game->m = 0;
+    game->n = 0;
+    game->N = 0;
+    game->mode = INIT_MODE;
+    game->counter = 0;
+    freeCellMatrix(game->userBoard, game->N);
+    freeCellMatrix(game->solution, game->N);
+    freeAllUserMoveNodes(game->movesList->head); /* TODO ask Eran about this */
+}
+
+/* Frees all memory allocated to the given board
+ * (This is the complementary free function of allocateCellMatrix */
+void freeCellMatrix(cell ***mat, int N) {
 
     int i, j;
     if (mat == NULL) {
@@ -38,6 +83,7 @@ void freeBoard(cell ***mat, int N) {
     }
     free(mat);
 }
+
 
 /* frees all the userMoveNode
  * starting from moveToFree to the end */
@@ -74,11 +120,9 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
  * cell->isValid = TRUE (1)
  * cell-isFixed = FALSE (0)*/
 cell ***allocateCellMatrix(int N) {
-    /*  we need to change this function (a bit) after you agree with me */
-    /* TODO: ok (?) */
-
     int i, j;
     cell ***mat;
+
     mat = (cell ***) malloc(N * sizeof(cell **));
     if (mat == NULL) {
         printMallocFailed();
@@ -97,19 +141,32 @@ cell ***allocateCellMatrix(int N) {
     return mat;
 }
 
+/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
+cell *createCell(int value) {
+    cell *newCell = (cell *) malloc(sizeof(cell));
+    if (newCell == NULL) {
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
+    newCell->value = value;
+    newCell->isValid = TRUE;
+    newCell->isFixed = FALSE;
+    return newCell;
+}
+
 
 /* Allocates memory for int matrix
  * with size N*N */
 int **allocateIntMatrix(int N) {
 
     int i, **mat;
-    mat = calloc(N, sizeof(int *));
+    mat = calloc((size_t)N, sizeof(int *));
     if (mat == NULL) {
         printf("Error: calloc has failed\n");
         exit(0);
     }
     for (i = 0; i < N; i++) {
-        mat[i] = calloc(N, sizeof(int));
+        mat[i] = calloc((size_t)N, sizeof(int));
         if (mat[i] == NULL) {
             printf("Error: calloc has failed\n");
             exit(0);

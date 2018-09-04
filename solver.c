@@ -3,7 +3,6 @@
 //
 
 #include "solver.h"
-#include "memoryAllocation.h"
 
 
 /* precondition: board has no erroneous values (to be checked before calling this function)
@@ -18,7 +17,7 @@ int solveUsingILP(gameParams *game, ILPCommand cmd) {
     sol = allocateIntMatrix(game->N);
     board = fromCellMatToIntMat(game->userBoard, game->N);
     result = ILP(board, sol, game->n, game->m, cmd);
-    if (cmd != VALIDATE) {
+    if (cmd != ILP_COMMAND_VALIDATE) {
         game->solution = fromIntMatToCellMat(sol, game->N);
         freeCellMatrix(oldSol, game->N);
     }

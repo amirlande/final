@@ -10,7 +10,7 @@
 #define TRUE 1
 #define FALSE 0
 
-enum commandType {
+typedef enum commandType {
     INVALID_COMMAND = 0,
     SET = 1,
     HINT = 2,
@@ -27,7 +27,7 @@ enum commandType {
     SAVE = 13,
     NUM_SOLS = 14,
     AUTO_FILL = 15,
-};
+} commandType;
 
 /* definition of a struct used to represent a command
  * it holds type of command, arguments and indication of validity */

@@ -7,49 +7,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "gameParams.h"
-
-#define TRUE 1
-#define FALSE 0
-#define VALID 1
-#define INVALID 0
-#define EMPTY 0
-#define BOARD cell ***
-
-
-/* Allocates memory for a new gameParams struct
- * Initializes its fields to default values
- * Called once by the play() function in the beginning of the program */
-gameParams *initSudokuGame();
-
-/* Pre:
- * 1. Memory for game already allocated
- * 2. Memory for game internal fields *not* allocated
- * Post: Initializes game fields to a (m*n)*(m*n) sudoku game */
-void initializeSudokuGameFields(gameParams *game, int m, int n);
-
-/* Frees all memory allocated to game, including game itself
- * (This is the complementary free function of initSudokuGame() */
-int freeSudokuGame(gameParams *game);
-
-/* Frees memory allocated to game fields, and initilizes its fields */
-void cleanSudokuGame(gameParams *game);
-
-
-/* Allocates memory for cell matrix mat with NxN values
- * This call allocated memory for all cells, and it initializes each cell's fields to:
- * cell->value = 0
- * cell->isValid = TRUE (1)
- * cell-isFixed = FALSE (0)*/
-cell ***allocateCellMatrix(int N);
-
-/* Frees all memory allocated to the given board
- * (This is the complementary free function of allocateCellMatrix */
-void freeCellMatrix(cell ***mat, int N);
-
-/* TODO - this function may need changes - when is it used? */
-/* gets a gameParams instance after one malloc */
-int createNewGame(gameParams *game, int n, int m);
-
+#include "errorMessages.h"
+#include "memoryAllocation.h"
 
 /* preconditions:
  * checks whether board has any erroneous cells
@@ -71,6 +30,7 @@ char *getLineSeparator(gameParams *game);
 
 
 int checkIfValid(int x, int y, int z, gameParams *game);
+
 
 /* prints the changes after undo/redo */
 int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
@@ -112,27 +72,18 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
 cell *createCell(int value);
 
 
-/* the REAL undo.
- * enveloped by the func named "undo".
- * made this change for the reset func */
-int undoEnveloped(gameParams *game, int isReset);
-
-int randomlyFillXCells(gameParams *game, int x);
-
-/* Return TRUE (1) on success, FALSE (0) on failure */
-int randomlyFillXCellsAndSolve(gameParams *game, int x);
-
-void randomlyClearYCells(gameParams *game, int y);
-
-
-
-
-
 /* Allocates memory to new nodes
  * sets the curr and prev pointers
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game);
 
 
+/* Cleans game->userBoard and game->solution to zero's */
+void cleanUserBoardAndSolution(gameParams *game);
+
+/* Used by randomlyFillXCells */
+void setToEmpty(int **matrix, int N);
+
+void markFullCellsAsFixed(cell ***board, int N);
 
 #endif //FINAL_GAMEUTILS_H

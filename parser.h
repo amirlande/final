@@ -6,13 +6,13 @@
 #define FINAL_PARSER_H
 
 
-#include "commandStruct.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "commands.h" /* access to all user commands the parser invokes after parsing input */
 #include "errorMessages.h"
+#include "commandStruct.h"
 
 /* parses command from user console input into a userCommand struct and then invokes relevant function from "commands.h"
  * returns a commandStruct with a "isValid" indication. Calling function must check the "isValid" field of the returned value
