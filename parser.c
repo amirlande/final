@@ -244,8 +244,7 @@ commandStruct *getCommandFromUser(gameParams *game) {
     int digit;
 
     command = initializeCommand(); /* memory allocation - TODO free this memory inside the function that invokes (for example) set() */
-    token = (char *) malloc(COMMAND_LEN *
-                            sizeof(char)); /* allocate memory using the COMMAND_LEN upper bound (memory freed in the end of the function)*/
+    token = (char *) malloc(COMMAND_LEN * sizeof(char)); /* allocate memory using the COMMAND_LEN upper bound (memory freed in the end of the function)*/
 
     /* TODO - test this logic */
     do {
@@ -269,36 +268,57 @@ commandStruct *getCommandFromUser(gameParams *game) {
             getParams(command, SET, copyOfInput,
                       game->N); /* getParams parses x,y and z and sets isValid tu TRUE if all are valid */
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "hint") == 0) { /* hint command */
         if (commandAvailable(HINT, game->mode)) {
             command->type = HINT;
             getParams(command, HINT, copyOfInput,
                       game->N); /* getParams parses x,y and sets isValid tu TRUE if all are valid */
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "validate") == 0) { /* validate command */
         if (commandAvailable(VALIDATE, game->mode)) {
             command->type = VALIDATE;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
+        }
+        else {
+            printInvalidCommand();
         }
     } else if (strcmp(token, "reset") == 0) { /* restart command */
         if (commandAvailable(RESET, game->mode)) {
             command->type = RESET;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "exit") == 0) { /* exit command */
         if (commandAvailable(EXIT, game->mode)) {
             command->type = EXIT;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
+        }
+        else {
+            printInvalidCommand();
         }
     } else if (strcmp(token, "solve") == 0) { /* available modes : ALL */
         if (commandAvailable(SOLVE, game->mode)) {
             command->type = SOLVE;
             getParams(command, SOLVE, copyOfInput, game->N);
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "edit") == 0) { /* available modes : ALL */
         if (commandAvailable(EDIT, game->mode)) {
             command->type = EDIT;
             getParams(command, EDIT, copyOfInput, game->N);
+        }
+        else {
+            printInvalidCommand();
         }
     } else if (strcmp(token, "mark_errors") == 0) { /* available modes: SOLVE */
         if (commandAvailable(MARK_ERRORS, game->mode)) {
@@ -306,39 +326,63 @@ commandStruct *getCommandFromUser(gameParams *game) {
             getParams(command, MARK_ERRORS, copyOfInput, game->N);
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "print_board") == 0) {
         if (commandAvailable(PRINT_BOARD, game->mode)) {
             command->type = PRINT_BOARD;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
+        }
+        else {
+            printInvalidCommand();
         }
     } else if (strcmp(token, "generate") == 0) {
         if (commandAvailable(GENERATE, game->mode)) {
             command->type = GENERATE;
             getParams(command, GENERATE, copyOfInput, game->N);
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "undo") == 0) {
         if (commandAvailable(UNDO, game->mode)) {
             command->type = UNDO;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
+        }
+        else {
+            printInvalidCommand();
         }
     } else if (strcmp(token, "redo") == 0) {
         if (commandAvailable(REDO, game->mode)) {
             command->type = REDO;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "save") == 0) {
         if (commandAvailable(SAVE, game->mode)) {
             command->type = SAVE;
             getParams(command, SAVE, copyOfInput, game->N);
+        }
+        else {
+            printInvalidCommand();
         }
     } else if (strcmp(token, "num_solutions") == 0) {
         if (commandAvailable(NUM_SOLS, game->mode)) {
             command->type = NUM_SOLS;
             command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         }
+        else {
+            printInvalidCommand();
+        }
     } else if (strcmp(token, "auto_fill") == 0) {
         if (commandAvailable(AUTO_FILL, game->mode)) {
             command->type = AUTO_FILL;
+        }
+        else {
+            printInvalidCommand();
         }
     }
         /* anything else is an invalid command: */

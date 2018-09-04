@@ -81,8 +81,8 @@ int playTurn(gameParams *game) {
             default:
                 printErrorInCodeFlow("playTurn", "parser.c");
         }
-        printBoard(game);
-        freeCommand(commandToPlay);
-        return TRUE;
     }
+    printBoard(game);
+    freeCommand(commandToPlay);
+    return TRUE;
 }
