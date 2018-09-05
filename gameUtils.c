@@ -395,6 +395,22 @@ void markFullCellsAsFixed(cell ***board, int N) {
     }
 }
 
+/* Iterates over each cell
+ * and check if it is valid
+ * or erroneous */
+void updateErrors(gameParams *game) {
+
+    int i, j, N, isValid;
+    N = game->N;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            isValid = checkIfValid(i, j, game->userBoard[i][j]->value, game);
+            game->userBoard[i][j]->isValid = isValid;
+        }
+
+    }
+}
+
 
 #if 0
 /* Called by undo

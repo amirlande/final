@@ -132,6 +132,7 @@ int set(int x, int y, int z, gameParams *game) {
     game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal;
 
     setValue(game, x - 1, y - 1, z);
+    updateErrors(game);
     printBoard(game);
 
 
@@ -147,6 +148,7 @@ int set(int x, int y, int z, gameParams *game) {
             // TODO the user will have to undo the move to continue solving ?? where to implement
         }
     }
+
 
     return 1;
 
@@ -313,6 +315,7 @@ int undoEnveloped(gameParams *game, int isReset) {
         game->counter--;
     }
 
+    updateErrors(game);
     if (isReset == FALSE) {
         /* not printing anything on reset */
         printBoard(game);
@@ -360,6 +363,7 @@ int redo(gameParams *game) {
         game->counter++;
     }
 
+    updateErrors(game);
     printBoard(game);
     printChanges(game, moveToPrint, 1);
 
@@ -468,6 +472,7 @@ int autoFill(gameParams *game) {
 
     setNewChangeListToGame(game, changeListHead);
     game->counter += numOfChanges;
+    updateErrors(game);
     printBoard(game);
 
     return 1;
