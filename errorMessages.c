@@ -8,7 +8,7 @@
 /* serves as a "shouldn't get here" print function with function and module name */
 void printErrorInCodeFlow(char *functionName, char *moduleName) {
     printf("Error in code flow - shouldn't have got here\n"
-           "Location: %s function at %s module\n");
+           "Location: %s function at %s module\n" , functionName, moduleName);
 }
 
 void printNotImplementedMessage(char *nameOfFunction) {

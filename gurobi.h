@@ -32,4 +32,18 @@ cell ***fromIntMatToCellMat(int **src, int N);
 void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double *lb, char *vtype, GRBenv *env,
              GRBmodel *model);
 
+int findEmptyCell(int **userBoard, int N, int *row, int *col);
+
+/* Checks if Z is a valid value for non-fixed cell <X,Y> */
+int tempCheckIfValid(int x, int y, int z, int **board, int n, int m);
+
+/* Checks if value z does not appear his 3x3 square in the matrix */
+int tempCheckIfSquareValid(int x, int y, int z, int **board, int n, int m);
+
+/* Checks if value z does not appear in row x */
+int tempCheckIfRowValid(int x, int y, int z, int **board, int n, int m);
+
+/* Checks if value z does not appear in column y */
+int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m);
+
 #endif //FINAL_GUROBI_H
