@@ -194,5 +194,8 @@ listOfMoves *allocateMoveList() {
         printMallocFailed();
         return NULL;
     }
+    list->head = NULL;
+    list->currentMove = NULL;
+    list->size = 0;
     return list;
 }

@@ -15,6 +15,7 @@ commandStruct *initializeCommand() {
     command->y = 0;
     command->z = 0;
     command->markError = 0;
+    command->fileName = NULL;
     return command;
 }
 

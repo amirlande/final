@@ -42,9 +42,9 @@ int edit(gameParams *game, char *filePath) {
     if (filePath == NULL) { /* no path was provided by user - enter EDIT mode with an empty 9x9 board */
         cleanSudokuGame(game);
         initializeSudokuGameFields(game, 3, 3);
+        game->mode = EDIT_MODE;
         return TRUE;
     }
-
     file = fopen(filePath, "r");
     if (file == NULL) {
         printErrorOpeningFile(EDIT_MODE); /* Prints the required error message according to mode */
@@ -54,6 +54,7 @@ int edit(gameParams *game, char *filePath) {
     cleanSudokuGame(game);
     /* Load new fields from file */
     loadGameParamsFromFile(game, file, EDIT_MODE);
+    game->mode = EDIT_MODE;
     /* At this point game should hold the new parameters of the loaded board */
     fclose(file);
     return TRUE;
@@ -133,10 +134,8 @@ int set(int x, int y, int z, gameParams *game) {
 
     setValue(game, x - 1, y - 1, z);
     updateErrors(game);
-    printBoard(game);
 
-
-    // TODO : handeling the game when it's done
+    // TODO : handling the game when it's done
 
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N)) {
         if (validate(game) == TRUE) {
@@ -148,10 +147,7 @@ int set(int x, int y, int z, gameParams *game) {
             // TODO the user will have to undo the move to continue solving ?? where to implement
         }
     }
-
-
     return 1;
-
 }
 
 /* Preconditions: 1. called only on EDIT or SOLVE modes
@@ -379,11 +375,14 @@ int save(gameParams *game, char *filePath) {
             printf("Error: board contains erroneous values\n");
             return FALSE;
         }
+        /*
         if (validate(game) == FALSE) {
             printf("Error: board validation failed\n");
             return FALSE;
         }
+         */
     }
+    //file = fopen("C:\\temp\\sudoku", "w");
     file = fopen(filePath, "w");
     if (file == NULL) {
         printf("Error: File cannot be created or modified\n");

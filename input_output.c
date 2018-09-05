@@ -12,7 +12,8 @@ int saveGameParamsToFile(gameParams *game, FILE *destFile, enum gameMode mode) {
         for (col = 0; col < game->N; col++) {
             fprintf(destFile, "%d", game->userBoard[row][col]->value);
             /* If in EDIT mode or cell is fixed - write an extra '.' next to digit */
-            if ((game->userBoard[row][col]->isFixed == TRUE) || (mode == EDIT_MODE)) {
+            if (((game->userBoard[row][col]->isFixed == TRUE) && (game->userBoard[row][col]->value != EMPTY))
+            || ((mode == EDIT_MODE) && game->userBoard[row][col]->value != EMPTY)) {
                 fprintf(destFile, ".");
             }
             /* If haven't reached end of row write space */
