@@ -226,6 +226,10 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
                 return;
             }
             command->fileName = (char *) malloc(strlen(token) + 1); /* allocate memory for fileName TODO free this memory */
+            if (command->fileName == NULL) {
+                printMallocFailed();
+                exit(EXIT_FAILURE);
+            }
             strcpy(command->fileName, token);
             command->isValid = TRUE;
             break;
@@ -237,6 +241,10 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
             }
             else { /* Path was provided by the user */
                 command->fileName = (char *) malloc(strlen(token) + 1);
+                if (command->fileName == NULL) {
+                    printMallocFailed();
+                    exit(EXIT_FAILURE);
+                }
                 strcpy(command->fileName, token);
             }
             command->isValid = TRUE;
@@ -278,6 +286,10 @@ commandStruct *getCommandFromUser(gameParams *game) {
 
     command = initializeCommand(); /* memory allocation - Freed in the end of playSudoku() */
     token = (char *) malloc(COMMAND_LEN * sizeof(char) + 1); /* allocate memory using the COMMAND_LEN upper bound (memory freed in the end of the function)*/
+    if (token == NULL) {
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
 
     do {
         /* read command from console (at most 256 chars) */

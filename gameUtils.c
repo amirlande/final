@@ -45,12 +45,10 @@ int boardIsEmpty(gameParams *game) {
 /* Allocates memory for a new board and copies values of
  * board_to_be_copied.
  * Returns pointer to the new board struct (Notice - it is a cell ****) */
-BOARD*copyBoard(cell ***board_to_be_copied, int N) {
+cell ***copyBoard(cell ***board_to_be_copied, int N) {
     int i, j;
-    BOARD*pointerToBoard;
-    BOARD copyOfBoard;
+    cell ***copyOfBoard;
 
-    pointerToBoard = (BOARD*) malloc(sizeof(BOARD));
     copyOfBoard = allocateCellMatrix(N);
 
     /* Copy cell by cell values: */
@@ -61,9 +59,7 @@ BOARD*copyBoard(cell ***board_to_be_copied, int N) {
             copyOfBoard[i][j]->isValid = board_to_be_copied[i][j]->isValid;
         }
     }
-    *pointerToBoard = copyOfBoard;
-    printNotImplementedMessage("copyBoard"); /* TODO remove this when we fix allocateCellMatrix */
-    return pointerToBoard;
+    return copyOfBoard;
 }
 
 /* returns the line separator for print_board

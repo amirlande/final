@@ -9,6 +9,10 @@
  * struct fields are initialized to default values */
 commandStruct *initializeCommand() {
     commandStruct *command = (commandStruct *) malloc(sizeof(commandStruct));
+    if (command == NULL) {
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
     command->type = INVALID_COMMAND;
     command->isValid = FALSE;
     command->x = 0;

@@ -11,7 +11,12 @@
 gameParams *initSudokuGame() {
     gameParams *newGame;
 
-    newGame = (gameParams *) (malloc(sizeof(gameParams)));
+    newGame = (gameParams *) malloc(sizeof(gameParams));
+    if (newGame == NULL) {
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
+
     newGame->mode = INIT_MODE;
     newGame->markErrors = 1;
     newGame->m = 0;
@@ -165,13 +170,13 @@ int **allocateIntMatrix(int N) {
     int i, **mat;
     mat = calloc((size_t)N, sizeof(int *));
     if (mat == NULL) {
-        printf("Error: calloc has failed\n");
+        printCallocFailed();
         exit(0);
     }
     for (i = 0; i < N; i++) {
         mat[i] = calloc((size_t)N, sizeof(int));
         if (mat[i] == NULL) {
-            printf("Error: calloc has failed\n");
+            printCallocFailed();
             exit(0);
         }
     }

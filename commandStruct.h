@@ -6,6 +6,7 @@
 #define FINAL_COMMANDSTRUCT_H
 
 #include <stdlib.h>
+#include "errorMessages.h"
 
 #define TRUE 1
 #define FALSE 0
