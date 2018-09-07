@@ -38,7 +38,7 @@ typedef struct commandStruct {
     int y;
     int z;
     char *fileName; /* used by solve and edit commands */
-    int markError; /* used by mark_errors command */
+    int markErrors; /* used by mark_errors command */
 } commandStruct;
 
 /* allocated memory for s commandStruct and returns pointer to it

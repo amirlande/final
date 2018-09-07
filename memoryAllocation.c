@@ -64,7 +64,10 @@ void cleanSudokuGame(gameParams *game) {
     game->counter = 0;
     freeCellMatrix(game->userBoard, game->N);
     freeCellMatrix(game->solution, game->N);
+    /* Free all memory used by moveList nodes and set head and current to NULL */
     freeAllUserMoveNodes(game->movesList->head); /* TODO ask Eran about this */
+    game->movesList->currentMove = NULL;
+    game->movesList->head = NULL;
 }
 
 /* Frees all memory allocated to the given board
@@ -92,9 +95,9 @@ void freeAllUserMoveNodes(userMoveNode *moveToFree) {
     if (moveToFree == NULL) {
         return;
     }
-    userMoveNode *nextMove = moveToFree->next;
+    freeAllUserMoveNodes(moveToFree->next);
+
     freeCellChangeRecNode(moveToFree->change);
-    freeAllUserMoveNodes(nextMove);
     free(moveToFree);
 }
 
@@ -106,10 +109,10 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
         return;
     }
 
-    cellChangeRecNode *nextChange = changeToFree->next;
+    freeCellChangeRecNode(changeToFree->next);
+
     free(changeToFree->prevVal);
-    free(changeToFree->currVal);
-    freeCellChangeRecNode(nextChange);
+    free(changeToFree->currVal); /* TODO Causes program to crash on specific scenario */
     free(changeToFree);
 
 }
@@ -196,6 +199,6 @@ listOfMoves *allocateMoveList() {
     }
     list->head = NULL;
     list->currentMove = NULL;
-    list->size = 0;
+    /* list->size = 0; */
     return list;
 }

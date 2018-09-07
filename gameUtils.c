@@ -97,40 +97,43 @@ char *getLineSeparator(gameParams *game) {
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game) {
 
-    /* First free all userMove nodes that are next to currentMove  (NULL check needed in case moveList is empty) */
+    /* First free all userMove nodes that are next to currentMove (NULL check needed in case moveList is empty) */
     if (game->movesList->currentMove != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
     }
     userMoveNode *newPrev = game->movesList->currentMove;
-    userMoveNode *newCurr = (userMoveNode *)malloc(sizeof(userMoveNode *));
+    userMoveNode *newCurr = (userMoveNode *)malloc(sizeof(userMoveNode));
+
     if (newCurr == NULL) {
-        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
     if (newPrev != NULL) { /* Set previous's next to the new current move, unless prev was NULL */
         newPrev->next = newCurr;
     }
+    game->movesList->currentMove = newCurr;
     newCurr->prev = newPrev;
     newCurr->next = NULL;
+
+    /* CHANGE NODE */
     newCurr->change = (cellChangeRecNode *)malloc(sizeof(cellChangeRecNode));
     if (newCurr->change == NULL) {
-        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
+
     newCurr->change->currVal = (cell *)malloc(sizeof(cell));
     if (newCurr->change->currVal == NULL) {
-        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
+
     newCurr->change->next = NULL;
-    game->movesList->currentMove = newCurr;
     if (game->movesList->currentMove->prev == NULL) { /* In case the new current move node becomes the head */
         game->movesList->head = game->movesList->currentMove;
     }
-    game->movesList->size++;
+
+    /* game->movesList->size++; */
 }
 
 /* Checks if Z is a valid value for non-fixed cell <X,Y> */
@@ -255,6 +258,7 @@ int checkIfColumnValid(int x, int y, int z, gameParams *game) {
 int doesCellHaveASingleLegalValue(gameParams *game, int x, int y) {
 
     int i, counter, N, value;
+    value = 0;
     N = game->n * game->m;
     counter = 0;
     for (i = 1; i < N + 1; i++) {
@@ -287,8 +291,9 @@ void setValue(gameParams *game, int x, int y, int z) {
 
     /* sets the value */
     game->userBoard[x][y]->value = z;
-    game->userBoard[x][y]->isValid = checkIfValid(x, y, z, game);
-    game->userBoard[x][y]->isFixed = 0;
+    game->userBoard[x][y]->isValid = FALSE; /* Doesn't matter what we assign - in the end we run a function that
+ * goes over all the board and checks each cell's validity*/
+    game->userBoard[x][y]->isFixed = FALSE;
 }
 
 /* Called by autoFill
@@ -363,7 +368,7 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     newMove->change = changeListHead;
     game->movesList->currentMove->next = newMove;
     game->movesList->currentMove = newMove;
-    game->movesList->size++;
+    /* game->movesList->size++; */
 
 }
 

@@ -21,7 +21,6 @@ int solveUsingILP(gameParams *game, ILPCommand cmd) {
         game->solution = fromIntMatToCellMat(sol, game->N);
         freeCellMatrix(oldSol, game->N);
     }
-
     freeIntMatrix(sol, game->N);
     freeIntMatrix(board, game->N);
     return result;

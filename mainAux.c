@@ -40,7 +40,7 @@ int playTurn(gameParams *game) {
                 edit(game, commandToPlay->fileName);
                 break;
             case MARK_ERRORS:
-                mark_errors(game, commandToPlay->markError);
+                mark_errors(game, commandToPlay->markErrors);
                 break;
             case PRINT_BOARD:
                 printBoard(game);

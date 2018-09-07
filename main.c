@@ -17,6 +17,7 @@ void playSudoku() {
     continueGame = TRUE;
     while (continueGame) {
         continueGame = playTurn(game); /* playTurn returns TRUE (1) on all commands except EXIT */
+        fflush(stdout);
     }
 
     freeSudokuGame(game);
@@ -88,8 +89,8 @@ int main() {
     seed = time(NULL);
     srand(seed);
 
-    emptyBoardGenerator("board1"); /* TODO delete this before submitting project! */
-    testFileOpening();
+    emptyBoardGenerator("randBoard"); /* TODO delete this before submitting project! */
+    //testFileOpening();
 
     playSudoku();
     return 1;
