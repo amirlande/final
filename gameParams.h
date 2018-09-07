@@ -62,7 +62,7 @@ typedef struct userMoveNode {
 typedef struct listOfMoves {
     userMoveNode *head;
     userMoveNode *currentMove;
-    int size;
+    /* int size; no need - linked list */
 } listOfMoves;
 
 

@@ -21,7 +21,6 @@ int solveUsingILP(gameParams *game, ILPCommand cmd) {
         game->solution = fromIntMatToCellMat(sol, game->N);
         freeCellMatrix(oldSol, game->N);
     }
-
     freeIntMatrix(sol, game->N);
     freeIntMatrix(board, game->N);
     return result;
@@ -32,26 +31,29 @@ int solveUsingILP(gameParams *game, ILPCommand cmd) {
  * so we can pass it to helper functions at gameUtils (that accept gameParams objects).
  * Notice: the following fields aren't assigned and are ignored by the helper functions
  * (the helper functions only use N, n, m and userBoard fields) */
-gameParams *wrapInGameParamsStruct(BOARD*board, int N, int n, int m) {
-    gameParams *partialGameParams;
-    partialGameParams = (gameParams *) malloc(1 * sizeof(gameParams));
-    if (partialGameParams == NULL) {
+gameParams *wrapInGameParamsStruct(cell ***board, int N, int n, int m) {
+    gameParams *temporaryGameParams;
+    temporaryGameParams = (gameParams *)malloc(sizeof(gameParams));
+    if (temporaryGameParams == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
-    partialGameParams->N = N;
-    partialGameParams->n = n;
-    partialGameParams->m = m;
-    partialGameParams->userBoard = *board;
-    return partialGameParams;
+    temporaryGameParams->N = N;
+    temporaryGameParams->n = n;
+    temporaryGameParams->m = m;
+    temporaryGameParams->userBoard = board; /* No need to allocate memory for userBoard, it points to an already-allocated struct */
+    temporaryGameParams->solution = allocateCellMatrix(N); /* TODO is it necessary? */
+    temporaryGameParams->markErrors = TRUE;
+    temporaryGameParams->movesList = allocateMoveList();
+    return temporaryGameParams;
 }
 
-void markAsFixed(BOARD*board, int N) {
+void markAsFixed(cell ***board, int N) {
     int i, j;
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
-            if ((*board)[i][j]->value != EMPTY) {
-                (*board)[i][j]->isFixed = TRUE;
+            if ((board)[i][j]->value != EMPTY) {
+                (board)[i][j]->isFixed = TRUE;
             }
         }
     }
@@ -106,30 +108,30 @@ void setBoard(BOARD board, int N, int row, int col, int value) {
     board[row][col]->value = value;
 }
 
-void countWithBacktracking(gameParams *partialGameParams, int *numOfSols) {
+void countWithBacktracking(gameParams *gameParams, int *numOfSols) {
     Stack *stack;
     element *stackElement;
     int row, col, value, N;
 
     stack = initializeStack();
-    N = partialGameParams->N;
+    N = gameParams->N;
 
     /* Set (row, col) to hold first empty cell */
-    if (findFirstEmptyCell(partialGameParams->userBoard, partialGameParams->N, &row, &col) == INVALID) {
+    if (findFirstEmptyCell(gameParams->userBoard, gameParams->N, &row, &col) == INVALID) {
         printf("I thought should never get here - should have been caught at if ((game->counter) == (game->N * game->N))");
         *numOfSols = 1;
         return;
     }
     /* Push onto stack an element for each valid (row, col, value)
      * row and col are fixed, value ranges from 1 to N inclusive */
-    pushValidValues(partialGameParams, row, col, stack);
+    pushValidValues(gameParams, row, col, stack);
 
     while (!isEmpty(stack)) {
         stackElement = pop(stack);
-        setBoard(partialGameParams->userBoard, N, stackElement->row, stackElement->col, stackElement->value);
+        setBoard(gameParams->userBoard, N, stackElement->row, stackElement->col, stackElement->value);
 
-        if (findFirstEmptyCell(partialGameParams->userBoard, N, &row, &col) == VALID) {
-            pushValidValues(partialGameParams, row, col, stack);
+        if (findFirstEmptyCell(gameParams->userBoard, N, &row, &col) == VALID) {
+            pushValidValues(gameParams, row, col, stack);
         } else { /* All cells are full - found a valid solution */
             (*numOfSols)++;
         }
@@ -144,8 +146,8 @@ void countWithBacktracking(gameParams *partialGameParams, int *numOfSols) {
  * it is called by num_solutions (defined in commands.h) */
 int countSolutions(gameParams *game) {
     int numOfSols;
-    BOARD*tempBoard; /* This is a pointer to a *copy* of the board (cell ***) that we'll work on */
-    gameParams *partialGameParams; /* This wraps tempBoard, N, n, m fields and passed to other functions */
+    cell ***tempBoard; /* This is a pointer to a *copy* of the board (cell ***) that we'll work on */
+    gameParams *temporaryGameParams; /* This wraps tempBoard, N, n, m fields and passed to other functions */
 
     /* First check if all N*N cells are assigned - if they are then the board is legally (precondition) full
      * and we return numOfSols == 1 TODO check carefully that count is incremented and decremented on changes */
@@ -157,17 +159,16 @@ int countSolutions(gameParams *game) {
     /* Prepare gameParams object to pass to countWithBacktracking:
      * 1 - Copy current game board and mark ALL its assigned values as fixed
      * 2 - Wrap the tempBoard inside a gameParams struct */
-    tempBoard = copyBoard(game->userBoard,
-                          game->N); /* TODO implementation of copyBoard waits for allocateMatrix to be fixed */
+    tempBoard = copyBoard(game->userBoard, game->N);
     markAsFixed(tempBoard, game->N);
-    partialGameParams = wrapInGameParamsStruct(tempBoard, game->N, game->n,
+    temporaryGameParams = wrapInGameParamsStruct(tempBoard, game->N, game->n,
                                                game->m); /* TODO remember this may cause problems check while debugging */
 
     /* Call the main Backtracking Iterative function: */
-    countWithBacktracking(partialGameParams, &numOfSols);
+    countWithBacktracking(temporaryGameParams, &numOfSols);
 
     /* Free memory and return: */
-    freeSudokuGame(partialGameParams);
+    freeSudokuGame(temporaryGameParams);
     return numOfSols;
 }
 

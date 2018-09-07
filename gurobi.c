@@ -27,7 +27,6 @@ int **fromCellMatToIntMat(cell ***src, int N) {
             dst[i][j] = src[i][j]->value;
         }
     }
-
     return dst;
 }
 
@@ -299,8 +298,6 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
         }
     }
-
-
     /* return 0 (false) if 1-N assignments to (row,col) returned false (an unsolvable board)
      * and backtrack (this return serves as one piece of the if (solveUsingDetBacktrackting(userBoard)) recursion chain */
     return 0;

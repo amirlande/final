@@ -45,12 +45,10 @@ int boardIsEmpty(gameParams *game) {
 /* Allocates memory for a new board and copies values of
  * board_to_be_copied.
  * Returns pointer to the new board struct (Notice - it is a cell ****) */
-BOARD*copyBoard(cell ***board_to_be_copied, int N) {
+cell ***copyBoard(cell ***board_to_be_copied, int N) {
     int i, j;
-    BOARD*pointerToBoard;
-    BOARD copyOfBoard;
+    cell ***copyOfBoard;
 
-    pointerToBoard = (BOARD*) malloc(sizeof(BOARD));
     copyOfBoard = allocateCellMatrix(N);
 
     /* Copy cell by cell values: */
@@ -61,9 +59,7 @@ BOARD*copyBoard(cell ***board_to_be_copied, int N) {
             copyOfBoard[i][j]->isValid = board_to_be_copied[i][j]->isValid;
         }
     }
-    *pointerToBoard = copyOfBoard;
-    printNotImplementedMessage("copyBoard"); /* TODO remove this when we fix allocateCellMatrix */
-    return pointerToBoard;
+    return copyOfBoard;
 }
 
 /* returns the line separator for print_board
@@ -75,7 +71,7 @@ char *getLineSeparator(gameParams *game) {
     m = game->m;
     N = game->N;
 
-    separator = malloc(sizeof(char) * (4 * N + m + 1));
+    separator = malloc(sizeof(char) * (4 * N + m + 1) + 1);
     if (separator == NULL) {
         freeSudokuGame(game);
         printMallocFailed();
@@ -92,37 +88,48 @@ char *getLineSeparator(gameParams *game) {
 
 
 /* Allocates memory to new nodes
- * frees all previous nodes that was next to current node
+ * frees all previous nodes that were next to current node
  * sets the curr and prev pointers
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game) {
 
-    freeAllUserMoveNodes(game->movesList->currentMove->next);
+    /* First free all userMove nodes that are next to currentMove (NULL check needed in case moveList is empty) */
+    if (game->movesList->currentMove != NULL) {
+        freeAllUserMoveNodes(game->movesList->currentMove->next);
+    }
     userMoveNode *newPrev = game->movesList->currentMove;
-    userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    userMoveNode *newCurr = (userMoveNode *)malloc(sizeof(userMoveNode));
+
     if (newCurr == NULL) {
-        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
-    newPrev->next = newCurr;
+    if (newPrev != NULL) { /* Set previous's next to the new current move, unless prev was NULL */
+        newPrev->next = newCurr;
+    }
+    game->movesList->currentMove = newCurr;
     newCurr->prev = newPrev;
     newCurr->next = NULL;
-    newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode *));
+
+    /* CHANGE NODE */
+    newCurr->change = (cellChangeRecNode *)malloc(sizeof(cellChangeRecNode));
     if (newCurr->change == NULL) {
-        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
-    newCurr->change->currVal = (cell *) malloc(sizeof(cell *));
+
+    newCurr->change->currVal = (cell *)malloc(sizeof(cell));
     if (newCurr->change->currVal == NULL) {
-        freeSudokuGame(game);
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
+
     newCurr->change->next = NULL;
-    game->movesList->currentMove = newCurr;
-    game->movesList->size++;
+    if (game->movesList->currentMove->prev == NULL) { /* In case the new current move node becomes the head */
+        game->movesList->head = game->movesList->currentMove;
+    }
+
+    /* game->movesList->size++; */
 }
 
 /* Checks if Z is a valid value for non-fixed cell <X,Y> */
@@ -247,6 +254,7 @@ int checkIfColumnValid(int x, int y, int z, gameParams *game) {
 int doesCellHaveASingleLegalValue(gameParams *game, int x, int y) {
 
     int i, counter, N, value;
+    value = 0;
     N = game->n * game->m;
     counter = 0;
     for (i = 1; i < N + 1; i++) {
@@ -279,8 +287,9 @@ void setValue(gameParams *game, int x, int y, int z) {
 
     /* sets the value */
     game->userBoard[x][y]->value = z;
-    game->userBoard[x][y]->isValid = checkIfValid(x, y, z, game);
-    game->userBoard[x][y]->isFixed = 0;
+    game->userBoard[x][y]->isValid = FALSE; /* Doesn't matter what we assign - in the end we run a function that
+ * goes over all the board and checks each cell's validity*/
+    game->userBoard[x][y]->isFixed = FALSE;
 }
 
 /* Called by autoFill
@@ -341,7 +350,9 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
 
     userMoveNode *newMove;
-    freeAllUserMoveNodes(game->movesList->currentMove->next);
+    if (game->movesList->currentMove->next !=NULL) {
+        freeAllUserMoveNodes(game->movesList->currentMove->next);
+    }
     newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
     if (newMove == NULL) {
         freeSudokuGame(game);
@@ -353,7 +364,7 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     newMove->change = changeListHead;
     game->movesList->currentMove->next = newMove;
     game->movesList->currentMove = newMove;
-    game->movesList->size++;
+    /* game->movesList->size++; */
 
 }
 

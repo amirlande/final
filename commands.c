@@ -42,9 +42,9 @@ int edit(gameParams *game, char *filePath) {
     if (filePath == NULL) { /* no path was provided by user - enter EDIT mode with an empty 9x9 board */
         cleanSudokuGame(game);
         initializeSudokuGameFields(game, 3, 3);
+        game->mode = EDIT_MODE;
         return TRUE;
     }
-
     file = fopen(filePath, "r");
     if (file == NULL) {
         printErrorOpeningFile(EDIT_MODE); /* Prints the required error message according to mode */
@@ -54,6 +54,7 @@ int edit(gameParams *game, char *filePath) {
     cleanSudokuGame(game);
     /* Load new fields from file */
     loadGameParamsFromFile(game, file, EDIT_MODE);
+    game->mode = EDIT_MODE;
     /* At this point game should hold the new parameters of the loaded board */
     fclose(file);
     return TRUE;
@@ -77,6 +78,7 @@ void printBoard(gameParams *game) {
     separatorRow = getLineSeparator(game);
     cellRow = '|';
 
+    updateErrors(game);
     for (i = 0; i < N; i++) {
         if (i % m == 0) {
             printf("%s\n", separatorRow);
@@ -86,7 +88,9 @@ void printBoard(gameParams *game) {
                 printf("%c", cellRow);
             }
             cellState = ' ';
-            if (!(game->userBoard[i][j]->isValid) && (game->markErrors)) {
+
+            if ((!(game->userBoard[i][j]->isValid) && (game->markErrors)) ||
+                    (!(game->userBoard[i][j]->isValid) && game->mode == EDIT_MODE)) {
                 cellState = '*';
             }
             if ((game->userBoard[i][j]->isFixed) && (game->mode != EDIT_MODE)) {
@@ -114,31 +118,31 @@ void printBoard(gameParams *game) {
  * lists and nodes are updated properly */
 int set(int x, int y, int z, gameParams *game) {
 
+    /* I took this out - this is not a requirement
+     * Erroneous cells are allowed (see under SET.g.)
     if (checkIfValid(x - 1, y - 1, z, game) == FALSE) {
         printf("Error: value is invalid\n");
         return 0;
     }
+     */
 
     /* no cell is considered fixed when on edit mode, according to forum */
-    if (game->mode != EDIT_MODE && game->userBoard[x - 1][y - 1]->isFixed) {
+    if (game->mode == SOLVE_MODE && game->userBoard[x - 1][y - 1]->isFixed) {
         printf("Error: cell is fixed\n");
         return 0;
     }
 
-    getNewCurrentMove(game);
+    getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
     game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
-    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal;
-
+    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal; /* TODO - find out again wi th Eran */
     setValue(game, x - 1, y - 1, z);
     updateErrors(game);
-    printBoard(game);
 
+    // TODO : handling the game when it's done
 
-    // TODO : handeling the game when it's done
-
-    if ((game->mode == SOLVE_MODE) && (game->counter == game->N)) {
+    if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
         if (validate(game) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
@@ -148,10 +152,7 @@ int set(int x, int y, int z, gameParams *game) {
             // TODO the user will have to undo the move to continue solving ?? where to implement
         }
     }
-
-
     return 1;
-
 }
 
 /* Preconditions: 1. called only on EDIT or SOLVE modes
@@ -296,30 +297,35 @@ int generate(gameParams *game, int x, int y) {
  * made this change for the reset func */
 int undoEnveloped(gameParams *game, int isReset) {
 
-    cellChangeRecNode *moveToUndo, *moveToPrint;
+    cellChangeRecNode *changeToUndo, *changeToPrint;
 
-    if (game->movesList->size == 0) {
+    if (game->movesList->currentMove == NULL) {
         printf("Error: no moves to undo\n");
-        return 0;
+        return FALSE;
     }
 
-    moveToUndo = game->movesList->currentMove->change;
-    moveToPrint = moveToUndo;
+    changeToUndo = game->movesList->currentMove->change;
+    changeToPrint = changeToUndo;
+
+    /* Update new current move to point to previous move (may be NULL) */
     game->movesList->currentMove = game->movesList->currentMove->prev;
-    game->movesList->size--;
+    /* game->movesList->size--; */
 
+    /* Iterate over the (singly) linked list of cell changes until we reach NULL */
+    while (changeToUndo != NULL) {
 
-    while (moveToUndo != NULL) {
-        game->userBoard[moveToUndo->x - 1][moveToUndo->y - 1] = moveToUndo->prevVal;
-        moveToUndo = moveToUndo->next;
-        game->counter--;
+        game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = changeToUndo->prevVal; /* Restore previous value */
+        /* TODO that last line of code - what happens to the old cell that game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] pointed to?
+         * TODO memory there isn't freed */
+        changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
+        game->counter--; /* TODO - problematic what if the undo changed 4 to 6? the counter shouldn't decrement */
     }
 
     updateErrors(game);
     if (isReset == FALSE) {
         /* not printing anything on reset */
         printBoard(game);
-        printChanges(game, moveToPrint, 0);
+        printChanges(game, changeToPrint, 0);
     }
 
     return 1;
@@ -346,28 +352,41 @@ int undo(gameParams *game) {
  * lists and nodes are updated properly */
 int redo(gameParams *game) {
 
-    cellChangeRecNode *moveToRedo, *moveToPrint;
+    cellChangeRecNode *changeToRedo, *changeToPrint;
 
-    if (game->movesList->currentMove->next == NULL) {
-        printf("Error: no moves to redo\n");
-        return 0;
+    /* Check if current points to NULL (in case we are redoing when current points to NULL
+     * (since all moves have been undone) bu head points to a move (since the moves that have been done can still be redone)*/
+    if (game->movesList->currentMove == NULL) { /* current points to NULL */
+        if (game->movesList->head != NULL) {
+            game->movesList->currentMove = game->movesList->head;
+        }
+        else {
+            printf("Error: no moves to redo\n");
+            return FALSE;
+        }
     }
-    game->movesList->currentMove = game->movesList->currentMove->next;
-    moveToRedo = game->movesList->currentMove->change;
-    moveToPrint = moveToRedo;
-    game->movesList->size++;
+    else { /* current doesn't point to NULL - check if there is next nove to redo */
+        if (game->movesList->currentMove->next == NULL) {
+            printf("Error: no moves to redo\n");
+            return FALSE;
+        }
+        game->movesList->currentMove = game->movesList->currentMove->next;
+    }
+    /* Getting here means that game->movesList->currentMove points to a valid (not NULL) move to be redone */
+    changeToRedo = game->movesList->currentMove->change;
+    changeToPrint = changeToRedo;
 
-    while (moveToRedo != NULL) {
-        game->userBoard[moveToRedo->x - 1][moveToRedo->y - 1] = moveToRedo->currVal;
-        moveToRedo = moveToRedo->next;
-        game->counter++;
+    while (changeToRedo != NULL) {
+        game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = changeToRedo->currVal;
+        changeToRedo = changeToRedo->next;
+        game->counter++; /* TODO same here - problematic since a change in a cell doesn't necessarily increment the counter */
     }
 
     updateErrors(game);
     printBoard(game);
-    printChanges(game, moveToPrint, 1);
+    printChanges(game, changeToPrint, 1);
 
-    return 1;
+    return TRUE;
 }
 
 int save(gameParams *game, char *filePath) {
@@ -379,11 +398,14 @@ int save(gameParams *game, char *filePath) {
             printf("Error: board contains erroneous values\n");
             return FALSE;
         }
+        /*
         if (validate(game) == FALSE) {
             printf("Error: board validation failed\n");
             return FALSE;
         }
+         */
     }
+    //file = fopen("C:\\temp\\sudoku", "w");
     file = fopen(filePath, "w");
     if (file == NULL) {
         printf("Error: File cannot be created or modified\n");

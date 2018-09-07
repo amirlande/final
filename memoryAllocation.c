@@ -11,7 +11,12 @@
 gameParams *initSudokuGame() {
     gameParams *newGame;
 
-    newGame = (gameParams *) (malloc(sizeof(gameParams)));
+    newGame = (gameParams *) malloc(sizeof(gameParams));
+    if (newGame == NULL) {
+        printMallocFailed();
+        exit(EXIT_FAILURE);
+    }
+
     newGame->mode = INIT_MODE;
     newGame->markErrors = 1;
     newGame->m = 0;
@@ -64,7 +69,10 @@ void cleanSudokuGame(gameParams *game) {
     game->counter = 0;
     freeCellMatrix(game->userBoard, game->N);
     freeCellMatrix(game->solution, game->N);
+    /* Free all memory used by moveList nodes and set head and current to NULL */
     freeAllUserMoveNodes(game->movesList->head); /* TODO ask Eran about this */
+    game->movesList->currentMove = NULL;
+    game->movesList->head = NULL;
 }
 
 /* Frees all memory allocated to the given board
@@ -92,9 +100,9 @@ void freeAllUserMoveNodes(userMoveNode *moveToFree) {
     if (moveToFree == NULL) {
         return;
     }
-    userMoveNode *nextMove = moveToFree->next;
+    freeAllUserMoveNodes(moveToFree->next);
+
     freeCellChangeRecNode(moveToFree->change);
-    freeAllUserMoveNodes(nextMove);
     free(moveToFree);
 }
 
@@ -106,10 +114,10 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
         return;
     }
 
-    cellChangeRecNode *nextChange = changeToFree->next;
+    freeCellChangeRecNode(changeToFree->next);
+
     free(changeToFree->prevVal);
-    free(changeToFree->currVal);
-    freeCellChangeRecNode(nextChange);
+    free(changeToFree->currVal); /* TODO Causes program to crash on specific scenario */
     free(changeToFree);
 
 }
@@ -162,13 +170,13 @@ int **allocateIntMatrix(int N) {
     int i, **mat;
     mat = calloc((size_t)N, sizeof(int *));
     if (mat == NULL) {
-        printf("Error: calloc has failed\n");
+        printCallocFailed();
         exit(0);
     }
     for (i = 0; i < N; i++) {
         mat[i] = calloc((size_t)N, sizeof(int));
         if (mat[i] == NULL) {
-            printf("Error: calloc has failed\n");
+            printCallocFailed();
             exit(0);
         }
     }
@@ -194,5 +202,8 @@ listOfMoves *allocateMoveList() {
         printMallocFailed();
         return NULL;
     }
+    list->head = NULL;
+    list->currentMove = NULL;
+    /* list->size = 0; */
     return list;
 }

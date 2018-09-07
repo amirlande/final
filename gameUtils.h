@@ -21,7 +21,7 @@ int boardIsEmpty(gameParams *game);
 /* Allocates memory for a new board and copies values of
  * board_to_be_copied.
  * Returns pointer to the new board struct (Notice - it is a cell ****) */
-BOARD*copyBoard(cell ***board_to_be_copied, int N);
+cell ***copyBoard(cell ***board_to_be_copied, int N);
 
 /* returns the line separator for print_board
  * consists 4N+m+1 dashes ('-')
