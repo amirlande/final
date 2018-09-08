@@ -90,7 +90,7 @@ void printBoard(gameParams *game) {
             cellState = ' ';
 
             if ((!(game->userBoard[i][j]->isValid) && (game->markErrors)) ||
-                    (!(game->userBoard[i][j]->isValid) && game->mode == EDIT_MODE)) {
+                (!(game->userBoard[i][j]->isValid) && game->mode == EDIT_MODE)) {
                 cellState = '*';
             }
             if ((game->userBoard[i][j]->isFixed) && (game->mode != EDIT_MODE)) {
@@ -136,7 +136,7 @@ int set(int x, int y, int z, gameParams *game) {
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
     game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
-    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal; /* TODO - find out again wi th Eran */
+    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal; /* TODO - find out again with Eran */
     setValue(game, x - 1, y - 1, z);
     updateErrors(game);
 
@@ -194,7 +194,7 @@ int getRandomLegalValue(gameParams *game, int row, int col) {
     int N, numberOfLegalValues, randomIndex, randomValue;
 
     N = game->N;
-    possibleLegalVals = (int *)calloc((size_t)N, sizeof(int));
+    possibleLegalVals = (int *) calloc((size_t) N, sizeof(int));
     if (possibleLegalVals == NULL) {
         printCallocFailed();
         exit(EXIT_FAILURE);
@@ -252,7 +252,8 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
             cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution values to zeros */
             continue; /* Attempt failed - continue to next iteration */
         }
-        markFullCellsAsFixed(game->userBoard, game->N); /* Mark all x chosen cells as fixed before passing to ILP solver */
+        markFullCellsAsFixed(game->userBoard,
+                             game->N); /* Mark all x chosen cells as fixed before passing to ILP solver */
         /* At this point randomlyFillXCells should have filled X cells and marked them as FIXED */
         success = solveUsingILP(game, ILP_COMMAND_GENERATE);   /* On success: game->solution holds the solution */
         if (!success) {
@@ -315,10 +316,10 @@ int undoEnveloped(gameParams *game, int isReset) {
     while (changeToUndo != NULL) {
 
         game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = changeToUndo->prevVal; /* Restore previous value */
-        /* TODO that last line of code - what happens to the old cell that game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] pointed to?
-         * TODO memory there isn't freed */
         changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
-        game->counter--; /* TODO - problematic what if the undo changed 4 to 6? the counter shouldn't decrement */
+        if (changeToPrint->prevVal == 0) { /* decrements counter only when deleting a value */
+            game->counter--;
+        }
     }
 
     updateErrors(game);
@@ -359,13 +360,11 @@ int redo(gameParams *game) {
     if (game->movesList->currentMove == NULL) { /* current points to NULL */
         if (game->movesList->head != NULL) {
             game->movesList->currentMove = game->movesList->head;
-        }
-        else {
+        } else {
             printf("Error: no moves to redo\n");
             return FALSE;
         }
-    }
-    else { /* current doesn't point to NULL - check if there is next nove to redo */
+    } else { /* current doesn't point to NULL - check if there is next nove to redo */
         if (game->movesList->currentMove->next == NULL) {
             printf("Error: no moves to redo\n");
             return FALSE;
@@ -438,7 +437,6 @@ int hint(int x, int y, gameParams *game) {
         printf("Error: board is unsolvable\n");
         return FALSE;
     }
-    /* TODO may need to change this if solution is int** */
     hint = game->solution[x - 1][y - 1]->value;
     printf("Hint: set cell to %d\n", hint);
 
@@ -510,12 +508,18 @@ int autoFill(gameParams *game) {
  * all move nodes are freed except head node
  * */
 int reset(gameParams *game) {
-    //TODO: not tested
-    while (game->movesList->currentMove != game->movesList->head) {
+    cell ***boardTofFree;
+
+    while (game->movesList->currentMove != NULL) {
         undoEnveloped(game, 1);
     }
 
-    freeAllUserMoveNodes(game->movesList->head->next);
+    boardTofFree = game->userBoard;
+    game->userBoard = allocateCellMatrix(game->N);
+    freeCellMatrix(boardTofFree,game->N);
+    freeAllUserMoveNodes(game->movesList->head);
+    free(game->movesList);
+    game->movesList = allocateMoveList();
     printf("Board reset\n");
     return 1;
 }

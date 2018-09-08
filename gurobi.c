@@ -269,7 +269,8 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
  * returns "1" if solvable, "0" otherwise
  * */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
-    int row, col, val, N, i, j;
+
+    int N, i, j, tot;
     N = n * m;
 
     for (i = 0; i < N; i++) {
@@ -278,8 +279,18 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         }
     }
 
+
+     return solveDet(res, n, m);
+
+}
+
+
+int solveDet(int **res, int n, int m) {
+    int row, col, val, N;
+    N = n * m;
+
     /* if no empty cells exist then board is legally full - return 1 (true)
-     * otherwise - (row, col) holds the first unassigned cell from (left to right and top to bottom) */
+  * otherwise - (row, col) holds the first unassigned cell from (left to right and top to bottom) */
     if (findEmptyCell(res, N, &row, &col) == 0) {
         return 1;
     }
@@ -290,17 +301,18 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         if (tempCheckIfValid(row, col, val, res, n, m)) {
             res[row][col] = val;
             /* if assigning (row, col) = val resulted in success return 1 (true), otherwise - remove val */
-            if (ILP(board,res,n,m,command)) {
+            if (solveDet(res, n, m)) {
                 return 1;
             } else {
                 res[row][col] = 0;
             }
-
         }
     }
     /* return 0 (false) if 1-N assignments to (row,col) returned false (an unsolvable board)
      * and backtrack (this return serves as one piece of the if (solveUsingDetBacktrackting(userBoard)) recursion chain */
     return 0;
+
+
 }
 
 /* userBoard is a 9x9 matrix (sudoku board), row and col are pointers to ints

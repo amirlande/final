@@ -100,8 +100,8 @@ void freeAllUserMoveNodes(userMoveNode *moveToFree) {
     if (moveToFree == NULL) {
         return;
     }
+    
     freeAllUserMoveNodes(moveToFree->next);
-
     freeCellChangeRecNode(moveToFree->change);
     free(moveToFree);
 }

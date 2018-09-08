@@ -67,7 +67,10 @@ int playTurn(gameParams *game) {
                 printErrorInCodeFlow("playTurn", "parser.c");
         }
     }
-    printBoard(game);
+
+    if (commandToPlay->type != UNDO) {
+        printBoard(game);
+    }
     freeCommand(commandToPlay);
     return TRUE;
 }

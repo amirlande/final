@@ -100,7 +100,7 @@ void setBoard(BOARD board, int N, int row, int col, int value) {
         for (j = 0; j < N; j++) {
             if (i > row || (i == row && j > col)) { /* Only cells that come "after" (row, col) */
                 if (!(board[i][j]->isFixed)) {
-                    (board)[i][j] = EMPTY;
+                    (board)[i][j]->value = EMPTY;
                 }
             }
         }

@@ -5,6 +5,7 @@
 #include "gameParams.h"
 #include "mainAux.h"
 #include "memoryAllocation.h"
+#include "tests.h"
 
 void playSudoku() {
     gameParams *game;
@@ -39,8 +40,8 @@ int emptyBoardGenerator(char *filePath) {
 
     n = 0;
     m = 0;
-    while (n == 0) {n = rand()%6;}
-    while (m == 0) {m = rand()%6;}
+    while (n == 0) { n = rand() % 6; }
+    while (m == 0) { m = rand() % 6; }
     N = n * m;
     printf("N = %d, n = %d, m = %d\n", N, n, m);
 
@@ -75,8 +76,7 @@ void testFileOpening() {
     file = fopen("board3", "w");
     if (file == NULL) {
         printf("Error opening ""board1"" for writing\n");
-    }
-    else {
+    } else {
         printf("Success\n");
     }
     fclose(file);
@@ -84,20 +84,22 @@ void testFileOpening() {
 
 }
 
+
+
 int main() {
     int seed;
     seed = time(NULL);
     srand(seed);
 
-    emptyBoardGenerator("randBoard"); /* TODO delete this before submitting project! */
+    emptyBoardGenerator("xxx"); /* TODO delete this before submitting project! */
     //testFileOpening();
 
     playSudoku();
     return 1;
 }
 
+#ifdef MAIN
 
-#ifdef OLDMAIN
 int main() {
 
 
@@ -109,11 +111,38 @@ int main() {
 
     */
     /* testing - merged from Eran's branch */
-    int x, y, k;
-    gameParams *game = getExampleGame(5, 2);
+    int x, y, k, **board;
+    gameParams *game;
+    game = (gameParams *) malloc(sizeof(gameParams));
+    game->userBoard = allocateCellMatrix(12);
+    game->n = 4;
+    game->m = 3;
+    game->counter = 0;
+    game->solution = allocateCellMatrix(12);
+    game->N = 12;
+    game->markErrors = 1;
+    game->movesList = allocateMoveList();
+
+
+    for (x = 0; x < 12; x++) {
+        for (y = 0; y < 12; y++) {
+            game->userBoard[x][y]->value = 0;
+        }
+    }
+
+    board = fromCellMatToIntMat(game->userBoard, 12);
     printBoard(game);
-    /*  undo(game);
-      redo(game);*/
+    validate(game);
+    //hint(1, 1, game);
+    //generate(game, 16, 3);
+
+    //solveUsingDetBacktrackingRecursion(board, 4, 3);
+    //solveDet(board, 4, 3);
+    //game->userBoard = fromIntMatToCellMat(board, 12);
+    game->userBoard = game->solution;
+    printBoard(game);
+
+/*
     printf("%d\n", game->userBoard[5][5]->value);
     printf("%d all\n", checkIfValid(5, 5, 1, game));
     printf("%d square\n", checkIfSquareValid(5, 5, 5, game));
@@ -121,12 +150,16 @@ int main() {
         for (x = 0; x < 10; x++) {
             for (k = 1; k < 11; k++) {
                 if (checkIfValid(x, y, k, game)) {
-                    printf("cell <%d,%d> (%d) can have %d\n", y, x,game->userBoard[x][y]->value, k);
+                    printf("cell <%d,%d> (%d) can have %d\n", y, x, game->userBoard[x][y]->value, k);
                 }
             }
         }
     }
+
+    */
     return 1;
 
 }
+
+
 #endif

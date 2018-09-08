@@ -46,4 +46,6 @@ int tempCheckIfRowValid(int x, int y, int z, int **board, int n, int m);
 /* Checks if value z does not appear in column y */
 int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m);
 
+int solveDet(int **res, int n, int m) ;
+
 #endif //FINAL_GUROBI_H
