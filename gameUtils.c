@@ -328,16 +328,12 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                         currentChange->next = NULL;
                     }
                     currentChange->prevVal = createCell(0);
-                    copyCell(currentChange->prevVal,game->userBoard[i][j]);
+                    copyCell(currentChange->prevVal, game->userBoard[i][j]);
                     free(game->userBoard[i][j]);
-                    game->userBoard[i][j] = (cell *) malloc(sizeof(cell));
-                    if (game->userBoard[i][j] == NULL) {
-                        freeSudokuGame(game);
-                        printMallocFailed();
-                        exit(EXIT_FAILURE);
-                    }
-                    /* setValue(game, i, j, legalValue); */
-                    currentChange->currVal = game->userBoard[i][j];
+                    game->userBoard[i][j] = createCell(0);
+                    setValue(game, i, j, legalValue);
+                    currentChange->currVal = createCell(0);
+                    copyCell(game->userBoard[i][j],currentChange->currVal);
                     currentChange->x = i + 1;
                     currentChange->y = j + 1;
                     currentChange->next = NULL;

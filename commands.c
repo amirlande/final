@@ -135,7 +135,8 @@ int set(int x, int y, int z, gameParams *game) {
     getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
-    game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
+    game->movesList->currentMove->change->prevVal = createCell(0);
+    copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->prevVal);
     free(game->userBoard[x - 1][y - 1]);
     game->userBoard[x - 1][y - 1] = createCell(0);
     setValue(game, x - 1, y - 1, z);
@@ -320,15 +321,14 @@ int undoEnveloped(gameParams *game, int isReset) {
         game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = createCell(0);
         copyCell(changeToUndo->prevVal, /* <- src */
                  game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]); /* Restore previous value */
-        changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
-        if (changeToPrint->prevVal == 0) { /* decrements counter only when deleting a value */
-            if (changeToUndo->currVal != 0) {
+        if (changeToPrint->prevVal->value == 0) { /* decrements counter only when deleting a value */
+            if (changeToUndo->currVal->value != 0) {
                 game->counter--;
             }
-        } else if (changeToUndo->currVal == 0) {
+        } else if (changeToUndo->currVal->value == 0) {
             game->counter++;
         }
-
+        changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
     }
 
     updateErrors(game);
@@ -390,15 +390,16 @@ int redo(gameParams *game) {
         game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = createCell(0);
         /* copying currVal to userBoard */
         copyCell(changeToRedo->currVal, game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
-        changeToRedo = changeToRedo->next;
-        if (changeToRedo->prevVal == 0) {
-            if (changeToRedo->currVal != 0) {
+        if (changeToRedo->prevVal->value == 0) {
+            if (changeToRedo->currVal->value != 0) {
                 game->counter++;
             }
 
-        } else if (changeToRedo->currVal == 0) {
+        } else if (changeToRedo->currVal->value == 0) {
             game->counter--;
         }
+        changeToRedo = changeToRedo->next;
+
     }
 
     updateErrors(game);

@@ -68,7 +68,7 @@ int playTurn(gameParams *game) {
         }
     }
 
-    if (commandToPlay->type != UNDO) {
+    if (commandToPlay->type != (UNDO) && commandToPlay->type != AUTO_FILL) {
         printBoard(game);
     }
     freeCommand(commandToPlay);
