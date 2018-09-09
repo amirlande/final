@@ -136,8 +136,10 @@ int set(int x, int y, int z, gameParams *game) {
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
     game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
-    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal; /* TODO - find out again with Eran */
+    free(game->userBoard[x - 1][y - 1]);
+    game->userBoard[x - 1][y - 1] = createCell(0);
     setValue(game, x - 1, y - 1, z);
+    copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
     updateErrors(game);
 
     // TODO : handling the game when it's done
@@ -314,8 +316,10 @@ int undoEnveloped(gameParams *game, int isReset) {
 
     /* Iterate over the (singly) linked list of cell changes until we reach NULL */
     while (changeToUndo != NULL) {
-
-        game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = changeToUndo->prevVal; /* Restore previous value */
+        free(game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]);
+        game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = createCell(0);
+        copyCell(changeToUndo->prevVal, /* <- src */
+                 game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]); /* Restore previous value */
         changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
         if (changeToPrint->prevVal == 0) { /* decrements counter only when deleting a value */
             game->counter--;
@@ -376,7 +380,9 @@ int redo(gameParams *game) {
     changeToPrint = changeToRedo;
 
     while (changeToRedo != NULL) {
-        game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = changeToRedo->currVal;
+        free(game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
+        game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = createCell(0);
+        copyCell(changeToRedo->currVal, game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
         changeToRedo = changeToRedo->next;
         game->counter++; /* TODO same here - problematic since a change in a cell doesn't necessarily increment the counter */
     }
@@ -485,12 +491,15 @@ int autoFill(gameParams *game) {
 
     changeListHead = getAutoFillChangeList(game, &numOfChanges);
 
+    printf("numOfChanges is %d\n", numOfChanges);
+
     if (numOfChanges == 0) {
         /* no alloc were made at this point */
         return 1;
     }
 
     setNewChangeListToGame(game, changeListHead);
+    setValuesBychangeListHead(game, changeListHead);
     game->counter += numOfChanges;
     updateErrors(game);
     printBoard(game);
@@ -516,7 +525,7 @@ int reset(gameParams *game) {
 
     boardTofFree = game->userBoard;
     game->userBoard = allocateCellMatrix(game->N);
-    freeCellMatrix(boardTofFree,game->N);
+    freeCellMatrix(boardTofFree, game->N);
     freeAllUserMoveNodes(game->movesList->head);
     free(game->movesList);
     game->movesList = allocateMoveList();

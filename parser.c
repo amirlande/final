@@ -424,6 +424,7 @@ commandStruct *getCommandFromUser(gameParams *game) {
     } else if (strcmp(token, "autofill") == 0) {
         if (commandAvailable(AUTO_FILL, game->mode)) {
             command->type = AUTO_FILL;
+            command->isValid = TRUE;
         }
         else {
             printInvalidCommand();

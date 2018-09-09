@@ -65,6 +65,10 @@ void setValue(gameParams *game, int x, int y, int z);
  * returns the list of changes */
 cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 
+
+void setValuesBychangeListHead(gameParams *game, cellChangeRecNode *changeListNode);
+
+
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
@@ -91,5 +95,7 @@ void markFullCellsAsFixed(cell ***board, int N);
  * and check if it is valid
  * or erroneous */
 void updateErrors(gameParams *game);
+
+void *copyCell(cell *src, cell *dst);
 
 #endif //FINAL_GAMEUTILS_H
