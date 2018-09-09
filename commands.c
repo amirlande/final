@@ -322,15 +322,21 @@ int undoEnveloped(gameParams *game, int isReset) {
                  game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]); /* Restore previous value */
         changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
         if (changeToPrint->prevVal == 0) { /* decrements counter only when deleting a value */
-            game->counter--;
+            if (changeToUndo->currVal != 0) {
+                game->counter--;
+            }
+        } else if (changeToUndo->currVal == 0) {
+            game->counter++;
         }
+
     }
 
     updateErrors(game);
     if (isReset == FALSE) {
-        /* not printing anything on reset */
+/* not printing anything on reset */
         printBoard(game);
-        printChanges(game, changeToPrint, 0);
+        printChanges(game, changeToPrint,
+                     0);
     }
 
     return 1;
@@ -382,9 +388,17 @@ int redo(gameParams *game) {
     while (changeToRedo != NULL) {
         free(game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
         game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = createCell(0);
+        /* copying currVal to userBoard */
         copyCell(changeToRedo->currVal, game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
         changeToRedo = changeToRedo->next;
-        game->counter++; /* TODO same here - problematic since a change in a cell doesn't necessarily increment the counter */
+        if (changeToRedo->prevVal == 0) {
+            if (changeToRedo->currVal != 0) {
+                game->counter++;
+            }
+
+        } else if (changeToRedo->currVal == 0) {
+            game->counter--;
+        }
     }
 
     updateErrors(game);
