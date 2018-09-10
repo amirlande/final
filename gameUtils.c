@@ -279,9 +279,9 @@ void setValue(gameParams *game, int x, int y, int z) {
 
     /* according to z value - increment or decrement game counter
     * if z was already set to (x,y) cell - don't change counter */
-    if ((z == 0) && (game->userBoard[x][y] != 0)) { /* when a non-zero cell is set back to zero (emptied) */
+    if ((z == 0) && (game->userBoard[x][y]->value != 0)) { /* when a non-zero cell is set back to zero (emptied) */
         game->counter--;
-    } else if ((z != 0) && (game->userBoard[x][y] == 0)) { /* when a zero cell is set to z (!=0) */
+    } else if ((z != 0) && (game->userBoard[x][y]->value == 0)) { /* when a zero cell is set to z (!=0) */
         game->counter++;
     }
 
@@ -328,12 +328,10 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                         currentChange->next = NULL;
                     }
                     currentChange->prevVal = createCell(0);
-                    copyCell(currentChange->prevVal, game->userBoard[i][j]);
+                    copyCell(game->userBoard[i][j], currentChange->prevVal);
                     free(game->userBoard[i][j]);
-                    game->userBoard[i][j] = createCell(0);
-                    setValue(game, i, j, legalValue);
-                    currentChange->currVal = createCell(0);
-                    copyCell(game->userBoard[i][j],currentChange->currVal);
+                    game->userBoard[i][j] = createCell(legalValue);
+                    currentChange->currVal = createCell(legalValue);
                     currentChange->x = i + 1;
                     currentChange->y = j + 1;
                     currentChange->next = NULL;
@@ -350,9 +348,9 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
 void setValuesBychangeListHead(gameParams *game, cellChangeRecNode *changeListNode) {
 
     int x, y;
-    x = changeListNode->x;
-    y = changeListNode->y;
     while (changeListNode != NULL) {
+        x = changeListNode->x;
+        y = changeListNode->y;
         setValue(game, x - 1, y - 1, changeListNode->currVal->value);
         changeListNode = changeListNode->next;
     }
@@ -364,7 +362,7 @@ void setValuesBychangeListHead(gameParams *game, cellChangeRecNode *changeListNo
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
 
     userMoveNode *newMove;
-    if (game->movesList->currentMove->next != NULL) {
+    if (game->movesList->currentMove != NULL && game->movesList->currentMove->next != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
     }
     newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
@@ -373,11 +371,19 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
-    newMove->prev = game->movesList->currentMove;
-    newMove->next = NULL;
+    if (game->movesList->currentMove == NULL) {
+        game->movesList->currentMove = newMove;
+        game->movesList->head = newMove;
+        newMove->prev = NULL;
+
+    } else {
+        newMove->prev = game->movesList->currentMove;
+        game->movesList->currentMove->next = newMove;
+        game->movesList->currentMove = newMove;
+    }
     newMove->change = changeListHead;
-    game->movesList->currentMove->next = newMove;
-    game->movesList->currentMove = newMove;
+    newMove->next = NULL;
+
     /* game->movesList->size++; */
 
 }

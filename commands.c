@@ -506,8 +506,6 @@ int autoFill(gameParams *game) {
 
     changeListHead = getAutoFillChangeList(game, &numOfChanges);
 
-    printf("numOfChanges is %d\n", numOfChanges);
-
     if (numOfChanges == 0) {
         /* no alloc were made at this point */
         return 1;

@@ -19,6 +19,7 @@ void playSudoku() {
     while (continueGame) {
         continueGame = playTurn(game); /* playTurn returns TRUE (1) on all commands except EXIT */
         fflush(stdout);
+        printf("game counter: %d\n",game->counter);
     }
 
     freeSudokuGame(game);
