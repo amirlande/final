@@ -71,7 +71,6 @@ void printBoard(gameParams *game) {
 
     int i, j, m, n, N;
     char cellRow, cellState, *separatorRow = NULL;
-// TODO : check bug on 3X3
     n = game->n;
     m = game->m;
     N = n * m;
@@ -97,7 +96,10 @@ void printBoard(gameParams *game) {
                 cellState = '.';
             }
 
-            printf(" %2d%c", game->userBoard[i][j]->value, cellState);
+            if (game->userBoard[i][j]->value == 0){
+                printf("   %c", cellState);
+            }else{
+            printf(" %2d%c", game->userBoard[i][j]->value, cellState);}
         }
         printf("%c\n", cellRow);
     }
@@ -126,6 +128,7 @@ int set(int x, int y, int z, gameParams *game) {
     }
      */
 
+    int prevZ;
     /* no cell is considered fixed when on edit mode, according to forum */
     if (game->mode == SOLVE_MODE && game->userBoard[x - 1][y - 1]->isFixed) {
         printf("Error: cell is fixed\n");
@@ -137,8 +140,9 @@ int set(int x, int y, int z, gameParams *game) {
     game->movesList->currentMove->change->y = y;
     game->movesList->currentMove->change->prevVal = createCell(0);
     copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->prevVal);
+    prevZ = game->movesList->currentMove->change->prevVal->value;
     free(game->userBoard[x - 1][y - 1]);
-    game->userBoard[x - 1][y - 1] = createCell(0);
+    game->userBoard[x - 1][y - 1] = createCell(prevZ);
     setValue(game, x - 1, y - 1, z);
     copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
     updateErrors(game);
@@ -536,11 +540,15 @@ int reset(gameParams *game) {
         undoEnveloped(game, 1);
     }
 
-    boardTofFree = game->userBoard;
+    /*boardTofFree = game->userBoard;
     game->userBoard = allocateCellMatrix(game->N);
     freeCellMatrix(boardTofFree, game->N);
     freeAllUserMoveNodes(game->movesList->head);
     free(game->movesList);
+    game->counter = 0;
+     */
+
+
     game->movesList = allocateMoveList();
     printf("Board reset\n");
     return 1;
