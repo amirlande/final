@@ -98,4 +98,4 @@ void updateErrors(gameParams *game);
 
 void *copyCell(cell *src, cell *dst);
 
-#endif //FINAL_GAMEUTILS_H
+#endif

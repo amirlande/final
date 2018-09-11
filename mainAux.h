@@ -9,4 +9,4 @@
  * return value: FALSE (0) if user enters EXIT or completes the board, TRUE (1) otherwise (game continues)*/
 int playTurn(gameParams *game);
 
-#endif //FINAL_MAINAUX_H
+#endif

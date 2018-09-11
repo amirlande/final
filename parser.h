@@ -18,4 +18,4 @@
  * the resolveCommand function should free this memory*/
 commandStruct *getCommandFromUser(gameParams *game);
 
-#endif //FINAL_PARSER_H
+#endif

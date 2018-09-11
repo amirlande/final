@@ -168,13 +168,13 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
     /* Each value must appear once in each subgrid */
     for (v = 0; v < N; v++) {
-        // defines what block are we at
+        /* defines what block are we at */
         for (ig = 0; ig < n; ig++) {
-            // number of blocks vertically (rows)
+            /* number of blocks vertically (rows) */
             for (jg = 0; jg < m; jg++) {
-                // number of block horizontally (cols)
+                /* number of block horizontally (cols) */
                 count = 0;
-                // iterates over the cells in that block
+                /* iterates over the cells in that block */
                 for (i = ig * m; i < (ig + 1) * m; i++) {
                     for (j = jg * n; j < (jg + 1) * n; j++) {
                         ind[count] = i * N * N + j * N + v;

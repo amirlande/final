@@ -143,16 +143,16 @@ int set(int x, int y, int z, gameParams *game) {
     copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
     updateErrors(game);
 
-    // TODO : handling the game when it's done
+    /* TODO : handling the game when it's done */
 
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
         if (validate(game) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
-            // TODO should follow by "Enter your command:\n"
+            /* TODO should follow by "Enter your command:\n" */
         } else {
             printf("Puzzle solution erroneous\n");
-            // TODO the user will have to undo the move to continue solving ?? where to implement
+            /* TODO the user will have to undo the move to continue solving ?? where to implement */
         }
     }
     return 1;
@@ -425,7 +425,7 @@ int save(gameParams *game, char *filePath) {
         }
          */
     }
-    //file = fopen("C:\\temp\\sudoku", "w");
+    /*file = fopen("C:\\temp\\sudoku", "w"); */
     file = fopen(filePath, "w");
     if (file == NULL) {
         printf("Error: File cannot be created or modified\n");
@@ -555,7 +555,7 @@ void exitGame(gameParams *game) {
 
     printf("Exiting...\n");
     freeSudokuGame(game);
-    // TODO (Amir?) : close all open files
+    /* TODO (Amir?) : close all open files */
 }
 
 

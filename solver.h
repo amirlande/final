@@ -19,4 +19,4 @@ int solveUsingILP(gameParams *game, ILPCommand cmd);
  * it is called by num_solutions (in commands.h) */
 int countSolutions(gameParams *game);
 
-#endif //FINAL_SOLVER_H
+#endif

@@ -13,4 +13,4 @@ int saveGameParamsToFile(gameParams *game, FILE *destfile, enum gameMode mode);
 int loadGameParamsFromFile(gameParams *game, FILE *sourcefile, enum gameMode mode);
 
 
-#endif //FINAL_INPUT_OUTPUT_H
+#endif

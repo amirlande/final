@@ -108,4 +108,4 @@ int reset(gameParams *game);
 void exitGame(gameParams *game);
 
 
-#endif //FINAL_COMMANDS_H
+#endif

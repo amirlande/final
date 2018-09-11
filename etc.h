@@ -10,4 +10,4 @@
 gameParams *getExampleGame(int n, int m);
 
 
-#endif //FINAL_ETC_H
+#endif

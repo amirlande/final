@@ -170,16 +170,16 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
         printf("%s %d,%d: ", command, moveToPrint->x, moveToPrint->y);
 
 
-        if (!curr) { // curr is zero
-            if (!prev) { // both zeros
+        if (!curr) {
+            if (!prev) {
                 printf("from _ to _\n");
-            } else { // curr zero, prev non zero
+            } else {
                 printf("from _ to %d\n", prev);
             }
-        } else { // curr is non zero
-            if (!prev) { // prev is zero
+        } else {
+            if (!prev) {
                 printf("from %d to _\n", curr);
-            } else { // both non zeros
+            } else {
                 printf("from %d to %d\n", curr, prev);
             }
         }

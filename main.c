@@ -93,7 +93,7 @@ int main() {
     srand(seed);
 
     emptyBoardGenerator("xxx"); /* TODO delete this before submitting project! */
-    //testFileOpening();
+    /*testFileOpening();*/
 
     playSudoku();
     return 1;
@@ -134,12 +134,13 @@ int main() {
     board = fromCellMatToIntMat(game->userBoard, 12);
     printBoard(game);
     validate(game);
-    //hint(1, 1, game);
+    /*//hint(1, 1, game);
     //generate(game, 16, 3);
 
     //solveUsingDetBacktrackingRecursion(board, 4, 3);
     //solveDet(board, 4, 3);
     //game->userBoard = fromIntMatToCellMat(board, 12);
+     */
     game->userBoard = game->solution;
     printBoard(game);
 

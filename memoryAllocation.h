@@ -59,4 +59,4 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree);
 
 listOfMoves *allocateMoveList();
 
-#endif //FINAL_MEMORYALLOCATION_H
+#endif

@@ -45,4 +45,4 @@ commandStruct *initializeCommand();
 
 void freeCommand(commandStruct *command);
 
-#endif //FINAL_COMMANDSTRUCT_H
+#endif

@@ -45,4 +45,4 @@ int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m);
 
 int solveDet(int **res, int n, int m) ;
 
-#endif //FINAL_GUROBI_H
+#endif

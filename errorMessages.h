@@ -17,4 +17,4 @@ void printCallocFailed();
 
 void printErrorOpeningFile(enum gameMode mode);
 
-#endif //FINAL_ERRORMESSAGES_H
+#endif
