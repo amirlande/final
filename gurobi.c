@@ -44,7 +44,7 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     return dst;
 }
 
-#if REALGUROBI
+
 /* Solves sudoku using ILP
  * res will hold the solved board values */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
@@ -52,9 +52,10 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     int N, error, i, j, v, ig, jg, count, *ind, *ind2, optimstatus, result;
     double *sol, *val, *val2, *lb, objval;
     char *vtype;
+    GRBmodel *model;
     GRBenv *env;
     env = NULL;
-    GRBmodel *model = NULL;
+    model = NULL;
     N = n * m;
     sol = (double *) malloc(N * N * N * sizeof(double));
     ind = (int *) malloc(N * sizeof(int));
@@ -260,8 +261,8 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreeenv(env);
 }
 
-#endif
 
+#if 0
 
 /* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
  * returns "1" if solvable, "0" otherwise
@@ -410,3 +411,4 @@ int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
 }
 
 
+#endif
