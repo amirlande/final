@@ -23,6 +23,7 @@ gameParams *initSudokuGame() {
     newGame->userBoard = NULL;
     newGame->counter = 0;
     newGame->movesList = allocateMoveList(); /* TODO - ask Eran how should be initialized here as well as in initializeSudokuGameFields */
+    return newGame;
 }
 
 void initializeSudokuGameFields(gameParams *game, int m, int n) {

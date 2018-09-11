@@ -278,7 +278,6 @@ commandStruct *getCommandFromUser(gameParams *game) {
     char input[COMMAND_LEN];
     char copyOfInput[COMMAND_LEN]; /* holds a copy of input string, to be passed to getParams function (since strtok alters input) */
     char *token;
-    int digit;
 
     command = initializeCommand(); /* memory allocation - Freed in the end of playSudoku() */
     token = (char *) malloc(COMMAND_LEN * sizeof(char) + 1); /* allocate memory using the COMMAND_LEN upper bound (memory freed in the end of the function)*/
