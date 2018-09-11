@@ -92,10 +92,11 @@ void printBoard(gameParams *game) {
                 cellState = '.';
             }
 
-            if (game->userBoard[i][j]->value == 0){
+            if (game->userBoard[i][j]->value == 0) {
                 printf("   %c", cellState);
-            }else{
-            printf(" %2d%c", game->userBoard[i][j]->value, cellState);}
+            } else {
+                printf(" %2d%c", game->userBoard[i][j]->value, cellState);
+            }
         }
         printf("%c\n", cellRow);
     }
@@ -270,6 +271,10 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
 }
 
 void randomlyClearYCells(gameParams *game, int y) {
+    int x;
+    x = y;
+    x++;
+    game++;
     /* TODO - implement */
 }
 
@@ -335,8 +340,7 @@ int undoEnveloped(gameParams *game, int isReset) {
     if (isReset == FALSE) {
 /* not printing anything on reset */
         printBoard(game);
-        printChanges(game, changeToPrint,
-                     0);
+        printChanges(changeToPrint, 0);
     }
 
     return 1;
@@ -404,7 +408,7 @@ int redo(gameParams *game) {
 
     updateErrors(game);
     printBoard(game);
-    printChanges(game, changeToPrint, 1);
+    printChanges(changeToPrint, 1);
 
     return TRUE;
 }
@@ -460,7 +464,7 @@ int hint(int x, int y, gameParams *game) {
     }
     hint = game->solution[x - 1][y - 1]->value;
     printf("Hint: set cell to %d\n", hint);
-
+    return 1;
 }
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
@@ -530,7 +534,6 @@ int autoFill(gameParams *game) {
  * all move nodes are freed except head node
  * */
 int reset(gameParams *game) {
-    cell ***boardTofFree;
 
     while (game->movesList->currentMove != NULL) {
         undoEnveloped(game, 1);

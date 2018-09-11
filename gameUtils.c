@@ -90,12 +90,14 @@ char *getLineSeparator(gameParams *game) {
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game) {
 
+    userMoveNode *newPrev, *newCurr;
+
     /* First free all userMove nodes that are next to currentMove (NULL check needed in case moveList is empty) */
     if (game->movesList->currentMove != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
     }
-    userMoveNode *newPrev = game->movesList->currentMove;
-    userMoveNode *newCurr = (userMoveNode *) malloc(sizeof(userMoveNode));
+    newPrev = game->movesList->currentMove;
+    newCurr = (userMoveNode *) malloc(sizeof(userMoveNode));
 
     if (newCurr == NULL) {
         printMallocFailed();
@@ -150,7 +152,7 @@ int checkIfValid(int x, int y, int z, gameParams *game) {
 }
 
 /* prints the changes after undo/redo */
-int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
+int printChanges(cellChangeRecNode *moveToPrint, int isRedo) {
     int curr, prev, tmp;
     char *command;
 

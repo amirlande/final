@@ -33,7 +33,7 @@ int checkIfValid(int x, int y, int z, gameParams *game);
 
 
 /* prints the changes after undo/redo */
-int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
+int printChanges(cellChangeRecNode *moveToPrint, int isRedo);
 
 
 /* Called by undo
