@@ -96,6 +96,6 @@ void markFullCellsAsFixed(cell ***board, int N);
  * or erroneous */
 void updateErrors(gameParams *game);
 
-void *copyCell(cell *src, cell *dst);
+void copyCell(cell *src, cell *dst);
 
 #endif

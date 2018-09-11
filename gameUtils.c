@@ -443,10 +443,11 @@ void updateErrors(gameParams *game) {
 }
 
 
-void *copyCell(cell *src, cell *dst) {
+void copyCell(cell *src, cell *dst) {
     dst->isValid = src->isValid;
     dst->value = src->value;
     dst->isFixed = src->isFixed;
+
 }
 
 
