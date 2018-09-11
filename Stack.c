@@ -61,6 +61,7 @@ int isEmpty(Stack *stack) {
         printErrorInCodeFlow("isEmpty", "Stack.c");
         return FALSE;
     }
+    return FALSE;
 }
 
 #ifdef OldStack

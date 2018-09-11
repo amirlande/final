@@ -108,7 +108,7 @@ void setBoard(BOARD board, int N, int row, int col, int value) {
 void countWithBacktracking(gameParams *gameParams, int *numOfSols) {
     Stack *stack;
     element *stackElement;
-    int row, col, value, N;
+    int row, col, N;
 
     stack = initializeStack();
     N = gameParams->N;
