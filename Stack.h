@@ -34,4 +34,4 @@ element *pop(Stack *stack);
 int isEmpty(Stack *stack);
 
 
-
+#endif

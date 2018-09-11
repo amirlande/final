@@ -24,7 +24,7 @@ typedef enum commandType {
     REDO = 12,
     SAVE = 13,
     NUM_SOLS = 14,
-    AUTO_FILL = 15,
+    AUTO_FILL = 15
 } commandType;
 
 /* definition of a struct used to represent a command

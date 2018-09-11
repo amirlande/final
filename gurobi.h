@@ -14,7 +14,7 @@
 typedef enum ILPCommand {
     ILP_COMMAND_VALIDATE = 1,
     ILP_COMMAND_GENERATE = 2,
-    ILP_COMMAND_HINT = 3,
+    ILP_COMMAND_HINT = 3
 } ILPCommand;
 
 
