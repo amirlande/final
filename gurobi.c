@@ -268,8 +268,11 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
  * */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
-    int N, i, j, tot;
+    int N, i, j;
     N = n * m;
+
+   /* TODO: just for compiling, remove this */
+    command++;
 
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
