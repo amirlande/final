@@ -1,6 +1,4 @@
-//
-// Created by eran on 07/09/18.
-//
+
 
 #ifndef FINAL_TESTS_H
 #define FINAL_TESTS_H

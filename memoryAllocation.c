@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/28/2018.
-//
 
 #include "memoryAllocation.h"
 
@@ -100,7 +97,7 @@ void freeAllUserMoveNodes(userMoveNode *moveToFree) {
     if (moveToFree == NULL) {
         return;
     }
-    
+
     freeAllUserMoveNodes(moveToFree->next);
     freeCellChangeRecNode(moveToFree->change);
     free(moveToFree);

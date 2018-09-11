@@ -1,6 +1,4 @@
-//
-// Created by eran on 01/09/18.
-//
+
 
 #include "gurobi.h"
 

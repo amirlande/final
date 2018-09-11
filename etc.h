@@ -1,6 +1,3 @@
-//
-// Created by eran on 18/08/18.
-//
 
 #ifndef FINAL_ETC_H
 #define FINAL_ETC_H

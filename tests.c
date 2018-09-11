@@ -1,6 +1,3 @@
-//
-// Created by eran on 07/09/18.
-//
 
 #include <printf.h>
 #include "tests.h"

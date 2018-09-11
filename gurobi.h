@@ -1,6 +1,3 @@
-//
-// Created by eran on 01/09/18.
-//
 
 #ifndef FINAL_GUROBI_H
 #define FINAL_GUROBI_H

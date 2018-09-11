@@ -1,6 +1,4 @@
-//
-// Created by amirlande on 9/1/2018.
-//
+
 
 #ifndef FINAL_MAINAUX_H
 #define FINAL_MAINAUX_H
