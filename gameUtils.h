@@ -33,7 +33,7 @@ int checkIfValid(int x, int y, int z, gameParams *game);
 
 
 /* prints the changes after undo/redo */
-int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo);
+int printChanges(cellChangeRecNode *moveToPrint, int isRedo);
 
 
 /* Called by undo
@@ -65,6 +65,10 @@ void setValue(gameParams *game, int x, int y, int z);
  * returns the list of changes */
 cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 
+
+void setValuesBychangeListHead(gameParams *game, cellChangeRecNode *changeListNode);
+
+
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
@@ -92,4 +96,6 @@ void markFullCellsAsFixed(cell ***board, int N);
  * or erroneous */
 void updateErrors(gameParams *game);
 
-#endif //FINAL_GAMEUTILS_H
+void copyCell(cell *src, cell *dst);
+
+#endif

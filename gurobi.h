@@ -1,6 +1,3 @@
-//
-// Created by eran on 01/09/18.
-//
 
 #ifndef FINAL_GUROBI_H
 #define FINAL_GUROBI_H
@@ -17,7 +14,7 @@
 typedef enum ILPCommand {
     ILP_COMMAND_VALIDATE = 1,
     ILP_COMMAND_GENERATE = 2,
-    ILP_COMMAND_HINT = 3,
+    ILP_COMMAND_HINT = 3
 } ILPCommand;
 
 
@@ -46,4 +43,6 @@ int tempCheckIfRowValid(int x, int y, int z, int **board, int n, int m);
 /* Checks if value z does not appear in column y */
 int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m);
 
-#endif //FINAL_GUROBI_H
+int solveDet(int **res, int n, int m) ;
+
+#endif

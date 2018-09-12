@@ -1,6 +1,4 @@
-//
-// Created by eran on 31/07/18.
-//
+
 #ifndef FINAL_COMMANDS_H
 #define FINAL_COMMANDS_H
 
@@ -110,4 +108,4 @@ int reset(gameParams *game);
 void exitGame(gameParams *game);
 
 
-#endif //FINAL_COMMANDS_H
+#endif

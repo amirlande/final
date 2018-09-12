@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/2/2018.
-//
 
 #ifndef FINAL_PARSER_H
 #define FINAL_PARSER_H
@@ -21,4 +18,4 @@
  * the resolveCommand function should free this memory*/
 commandStruct *getCommandFromUser(gameParams *game);
 
-#endif //FINAL_PARSER_H
+#endif

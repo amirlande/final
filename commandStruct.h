@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/23/2018.
-//
 
 #ifndef FINAL_COMMANDSTRUCT_H
 #define FINAL_COMMANDSTRUCT_H
@@ -27,7 +24,7 @@ typedef enum commandType {
     REDO = 12,
     SAVE = 13,
     NUM_SOLS = 14,
-    AUTO_FILL = 15,
+    AUTO_FILL = 15
 } commandType;
 
 /* definition of a struct used to represent a command
@@ -48,4 +45,4 @@ commandStruct *initializeCommand();
 
 void freeCommand(commandStruct *command);
 
-#endif //FINAL_COMMANDSTRUCT_H
+#endif

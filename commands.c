@@ -1,7 +1,3 @@
-//
-// Created by eran on 31/07/18.
-//
-
 
 #include "commands.h"
 
@@ -71,7 +67,6 @@ void printBoard(gameParams *game) {
 
     int i, j, m, n, N;
     char cellRow, cellState, *separatorRow = NULL;
-// TODO : check bug on 3X3
     n = game->n;
     m = game->m;
     N = n * m;
@@ -90,14 +85,18 @@ void printBoard(gameParams *game) {
             cellState = ' ';
 
             if ((!(game->userBoard[i][j]->isValid) && (game->markErrors)) ||
-                    (!(game->userBoard[i][j]->isValid) && game->mode == EDIT_MODE)) {
+                (!(game->userBoard[i][j]->isValid) && game->mode == EDIT_MODE)) {
                 cellState = '*';
             }
             if ((game->userBoard[i][j]->isFixed) && (game->mode != EDIT_MODE)) {
                 cellState = '.';
             }
 
-            printf(" %2d%c", game->userBoard[i][j]->value, cellState);
+            if (game->userBoard[i][j]->value == 0) {
+                printf("   %c", cellState);
+            } else {
+                printf(" %2d%c", game->userBoard[i][j]->value, cellState);
+            }
         }
         printf("%c\n", cellRow);
     }
@@ -126,6 +125,7 @@ int set(int x, int y, int z, gameParams *game) {
     }
      */
 
+    int prevZ;
     /* no cell is considered fixed when on edit mode, according to forum */
     if (game->mode == SOLVE_MODE && game->userBoard[x - 1][y - 1]->isFixed) {
         printf("Error: cell is fixed\n");
@@ -135,21 +135,25 @@ int set(int x, int y, int z, gameParams *game) {
     getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
-    game->movesList->currentMove->change->prevVal = game->userBoard[x - 1][y - 1];
-    game->userBoard[x - 1][y - 1] = game->movesList->currentMove->change->currVal; /* TODO - find out again wi th Eran */
+    game->movesList->currentMove->change->prevVal = createCell(0);
+    copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->prevVal);
+    prevZ = game->movesList->currentMove->change->prevVal->value;
+    free(game->userBoard[x - 1][y - 1]);
+    game->userBoard[x - 1][y - 1] = createCell(prevZ);
     setValue(game, x - 1, y - 1, z);
+    copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
     updateErrors(game);
 
-    // TODO : handling the game when it's done
+    /* TODO : handling the game when it's done */
 
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
         if (validate(game) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
-            // TODO should follow by "Enter your command:\n"
+            /* TODO should follow by "Enter your command:\n" */
         } else {
             printf("Puzzle solution erroneous\n");
-            // TODO the user will have to undo the move to continue solving ?? where to implement
+            /* TODO the user will have to undo the move to continue solving ?? where to implement */
         }
     }
     return 1;
@@ -194,7 +198,7 @@ int getRandomLegalValue(gameParams *game, int row, int col) {
     int N, numberOfLegalValues, randomIndex, randomValue;
 
     N = game->N;
-    possibleLegalVals = (int *)calloc((size_t)N, sizeof(int));
+    possibleLegalVals = (int *) calloc((size_t) N, sizeof(int));
     if (possibleLegalVals == NULL) {
         printCallocFailed();
         exit(EXIT_FAILURE);
@@ -252,7 +256,8 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
             cleanUserBoardAndSolution(game); /* Cleans game->userBoard and game->solution values to zeros */
             continue; /* Attempt failed - continue to next iteration */
         }
-        markFullCellsAsFixed(game->userBoard, game->N); /* Mark all x chosen cells as fixed before passing to ILP solver */
+        markFullCellsAsFixed(game->userBoard,
+                             game->N); /* Mark all x chosen cells as fixed before passing to ILP solver */
         /* At this point randomlyFillXCells should have filled X cells and marked them as FIXED */
         success = solveUsingILP(game, ILP_COMMAND_GENERATE);   /* On success: game->solution holds the solution */
         if (!success) {
@@ -266,6 +271,10 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
 }
 
 void randomlyClearYCells(gameParams *game, int y) {
+    int x;
+    x = y;
+    x++;
+    game++;
     /* TODO - implement */
 }
 
@@ -313,19 +322,25 @@ int undoEnveloped(gameParams *game, int isReset) {
 
     /* Iterate over the (singly) linked list of cell changes until we reach NULL */
     while (changeToUndo != NULL) {
-
-        game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = changeToUndo->prevVal; /* Restore previous value */
-        /* TODO that last line of code - what happens to the old cell that game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] pointed to?
-         * TODO memory there isn't freed */
+        free(game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]);
+        game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = createCell(0);
+        copyCell(changeToUndo->prevVal, /* <- src */
+                 game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]); /* Restore previous value */
+        if (changeToPrint->prevVal->value == 0) { /* decrements counter only when deleting a value */
+            if (changeToUndo->currVal->value != 0) {
+                game->counter--;
+            }
+        } else if (changeToUndo->currVal->value == 0) {
+            game->counter++;
+        }
         changeToUndo = changeToUndo->next; /* Move to next cell change (done on the same turn) */
-        game->counter--; /* TODO - problematic what if the undo changed 4 to 6? the counter shouldn't decrement */
     }
 
     updateErrors(game);
     if (isReset == FALSE) {
-        /* not printing anything on reset */
+/* not printing anything on reset */
         printBoard(game);
-        printChanges(game, changeToPrint, 0);
+        printChanges(changeToPrint, 0);
     }
 
     return 1;
@@ -359,13 +374,11 @@ int redo(gameParams *game) {
     if (game->movesList->currentMove == NULL) { /* current points to NULL */
         if (game->movesList->head != NULL) {
             game->movesList->currentMove = game->movesList->head;
-        }
-        else {
+        } else {
             printf("Error: no moves to redo\n");
             return FALSE;
         }
-    }
-    else { /* current doesn't point to NULL - check if there is next nove to redo */
+    } else { /* current doesn't point to NULL - check if there is next nove to redo */
         if (game->movesList->currentMove->next == NULL) {
             printf("Error: no moves to redo\n");
             return FALSE;
@@ -377,14 +390,25 @@ int redo(gameParams *game) {
     changeToPrint = changeToRedo;
 
     while (changeToRedo != NULL) {
-        game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = changeToRedo->currVal;
+        free(game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
+        game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = createCell(0);
+        /* copying currVal to userBoard */
+        copyCell(changeToRedo->currVal, game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
+        if (changeToRedo->prevVal->value == 0) {
+            if (changeToRedo->currVal->value != 0) {
+                game->counter++;
+            }
+
+        } else if (changeToRedo->currVal->value == 0) {
+            game->counter--;
+        }
         changeToRedo = changeToRedo->next;
-        game->counter++; /* TODO same here - problematic since a change in a cell doesn't necessarily increment the counter */
+
     }
 
     updateErrors(game);
     printBoard(game);
-    printChanges(game, changeToPrint, 1);
+    printChanges(changeToPrint, 1);
 
     return TRUE;
 }
@@ -405,7 +429,7 @@ int save(gameParams *game, char *filePath) {
         }
          */
     }
-    //file = fopen("C:\\temp\\sudoku", "w");
+    /*file = fopen("C:\\temp\\sudoku", "w"); */
     file = fopen(filePath, "w");
     if (file == NULL) {
         printf("Error: File cannot be created or modified\n");
@@ -438,10 +462,9 @@ int hint(int x, int y, gameParams *game) {
         printf("Error: board is unsolvable\n");
         return FALSE;
     }
-    /* TODO may need to change this if solution is int** */
     hint = game->solution[x - 1][y - 1]->value;
     printf("Hint: set cell to %d\n", hint);
-
+    return 1;
 }
 
 /* preconditions: 1. called only on EDIT or SOLVE modes
@@ -493,6 +516,7 @@ int autoFill(gameParams *game) {
     }
 
     setNewChangeListToGame(game, changeListHead);
+    setValuesBychangeListHead(game, changeListHead);
     game->counter += numOfChanges;
     updateErrors(game);
     printBoard(game);
@@ -510,12 +534,21 @@ int autoFill(gameParams *game) {
  * all move nodes are freed except head node
  * */
 int reset(gameParams *game) {
-    //TODO: not tested
-    while (game->movesList->currentMove != game->movesList->head) {
+
+    while (game->movesList->currentMove != NULL) {
         undoEnveloped(game, 1);
     }
 
-    freeAllUserMoveNodes(game->movesList->head->next);
+    /*boardTofFree = game->userBoard;
+    game->userBoard = allocateCellMatrix(game->N);
+    freeCellMatrix(boardTofFree, game->N);
+    freeAllUserMoveNodes(game->movesList->head);
+    free(game->movesList);
+    game->counter = 0;
+     */
+
+
+    game->movesList = allocateMoveList();
     printf("Board reset\n");
     return 1;
 }
@@ -525,7 +558,7 @@ void exitGame(gameParams *game) {
 
     printf("Exiting...\n");
     freeSudokuGame(game);
-    // TODO (Amir?) : close all open files
+    /* TODO (Amir?) : close all open files */
 }
 
 

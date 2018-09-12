@@ -1,6 +1,4 @@
-//
-// Created by eran on 01/09/18.
-//
+
 
 #include "gurobi.h"
 
@@ -46,7 +44,7 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     return dst;
 }
 
-#if REALGUROBI
+
 /* Solves sudoku using ILP
  * res will hold the solved board values */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
@@ -54,9 +52,10 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     int N, error, i, j, v, ig, jg, count, *ind, *ind2, optimstatus, result;
     double *sol, *val, *val2, *lb, objval;
     char *vtype;
+    GRBmodel *model;
     GRBenv *env;
     env = NULL;
-    GRBmodel *model = NULL;
+    model = NULL;
     N = n * m;
     sol = (double *) malloc(N * N * N * sizeof(double));
     ind = (int *) malloc(N * sizeof(int));
@@ -170,13 +169,13 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
     /* Each value must appear once in each subgrid */
     for (v = 0; v < N; v++) {
-        // defines what block are we at
+        /* defines what block are we at */
         for (ig = 0; ig < n; ig++) {
-            // number of blocks vertically (rows)
+            /* number of blocks vertically (rows) */
             for (jg = 0; jg < m; jg++) {
-                // number of block horizontally (cols)
+                /* number of block horizontally (cols) */
                 count = 0;
-                // iterates over the cells in that block
+                /* iterates over the cells in that block */
                 for (i = ig * m; i < (ig + 1) * m; i++) {
                     for (j = jg * n; j < (jg + 1) * n; j++) {
                         ind[count] = i * N * N + j * N + v;
@@ -262,15 +261,19 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreeenv(env);
 }
 
-#endif
 
+#if 0
 
 /* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
  * returns "1" if solvable, "0" otherwise
  * */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
-    int row, col, val, N, i, j;
+
+    int N, i, j;
     N = n * m;
+
+   /* TODO: just for compiling, remove this */
+    command++;
 
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
@@ -278,8 +281,18 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         }
     }
 
+
+     return solveDet(res, n, m);
+
+}
+
+
+int solveDet(int **res, int n, int m) {
+    int row, col, val, N;
+    N = n * m;
+
     /* if no empty cells exist then board is legally full - return 1 (true)
-     * otherwise - (row, col) holds the first unassigned cell from (left to right and top to bottom) */
+  * otherwise - (row, col) holds the first unassigned cell from (left to right and top to bottom) */
     if (findEmptyCell(res, N, &row, &col) == 0) {
         return 1;
     }
@@ -290,17 +303,18 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         if (tempCheckIfValid(row, col, val, res, n, m)) {
             res[row][col] = val;
             /* if assigning (row, col) = val resulted in success return 1 (true), otherwise - remove val */
-            if (ILP(board,res,n,m,command)) {
+            if (solveDet(res, n, m)) {
                 return 1;
             } else {
                 res[row][col] = 0;
             }
-
         }
     }
     /* return 0 (false) if 1-N assignments to (row,col) returned false (an unsolvable board)
      * and backtrack (this return serves as one piece of the if (solveUsingDetBacktrackting(userBoard)) recursion chain */
     return 0;
+
+
 }
 
 /* userBoard is a 9x9 matrix (sudoku board), row and col are pointers to ints
@@ -397,3 +411,4 @@ int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
 }
 
 
+#endif
