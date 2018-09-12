@@ -21,8 +21,7 @@ void playSudoku() {
         fflush(stdout);
         printf("game counter: %d\n",game->counter);
     }
-
-    freeSudokuGame(game);
+    printf("!!!\n");
 }
 
 /* Only for testing - this function randomly picks m, n between 1 and 5
@@ -39,10 +38,12 @@ int emptyBoardGenerator(char *filePath) {
         exit(EXIT_FAILURE);
     }
 
-    n = 0;
-    m = 0;
+    n = 1;
+    m = 2;
+
     while (n == 0) { n = rand() % 6; }
     while (m == 0) { m = rand() % 6; }
+
     N = n * m;
     printf("N = %d, n = %d, m = %d\n", N, n, m);
 

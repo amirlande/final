@@ -1,5 +1,4 @@
 
-#include <printf.h>
 #include "tests.h"
 #include <stdio.h>
 #include <stdlib.h>

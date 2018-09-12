@@ -3,6 +3,8 @@
 #include "gurobi.h"
 
 
+
+
 void updateSolved(double *sol, int **res, int N) {
     int i, j, k;
     for (i = 0; i < N; i++) {
@@ -44,6 +46,8 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     return dst;
 }
 
+
+#if 0
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
@@ -261,8 +265,8 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreeenv(env);
 }
 
+#endif
 
-#if 0
 
 /* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
  * returns "1" if solvable, "0" otherwise
@@ -411,4 +415,3 @@ int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
 }
 
 
-#endif
