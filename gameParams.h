@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 9/1/2018.
-//
 
 #ifndef FINAL_GAMEPARAMS_H
 #define FINAL_GAMEPARAMS_H
@@ -13,6 +10,7 @@
 #define VALID 1
 #define INVALID 0
 #define EMPTY 0
+#define NULL ((void *)0)
 #define FULL 1
 #define BOARD cell ***
 #define MAX_NUMBER_OF_ATTEMPTS 1000
@@ -83,4 +81,4 @@ typedef struct gameParams {
 
 
 
-#endif //FINAL_GAMEPARAMS_H
+#endif

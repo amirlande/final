@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/28/2018.
-//
 
 #ifndef FINAL_STACK_H
 #define FINAL_STACK_H
@@ -36,6 +33,5 @@ element *pop(Stack *stack);
 /* Returns TRUE (1) if stack->count == 0, FALSE (0) otherwise */
 int isEmpty(Stack *stack);
 
-#endif //FINAL_STACK_H
 
-
+#endif

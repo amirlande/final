@@ -1,7 +1,3 @@
-//
-// Created by amirlande on 8/2/2018.
-//
-
 
 #ifndef FINAL_SOLVER_H
 #define FINAL_SOLVER_H
@@ -23,4 +19,4 @@ int solveUsingILP(gameParams *game, ILPCommand cmd);
  * it is called by num_solutions (in commands.h) */
 int countSolutions(gameParams *game);
 
-#endif //FINAL_SOLVER_H
+#endif

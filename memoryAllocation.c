@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/28/2018.
-//
 
 #include "memoryAllocation.h"
 
@@ -26,6 +23,7 @@ gameParams *initSudokuGame() {
     newGame->userBoard = NULL;
     newGame->counter = 0;
     newGame->movesList = allocateMoveList(); /* TODO - ask Eran how should be initialized here as well as in initializeSudokuGameFields */
+    return newGame;
 }
 
 void initializeSudokuGameFields(gameParams *game, int m, int n) {
@@ -100,8 +98,8 @@ void freeAllUserMoveNodes(userMoveNode *moveToFree) {
     if (moveToFree == NULL) {
         return;
     }
-    freeAllUserMoveNodes(moveToFree->next);
 
+    freeAllUserMoveNodes(moveToFree->next);
     freeCellChangeRecNode(moveToFree->change);
     free(moveToFree);
 }

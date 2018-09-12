@@ -1,6 +1,5 @@
-//
-// Created by amirlande on 9/1/2018.
-//
+
+
 
 #include "mainAux.h"
 
@@ -67,7 +66,10 @@ int playTurn(gameParams *game) {
                 printErrorInCodeFlow("playTurn", "parser.c");
         }
     }
-    printBoard(game);
+
+    if (commandToPlay->type != (UNDO) && commandToPlay->type != AUTO_FILL) {
+        printBoard(game);
+    }
     freeCommand(commandToPlay);
     return TRUE;
 }

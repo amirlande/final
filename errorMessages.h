@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/23/2018.
-//
 
 #ifndef FINAL_ERRORMESSAGES_H
 #define FINAL_ERRORMESSAGES_H
@@ -20,4 +17,4 @@ void printCallocFailed();
 
 void printErrorOpeningFile(enum gameMode mode);
 
-#endif //FINAL_ERRORMESSAGES_H
+#endif

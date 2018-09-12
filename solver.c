@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/2/2018.
-//
 
 #include "solver.h"
 
@@ -100,7 +97,7 @@ void setBoard(BOARD board, int N, int row, int col, int value) {
         for (j = 0; j < N; j++) {
             if (i > row || (i == row && j > col)) { /* Only cells that come "after" (row, col) */
                 if (!(board[i][j]->isFixed)) {
-                    (board)[i][j] = EMPTY;
+                    (board)[i][j]->value = EMPTY;
                 }
             }
         }
@@ -111,7 +108,7 @@ void setBoard(BOARD board, int N, int row, int col, int value) {
 void countWithBacktracking(gameParams *gameParams, int *numOfSols) {
     Stack *stack;
     element *stackElement;
-    int row, col, value, N;
+    int row, col, N;
 
     stack = initializeStack();
     N = gameParams->N;

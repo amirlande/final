@@ -1,6 +1,4 @@
-//
-// Created by amirlande on 8/2/2018.
-//
+
 
 #include "input_output.h"
 
@@ -31,7 +29,7 @@ int saveGameParamsToFile(gameParams *game, FILE *destFile, enum gameMode mode) {
 int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mode) {
     int row, col, m, n, N;
     int numberOfFilledCells, c;
-
+    cell ***newUserBoard, ***newSolution;
     /* Get new parameters for gameParams fields: */
     /* First get m, n (ignoring white spaces) */
     while (isspace(c = fgetc(sourceFile))) {}
@@ -41,8 +39,8 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
     N = n * m;
 
     /* Allocate new matrix */
-    cell ***newUserBoard = allocateCellMatrix(N);
-    cell ***newSolution = allocateCellMatrix(N);
+    newUserBoard = allocateCellMatrix(N);
+    newSolution = allocateCellMatrix(N);
 
     /* Assign new fields to game: */
     game->mode = mode;

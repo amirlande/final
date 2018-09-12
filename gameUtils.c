@@ -1,6 +1,3 @@
-//
-// Created by eran on 31/07/18.
-//
 
 #include "gameUtils.h"
 
@@ -93,12 +90,14 @@ char *getLineSeparator(gameParams *game) {
  * -- no data is added -- */
 void getNewCurrentMove(gameParams *game) {
 
+    userMoveNode *newPrev, *newCurr;
+
     /* First free all userMove nodes that are next to currentMove (NULL check needed in case moveList is empty) */
     if (game->movesList->currentMove != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
     }
-    userMoveNode *newPrev = game->movesList->currentMove;
-    userMoveNode *newCurr = (userMoveNode *)malloc(sizeof(userMoveNode));
+    newPrev = game->movesList->currentMove;
+    newCurr = (userMoveNode *) malloc(sizeof(userMoveNode));
 
     if (newCurr == NULL) {
         printMallocFailed();
@@ -112,13 +111,13 @@ void getNewCurrentMove(gameParams *game) {
     newCurr->next = NULL;
 
     /* CHANGE NODE */
-    newCurr->change = (cellChangeRecNode *)malloc(sizeof(cellChangeRecNode));
+    newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
     if (newCurr->change == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
 
-    newCurr->change->currVal = (cell *)malloc(sizeof(cell));
+    newCurr->change->currVal = (cell *) malloc(sizeof(cell));
     if (newCurr->change->currVal == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);
@@ -153,7 +152,7 @@ int checkIfValid(int x, int y, int z, gameParams *game) {
 }
 
 /* prints the changes after undo/redo */
-int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
+int printChanges(cellChangeRecNode *moveToPrint, int isRedo) {
     int curr, prev, tmp;
     char *command;
 
@@ -173,16 +172,16 @@ int printChanges(gameParams *game, cellChangeRecNode *moveToPrint, int isRedo) {
         printf("%s %d,%d: ", command, moveToPrint->x, moveToPrint->y);
 
 
-        if (!curr) { // curr is zero
-            if (!prev) { // both zeros
+        if (!curr) {
+            if (!prev) {
                 printf("from _ to _\n");
-            } else { // curr zero, prev non zero
+            } else {
                 printf("from _ to %d\n", prev);
             }
-        } else { // curr is non zero
-            if (!prev) { // prev is zero
+        } else {
+            if (!prev) {
                 printf("from %d to _\n", curr);
-            } else { // both non zeros
+            } else {
                 printf("from %d to %d\n", curr, prev);
             }
         }
@@ -253,14 +252,14 @@ int checkIfColumnValid(int x, int y, int z, gameParams *game) {
  * returns FALSE - iff has 0, or more than 1 values */
 int doesCellHaveASingleLegalValue(gameParams *game, int x, int y) {
 
-    int i, counter, N, value;
+    int k, counter, N, value;
     value = 0;
     N = game->n * game->m;
     counter = 0;
-    for (i = 1; i < N + 1; i++) {
-        if (checkIfValid(x, y, i, game)) {
+    for (k = 1; k < N + 1; k++) {
+        if (checkIfValid(x, y, k, game)) {
             counter++;
-            value = i;
+            value = k;
             if (counter > 1) { return FALSE; }
         }
     }
@@ -279,9 +278,9 @@ void setValue(gameParams *game, int x, int y, int z) {
 
     /* according to z value - increment or decrement game counter
     * if z was already set to (x,y) cell - don't change counter */
-    if ((z == 0) && (game->userBoard[x][y] != 0)) { /* when a non-zero cell is set back to zero (emptied) */
+    if ((z == 0) && (game->userBoard[x][y]->value != 0)) { /* when a non-zero cell is set back to zero (emptied) */
         game->counter--;
-    } else if ((z != 0) && (game->userBoard[x][y] == 0)) { /* when a zero cell is set to z (!=0) */
+    } else if ((z != 0) && (game->userBoard[x][y]->value == 0)) { /* when a zero cell is set to z (!=0) */
         game->counter++;
     }
 
@@ -304,53 +303,65 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
     changes = 0;
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
-            legalValue = doesCellHaveASingleLegalValue(game, i, j);
-            if (legalValue != FALSE) {
-                if (changes == 0) {
-                    /* keep the first node */
-                    changeListHead = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
-                    if (changeListHead == NULL) {
-                        freeSudokuGame(game);
-                        printMallocFailed();
-                        exit(EXIT_FAILURE);
+            if (game->userBoard[i][j]->value == 0) {
+                legalValue = doesCellHaveASingleLegalValue(game, i, j);
+                if (legalValue != FALSE) {
+                    if (changes == 0) {
+                        /* keep the first node */
+                        changeListHead = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
+                        if (changeListHead == NULL) {
+                            freeSudokuGame(game);
+                            printMallocFailed();
+                            exit(EXIT_FAILURE);
+                        }
+                        currentChange = changeListHead;
+                        currentChange->next = NULL;
+                    } else {
+                        currentChange->next = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
+                        if (currentChange->next == NULL) {
+                            freeSudokuGame(game);
+                            printMallocFailed();
+                            exit(EXIT_FAILURE);
+                        }
+                        currentChange = currentChange->next;
+                        currentChange->next = NULL;
                     }
-                    currentChange = changeListHead;
-                } else {
-                    currentChange->next = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
-                    if (currentChange->next == NULL) {
-                        freeSudokuGame(game);
-                        printMallocFailed();
-                        exit(EXIT_FAILURE);
-                    }
-                    currentChange = currentChange->next;
+                    currentChange->prevVal = createCell(0);
+                    copyCell(game->userBoard[i][j], currentChange->prevVal);
+                    free(game->userBoard[i][j]);
+                    game->userBoard[i][j] = createCell(legalValue);
+                    currentChange->currVal = createCell(legalValue);
+                    currentChange->x = i + 1;
+                    currentChange->y = j + 1;
+                    currentChange->next = NULL;
+                    changes++;
+                    printf("Cell <%d,%d> set to %d\n", i + 1, j + 1, legalValue);
                 }
-                currentChange->prevVal = game->userBoard[i][j];
-                game->userBoard[i][j] = (cell *) malloc(sizeof(cell));
-                if (game->userBoard[i][j] == NULL) {
-                    freeSudokuGame(game);
-                    printMallocFailed();
-                    exit(EXIT_FAILURE);
-                }
-                setValue(game, i, j, legalValue);
-                currentChange->currVal = game->userBoard[i][j];
-                currentChange->x = i + 1;
-                currentChange->y = j + 1;
-                currentChange->next = NULL;
-                changes++;
-                printf("Cell <%d,%d> set to %d\n", i + 1, j + 1, legalValue);
             }
         }
     }
-
     *numOfChanges = changes;
     return changeListHead;
+}
+
+void setValuesBychangeListHead(gameParams *game, cellChangeRecNode *changeListNode) {
+
+    int x, y;
+    while (changeListNode != NULL) {
+        x = changeListNode->x;
+        y = changeListNode->y;
+        setValue(game, x - 1, y - 1, changeListNode->currVal->value);
+        changeListNode = changeListNode->next;
+    }
+
+
 }
 
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead) {
 
     userMoveNode *newMove;
-    if (game->movesList->currentMove->next !=NULL) {
+    if (game->movesList->currentMove != NULL && game->movesList->currentMove->next != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
     }
     newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
@@ -359,11 +370,19 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
         printMallocFailed();
         exit(EXIT_FAILURE);
     }
-    newMove->prev = game->movesList->currentMove;
-    newMove->next = NULL;
+    if (game->movesList->currentMove == NULL) {
+        game->movesList->currentMove = newMove;
+        game->movesList->head = newMove;
+        newMove->prev = NULL;
+
+    } else {
+        newMove->prev = game->movesList->currentMove;
+        game->movesList->currentMove->next = newMove;
+        game->movesList->currentMove = newMove;
+    }
     newMove->change = changeListHead;
-    game->movesList->currentMove->next = newMove;
-    game->movesList->currentMove = newMove;
+    newMove->next = NULL;
+
     /* game->movesList->size++; */
 
 }
@@ -406,6 +425,7 @@ void markFullCellsAsFixed(cell ***board, int N) {
     }
 }
 
+
 /* Iterates over each cell
  * and check if it is valid
  * or erroneous */
@@ -420,6 +440,14 @@ void updateErrors(gameParams *game) {
         }
 
     }
+}
+
+
+void copyCell(cell *src, cell *dst) {
+    dst->isValid = src->isValid;
+    dst->value = src->value;
+    dst->isFixed = src->isFixed;
+
 }
 
 

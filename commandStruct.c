@@ -1,6 +1,3 @@
-//
-// Created by amirlande on 8/23/2018.
-//
 
 
 #include "commandStruct.h"

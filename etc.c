@@ -1,6 +1,4 @@
-//
-// Created by eran on 18/08/18.
-//
+
 
 #define NULL 0
 
