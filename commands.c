@@ -135,20 +135,17 @@ int set(int x, int y, int z, gameParams *game) {
         return 0;
     }
 
-    /* only assign if it is a new value */
-    if (z != game->userBoard[y - 1][x - 1]->value) {
-        getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
-        game->movesList->currentMove->change->x = x;
-        game->movesList->currentMove->change->y = y;
-        game->movesList->currentMove->change->prevVal = createCell(0);
-        copyCell(game->userBoard[y - 1][x - 1], game->movesList->currentMove->change->prevVal);
-        prevZ = game->movesList->currentMove->change->prevVal->value;
-        free(game->userBoard[y - 1][x - 1]);
-        game->userBoard[y - 1][x - 1] = createCell(prevZ);
-        setValue(game, x - 1, y - 1, z);
-        copyCell(game->userBoard[y - 1][x - 1], game->movesList->currentMove->change->currVal);
+    getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
+    game->movesList->currentMove->change->x = x;
+    game->movesList->currentMove->change->y = y;
+    game->movesList->currentMove->change->prevVal = createCell(0);
+    copyCell(game->userBoard[y - 1][x - 1], game->movesList->currentMove->change->prevVal);
+    prevZ = game->movesList->currentMove->change->prevVal->value;
+    free(game->userBoard[y - 1][x - 1]);
+    game->userBoard[y - 1][x - 1] = createCell(prevZ);
+    setValue(game, x - 1, y - 1, z);
+    copyCell(game->userBoard[y - 1][x - 1], game->movesList->currentMove->change->currVal);
 
-    }
     updateErrors(game);
     printBoard(game);
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
