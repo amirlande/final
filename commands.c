@@ -148,8 +148,7 @@ int set(int x, int y, int z, gameParams *game) {
 
     printBoard(game);
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
-        /* TODO - implement solveUsingILP from SET command!! */
-        if (solveUsingILP(game, ILP_COMMAND_SET) == TRUE) {
+        if (solveUsingILP(game, ILP_COMMAND_VALIDATE) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
         } else {
@@ -266,6 +265,7 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
             continue; /* Attempt failed - continue to next iteration */
         }
         /* Getting here means solution holds a valid complete board */
+        cleanUserBoard(game);
         break;
     }
     return ((success == TRUE) ? TRUE : FALSE);
@@ -277,7 +277,7 @@ void randomlyClearAllButYCells(gameParams *game, int y) {
     N = game->N;
 
     counter = 0;
-    cellsToRemove = N*N - y;
+    cellsToRemove = N * N - y;
     while (counter < cellsToRemove) {
         randomRow = rand() % N;
         randomCol = rand() % N;
@@ -294,6 +294,8 @@ void randomlyClearAllButYCells(gameParams *game, int y) {
  * x, y are valid integers */
 int generate(gameParams *game, int x, int y) {
     int succeeded, i, j;
+    cellChangeRecNode *changeListHead;
+    changeListHead = NULL;
 
     if (!boardIsEmpty(game)) {
         printf("Error: board is not empty\n");
@@ -307,14 +309,83 @@ int generate(gameParams *game, int x, int y) {
     }
     /* Randomly clear Y cells: */
     randomlyClearAllButYCells(game, y);
-    /* Copy solution to userBoard */
+
     for (i = 0; i < game->N; i++) {
-        for (j = 0; j < game->N; j++)
-        game->userBoard[i][j]->value = game->solution[i][j]->value;
+        printf("\n");
+        for (j = 0; j < game->N; j++) {
+            printf(" %d ",game->solution[i][j]->value);
+        }
     }
+    printf("\n");
+
+    for (i = 0; i < game->N; i++) {
+        printf("\n");
+        for (j = 0; j < game->N; j++) {
+            printf(" %d ",game->userBoard[i][j]->value);
+        }
+    }
+    printf("\n");
+
+    changeListHead = getGenerateChangeList(game, y);
+    setNewChangeListToGame(game, changeListHead);
+    setValuesBychangeListHead(game, changeListHead);
+
     markFullCellsAsFixed(game->userBoard, game->N); /* Mark as FIXED all remaining cells */
+    game->counter += y;
     printBoard(game);
     return TRUE;
+}
+
+cellChangeRecNode *getGenerateChangeList(gameParams *game, int y) {
+
+    int i, j, N, changes, sol;
+    N = game->N;
+    cellChangeRecNode *changeListHead, *currentChange;
+    currentChange = NULL;
+    changeListHead = NULL;
+    changes = 0;
+
+
+    /* Copy solution to userBoard */
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            sol = game->solution[i][j]->value;
+            if (sol != 0) {
+                if (changes == 0) {
+                    /* keep the first node */
+                    changeListHead = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
+                    if (changeListHead == NULL) {
+                        freeSudokuGame(game);
+                        printMallocFailed();
+                        exit(EXIT_FAILURE);
+                    }
+                    currentChange = changeListHead;
+                    currentChange->next = NULL;
+                } else {
+                    currentChange->next = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
+                    if (currentChange->next == NULL) {
+                        freeSudokuGame(game);
+                        printMallocFailed();
+                        exit(EXIT_FAILURE);
+                    }
+                    currentChange = currentChange->next;
+                    currentChange->next = NULL;
+                }
+                currentChange->prevVal = createCell(0);
+                copyCell(game->userBoard[i][j], currentChange->prevVal);
+                free(game->userBoard[i][j]);
+                game->userBoard[i][j] = createCell(-1);
+                currentChange->currVal = createCell(sol);
+                currentChange->x = i + 1;
+                currentChange->y = j + 1;
+                currentChange->next = NULL;
+                changes++;
+            }
+        }
+    }
+
+    printf("changes are: %d\n",changes);
+    return changeListHead;
 }
 
 /* the REAL undo.
@@ -334,7 +405,6 @@ int undoEnveloped(gameParams *game, int isReset) {
 
     /* Update new current move to point to previous move (may be NULL) */
     game->movesList->currentMove = game->movesList->currentMove->prev;
-    /* game->movesList->size--; */
 
     /* Iterate over the (singly) linked list of cell changes until we reach NULL */
     while (changeToUndo != NULL) {
@@ -354,7 +424,7 @@ int undoEnveloped(gameParams *game, int isReset) {
 
     updateErrors(game);
     if (isReset == FALSE) {
-/* not printing anything on reset */
+        /* not printing anything on reset */
         printBoard(game);
         printChanges(changeToPrint, 0);
     }
@@ -438,14 +508,11 @@ int save(gameParams *game, char *filePath) {
             printf("Error: board contains erroneous values\n");
             return FALSE;
         }
-        /* TODO - implement solveUsingILP from SAVE command!! */
-
-        if (solveUsingILP(game, ILP_COMMAND_SAVE) == FALSE) {
+        if (solveUsingILP(game, ILP_COMMAND_VALIDATE) == FALSE) {
             printf("Error: board validation failed\n");
             return FALSE;
         }
     }
-    /*file = fopen("C:\\temp\\sudoku", "w"); */
     file = fopen(filePath, "w");
     if (file == NULL) {
         printf("Error: File cannot be created or modified\n");
@@ -537,9 +604,8 @@ int autoFill(gameParams *game) {
     updateErrors(game);
     printBoard(game);
 
-    /* TODO - implement solveUsingILP from AUTOFILL command!! */
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
-        if (solveUsingILP(game, ILP_COMMAND_AUTOFILL) == TRUE) {
+        if (solveUsingILP(game, ILP_COMMAND_VALIDATE) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
         } else {
@@ -572,7 +638,6 @@ int reset(gameParams *game) {
     free(game->movesList);
     game->counter = 0;
      */
-
 
     game->movesList = allocateMoveList();
     printf("Board reset\n");

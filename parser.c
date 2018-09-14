@@ -98,13 +98,12 @@ int commandAvailable(commandType type, enum gameMode mode) {
  * N - the N parameter of the sudoku board (sudoku has 1-N digits) */
 void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfInput, int N) {
     int number;
-    char *zeroToken;
     char *firstToken;
     char *secondToken;
     char *thirdToken;
 
 
-    zeroToken = strtok(copyOfInput, " \t\r\n"); /* gets rid of first word (already read before, in getCommandFromUser) */
+    strtok(copyOfInput, " \t\r\n"); /* gets rid of first word (already read before, in getCommandFromUser) */
 
     switch (typeOfCommand) {
         case SET: /* read 3 space-separated integers */

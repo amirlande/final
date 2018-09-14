@@ -299,7 +299,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
     cellChangeRecNode *changeListHead, *currentChange;
     currentChange = NULL;
     changeListHead = NULL;
-    N = game->n * game->m;
+    N = game->N;
     changes = 0;
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
@@ -329,7 +329,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                     currentChange->prevVal = createCell(0);
                     copyCell(game->userBoard[i][j], currentChange->prevVal);
                     free(game->userBoard[i][j]);
-                    game->userBoard[i][j] = createCell(legalValue);
+                    game->userBoard[i][j] = createCell(-1);
                     currentChange->currVal = createCell(legalValue);
                     currentChange->x = i + 1;
                     currentChange->y = j + 1;
@@ -399,6 +399,19 @@ void cleanUserBoardAndSolution(gameParams *game) {
             game->solution[i][j]->value = EMPTY;
             game->solution[i][j]->isFixed = FALSE;
             game->solution[i][j]->isValid = TRUE;
+        }
+    }
+}
+
+/* Cleans game->userBoard */
+void cleanUserBoard(gameParams *game) {
+    int i, j;
+
+    for (i = 0; i < game->N; i++) {
+        for (j = 0; j < game->N; j++) {
+            game->userBoard[i][j]->value = EMPTY;
+            game->userBoard[i][j]->isFixed = FALSE;
+            game->userBoard[i][j]->isValid = TRUE;
         }
     }
 }

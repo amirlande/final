@@ -86,6 +86,8 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         }
     }
 
+    GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
+
     /* Create environment */
     error = GRBloadenv(&env, "sudoku.log");
     if (error) {
@@ -275,9 +277,6 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
     int N, i, j;
     N = n * m;
-
-   /* TODO: just for compiling, remove this */
-    command++;
 
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {

@@ -85,6 +85,11 @@ void getNewCurrentMove(gameParams *game);
 /* Cleans game->userBoard and game->solution to zero's */
 void cleanUserBoardAndSolution(gameParams *game);
 
+
+/* Cleans game->userBoard to zero's */
+void cleanUserBoard(gameParams *game);
+
+
 /* Used by randomlyFillXCells */
 void setToEmpty(int **matrix, int N);
 

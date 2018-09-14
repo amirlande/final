@@ -29,7 +29,6 @@ int saveGameParamsToFile(gameParams *game, FILE *destFile, enum gameMode mode) {
 int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mode) {
     int row, col, m, n, N;
     int numberOfFilledCells, c;
-    cell ***newUserBoard, ***newSolution;
     /* Get new parameters for gameParams fields: */
     /* First get m, n (ignoring white spaces) */
     while (isspace(c = fgetc(sourceFile))) {}
