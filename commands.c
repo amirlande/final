@@ -27,6 +27,7 @@ int solve(gameParams *game, char *filePath) {
     /* Load new fields from file */
     loadGameParamsFromFile(game, file, SOLVE_MODE);
     /* At this point game should hold the new parameters of the loaded board */
+    printBoard(game);
     fclose(file);
     return TRUE;
 }
@@ -52,6 +53,7 @@ int edit(gameParams *game, char *filePath) {
     loadGameParamsFromFile(game, file, EDIT_MODE);
     game->mode = EDIT_MODE;
     /* At this point game should hold the new parameters of the loaded board */
+    printBoard(game);
     fclose(file);
     return TRUE;
 }
@@ -144,8 +146,10 @@ int set(int x, int y, int z, gameParams *game) {
     copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
     updateErrors(game);
 
+    printBoard(game);
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
-        if (validate(game) == TRUE) {
+        /* TODO - implement solveUsingILP from SET command!! */
+        if (solveUsingILP(game, ILP_COMMAND_SET) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
         } else {
@@ -309,7 +313,7 @@ int generate(gameParams *game, int x, int y) {
         game->userBoard[i][j]->value = game->solution[i][j]->value;
     }
     markFullCellsAsFixed(game->userBoard, game->N); /* Mark as FIXED all remaining cells */
-
+    printBoard(game);
     return TRUE;
 }
 
@@ -434,8 +438,9 @@ int save(gameParams *game, char *filePath) {
             printf("Error: board contains erroneous values\n");
             return FALSE;
         }
+        /* TODO - implement solveUsingILP from SAVE command!! */
 
-        if (validate(game) == FALSE) {
+        if (solveUsingILP(game, ILP_COMMAND_SAVE) == FALSE) {
             printf("Error: board validation failed\n");
             return FALSE;
         }
@@ -532,8 +537,9 @@ int autoFill(gameParams *game) {
     updateErrors(game);
     printBoard(game);
 
+    /* TODO - implement solveUsingILP from AUTOFILL command!! */
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
-        if (validate(game) == TRUE) {
+        if (solveUsingILP(game, ILP_COMMAND_AUTOFILL) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
         } else {
@@ -570,6 +576,7 @@ int reset(gameParams *game) {
 
     game->movesList = allocateMoveList();
     printf("Board reset\n");
+    printBoard(game);
     return 1;
 }
 

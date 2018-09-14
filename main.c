@@ -21,7 +21,6 @@ void playSudoku() {
         fflush(stdout);
         printf("game counter: %d\n",game->counter);
     }
-    printf("!!!\n");
 }
 
 /* Only for testing - this function randomly picks m, n between 1 and 5
@@ -82,11 +81,7 @@ void testFileOpening() {
         printf("Success\n");
     }
     fclose(file);
-
-
 }
-
-
 
 int main() {
     int seed;
@@ -94,75 +89,7 @@ int main() {
     srand(seed);
 
     emptyBoardGenerator("xxx"); /* TODO delete this before submitting project! */
-    /*testFileOpening();*/
 
     playSudoku();
     return 1;
 }
-
-#ifdef MAIN
-
-int main() {
-
-
-    /* testing - merged from Amir's branch
-    printf("%d", checkIfNumericString("345"));
-    printf("%d", checkIfNumericString("345.5"));
-    printf("%d", checkIfNumericString("4555a5"));
-    printf("%d", checkIfNumericString(" "));
-
-    */
-    /* testing - merged from Eran's branch */
-    int x, y, k, **board;
-    gameParams *game;
-    game = (gameParams *) malloc(sizeof(gameParams));
-    game->userBoard = allocateCellMatrix(12);
-    game->n = 4;
-    game->m = 3;
-    game->counter = 0;
-    game->solution = allocateCellMatrix(12);
-    game->N = 12;
-    game->markErrors = 1;
-    game->movesList = allocateMoveList();
-
-
-    for (x = 0; x < 12; x++) {
-        for (y = 0; y < 12; y++) {
-            game->userBoard[x][y]->value = 0;
-        }
-    }
-
-    board = fromCellMatToIntMat(game->userBoard, 12);
-    printBoard(game);
-    validate(game);
-    /*//hint(1, 1, game);
-    //generate(game, 16, 3);
-
-    //solveUsingDetBacktrackingRecursion(board, 4, 3);
-    //solveDet(board, 4, 3);
-    //game->userBoard = fromIntMatToCellMat(board, 12);
-     */
-    game->userBoard = game->solution;
-    printBoard(game);
-
-/*
-    printf("%d\n", game->userBoard[5][5]->value);
-    printf("%d all\n", checkIfValid(5, 5, 1, game));
-    printf("%d square\n", checkIfSquareValid(5, 5, 5, game));
-    for (y = 0; y < 10; y++) {
-        for (x = 0; x < 10; x++) {
-            for (k = 1; k < 11; k++) {
-                if (checkIfValid(x, y, k, game)) {
-                    printf("cell <%d,%d> (%d) can have %d\n", y, x, game->userBoard[x][y]->value, k);
-                }
-            }
-        }
-    }
-
-    */
-    return 1;
-
-}
-
-
-#endif

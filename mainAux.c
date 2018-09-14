@@ -66,10 +66,6 @@ int playTurn(gameParams *game) {
                 printErrorInCodeFlow("playTurn", "parser.c");
         }
     }
-
-    if (commandToPlay->type != (UNDO) && commandToPlay->type != AUTO_FILL) {
-        printBoard(game);
-    }
     freeCommand(commandToPlay);
     return TRUE;
 }

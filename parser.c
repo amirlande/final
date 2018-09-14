@@ -98,19 +98,26 @@ int commandAvailable(commandType type, enum gameMode mode) {
  * N - the N parameter of the sudoku board (sudoku has 1-N digits) */
 void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfInput, int N) {
     int number;
-    char *token;
+    char *zeroToken;
+    char *firstToken;
+    char *secondToken;
+    char *thirdToken;
 
-    token = strtok(copyOfInput, " \t\r\n"); /* gets rid of first word (already read before, in getCommandFromUser) */
+
+    zeroToken = strtok(copyOfInput, " \t\r\n"); /* gets rid of first word (already read before, in getCommandFromUser) */
 
     switch (typeOfCommand) {
         case SET: /* read 3 space-separated integers */
-            /* first argument */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
+            firstToken = strtok(NULL, " \t\r\n");
+            secondToken = strtok(NULL, " \t\r\n");
+            thirdToken = strtok(NULL, " \t\r\n");
+            if (firstToken == NULL || secondToken == NULL || thirdToken == NULL) { /* If one of them is NULL the command is invalid */
                 printInvalidCommand();
                 return;
             }
-            number = checkIfInRange(token, 1, N);
+            /* SET command is in the right format, check the values: */
+            /* first argument */
+            number = checkIfInRange(firstToken, 1, N);
             if (number != -1) {
                 command->x = number;
             } else {
@@ -119,12 +126,7 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
                 return;
             }
             /* second argument */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
-                printInvalidCommand();
-                return;
-            }
-            number = checkIfInRange(token, 1, N);
+            number = checkIfInRange(secondToken, 1, N);
             if (number != -1) {
                 command->y = number;
             } else {
@@ -133,12 +135,7 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
                 return;
             }
             /* third argument */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
-                printInvalidCommand();
-                return;
-            }
-            number = checkIfInRange(token, 0, N);
+            number = checkIfInRange(thirdToken, 0, N);
             if (number != -1) {
                 command->z = number;
             } else {
@@ -150,13 +147,15 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
             break;
 
         case HINT:
-            /* first argument */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
+            firstToken = strtok(NULL, " \t\r\n");
+            secondToken = strtok(NULL, " \t\r\n");
+            if (firstToken == NULL || secondToken == NULL) {
                 printInvalidCommand();
                 return;
             }
-            number = checkIfInRange(token, 1, N);
+            /* HINT command is in the right format, check the values: */
+            /* first argument */
+            number = checkIfInRange(firstToken, 1, N);
             if (number != -1) {
                 command->x = number;
             } else {
@@ -165,12 +164,7 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
                 return;
             }
             /* second argument */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
-                printInvalidCommand();
-                return;
-            }
-            number = checkIfInRange(token, 1, N);
+            number = checkIfInRange(secondToken, 1, N);
             if (number != -1) {
                 command->y = number;
             } else {
@@ -182,13 +176,15 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
             break;
 
         case GENERATE:
-            /* first argument - must be between 0 to N*N */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
+            firstToken = strtok(NULL, " \t\r\n");
+            secondToken = strtok(NULL, " \t\r\n");
+            if (firstToken == NULL || secondToken == NULL) {
                 printInvalidCommand();
                 return;
             }
-            number = checkIfInRange(token, 0, N * N); /* TODO check if the upper bound is N*N */
+            /* GENERATE command is in the right format, check the values: */
+            /* first argument - must be between 0 to N*N */
+            number = checkIfInRange(firstToken, 0, N * N);
             if (number != -1) {
                 command->x = number;
             } else {
@@ -197,12 +193,7 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
                 return;
             }
             /* second argument - must be between 0 to N*N */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If token is NULL the command is invalid */
-                printInvalidCommand();
-                return;
-            }
-            number = checkIfInRange(token, 0, N * N); /* TODO check if the upper bound is N*N */
+            number = checkIfInRange(secondToken, 0, N * N);
             if (number != -1) {
                 command->y = number;
             } else {
@@ -216,43 +207,43 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
         /* deal with SOLVE and SAVE identically - read file path */
         case SOLVE:
         case SAVE:
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* Not enough arguments (file path wasn't provided) invalid command */
+            firstToken = strtok(NULL, " \t\r\n");
+            if (firstToken == NULL) { /* Not enough arguments (file path wasn't provided) invalid command */
                 printInvalidCommand();
                 return;
             }
-            command->fileName = (char *) malloc(strlen(token) + 1); /* allocate memory for fileName TODO free this memory */
+            command->fileName = (char *) malloc(strlen(firstToken) + 1); /* allocate memory for fileName */
             if (command->fileName == NULL) {
                 printMallocFailed();
                 exit(EXIT_FAILURE);
             }
-            strcpy(command->fileName, token);
+            strcpy(command->fileName, firstToken);
             command->isValid = TRUE;
             break;
 
         case EDIT: /* The user may enter "edit" without a file path */
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* If no file path provided temp will point to NULL */
+            firstToken = strtok(NULL, " \t\r\n");
+            if (firstToken == NULL) { /* If no file path provided temp will point to NULL */
                 command->fileName = NULL;
             }
             else { /* Path was provided by the user */
-                command->fileName = (char *) malloc(strlen(token) + 1);
+                command->fileName = (char *) malloc(strlen(firstToken) + 1);
                 if (command->fileName == NULL) {
                     printMallocFailed();
                     exit(EXIT_FAILURE);
                 }
-                strcpy(command->fileName, token);
+                strcpy(command->fileName, firstToken);
             }
             command->isValid = TRUE;
             break;
 
         case MARK_ERRORS:
-            token = strtok(NULL, " \t\r\n");
-            if (token == NULL) { /* Not enough arguments - invalid command */
+            firstToken = strtok(NULL, " \t\r\n");
+            if (firstToken == NULL) { /* Not enough arguments - invalid command */
                 printInvalidCommand();
                 return;
             }
-            number = checkIfZeroOrOne(token);
+            number = checkIfZeroOrOne(firstToken);
             if (number != -1) {
                 command->markErrors = number;
                 command->isValid = TRUE;
