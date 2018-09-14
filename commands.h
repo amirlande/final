@@ -59,7 +59,7 @@ int generate(gameParams *game, int x, int y);
 
 
 
-cellChangeRecNode *getGenerateChangeList(gameParams *game, int y);
+cellChangeRecNode *getGenerateChangeList(gameParams *game);
 
 /* Pre:
  * command is valid

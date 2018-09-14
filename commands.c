@@ -40,6 +40,7 @@ int edit(gameParams *game, char *filePath) {
         cleanSudokuGame(game);
         initializeSudokuGameFields(game, 3, 3);
         game->mode = EDIT_MODE;
+        printBoard(game);
         return TRUE;
     }
     file = fopen(filePath, "r");
@@ -129,23 +130,26 @@ int set(int x, int y, int z, gameParams *game) {
 
     int prevZ;
     /* no cell is considered fixed when on edit mode, according to forum */
-    if (game->mode == SOLVE_MODE && game->userBoard[x - 1][y - 1]->isFixed) {
+    if (game->mode == SOLVE_MODE && game->userBoard[y - 1][x - 1]->isFixed) {
         printf("Error: cell is fixed\n");
         return 0;
     }
 
-    getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
-    game->movesList->currentMove->change->x = x;
-    game->movesList->currentMove->change->y = y;
-    game->movesList->currentMove->change->prevVal = createCell(0);
-    copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->prevVal);
-    prevZ = game->movesList->currentMove->change->prevVal->value;
-    free(game->userBoard[x - 1][y - 1]);
-    game->userBoard[x - 1][y - 1] = createCell(prevZ);
-    setValue(game, x - 1, y - 1, z);
-    copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
-    updateErrors(game);
+    /* only assign if it is a new value */
+    if (z != game->userBoard[y - 1][x - 1]->value) {
+        getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
+        game->movesList->currentMove->change->x = x;
+        game->movesList->currentMove->change->y = y;
+        game->movesList->currentMove->change->prevVal = createCell(0);
+        copyCell(game->userBoard[y - 1][x - 1], game->movesList->currentMove->change->prevVal);
+        prevZ = game->movesList->currentMove->change->prevVal->value;
+        free(game->userBoard[y - 1][x - 1]);
+        game->userBoard[y - 1][x - 1] = createCell(prevZ);
+        setValue(game, x - 1, y - 1, z);
+        copyCell(game->userBoard[y - 1][x - 1], game->movesList->currentMove->change->currVal);
 
+    }
+    updateErrors(game);
     printBoard(game);
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
         if (solveUsingILP(game, ILP_COMMAND_VALIDATE) == TRUE) {
@@ -184,7 +188,7 @@ int getPossibleValues(gameParams *game, int row, int col, int *possibleLegalVals
 
     counter = 0;
     for (val = 0; val < game->N; val++) {
-        if (checkIfValid(row, col, val, game)) {
+        if (checkIfValid(col, row, val, game)) {
             possibleLegalVals[counter] = val;
             counter++;
         }
@@ -293,9 +297,8 @@ void randomlyClearAllButYCells(gameParams *game, int y) {
  * Available in EDIT mode only
  * x, y are valid integers */
 int generate(gameParams *game, int x, int y) {
-    int succeeded, i, j;
+    int succeeded;
     cellChangeRecNode *changeListHead;
-    changeListHead = NULL;
 
     if (!boardIsEmpty(game)) {
         printf("Error: board is not empty\n");
@@ -310,25 +313,9 @@ int generate(gameParams *game, int x, int y) {
     /* Randomly clear Y cells: */
     randomlyClearAllButYCells(game, y);
 
-    for (i = 0; i < game->N; i++) {
-        printf("\n");
-        for (j = 0; j < game->N; j++) {
-            printf(" %d ",game->solution[i][j]->value);
-        }
-    }
-    printf("\n");
-
-    for (i = 0; i < game->N; i++) {
-        printf("\n");
-        for (j = 0; j < game->N; j++) {
-            printf(" %d ",game->userBoard[i][j]->value);
-        }
-    }
-    printf("\n");
-
-    changeListHead = getGenerateChangeList(game, y);
+    changeListHead = getGenerateChangeList(game);
     setNewChangeListToGame(game, changeListHead);
-    setValuesBychangeListHead(game, changeListHead);
+    setValuesByChangeListHead(game, changeListHead);
 
     markFullCellsAsFixed(game->userBoard, game->N); /* Mark as FIXED all remaining cells */
     game->counter += y;
@@ -336,11 +323,11 @@ int generate(gameParams *game, int x, int y) {
     return TRUE;
 }
 
-cellChangeRecNode *getGenerateChangeList(gameParams *game, int y) {
+cellChangeRecNode *getGenerateChangeList(gameParams *game) {
 
     int i, j, N, changes, sol;
-    N = game->N;
     cellChangeRecNode *changeListHead, *currentChange;
+    N = game->N;
     currentChange = NULL;
     changeListHead = NULL;
     changes = 0;
@@ -349,7 +336,7 @@ cellChangeRecNode *getGenerateChangeList(gameParams *game, int y) {
     /* Copy solution to userBoard */
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
-            sol = game->solution[i][j]->value;
+            sol = game->solution[j][i]->value;
             if (sol != 0) {
                 if (changes == 0) {
                     /* keep the first node */
@@ -372,9 +359,9 @@ cellChangeRecNode *getGenerateChangeList(gameParams *game, int y) {
                     currentChange->next = NULL;
                 }
                 currentChange->prevVal = createCell(0);
-                copyCell(game->userBoard[i][j], currentChange->prevVal);
-                free(game->userBoard[i][j]);
-                game->userBoard[i][j] = createCell(-1);
+                copyCell(game->userBoard[j][i], currentChange->prevVal);
+                free(game->userBoard[j][i]);
+                game->userBoard[j][i] = createCell(-1);
                 currentChange->currVal = createCell(sol);
                 currentChange->x = i + 1;
                 currentChange->y = j + 1;
@@ -384,7 +371,7 @@ cellChangeRecNode *getGenerateChangeList(gameParams *game, int y) {
         }
     }
 
-    printf("changes are: %d\n",changes);
+    printf("changes are: %d\n", changes);
     return changeListHead;
 }
 
@@ -408,10 +395,10 @@ int undoEnveloped(gameParams *game, int isReset) {
 
     /* Iterate over the (singly) linked list of cell changes until we reach NULL */
     while (changeToUndo != NULL) {
-        free(game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]);
-        game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1] = createCell(0);
+        free(game->userBoard[changeToUndo->y - 1][changeToUndo->x - 1]);
+        game->userBoard[changeToUndo->y - 1][changeToUndo->x - 1] = createCell(0);
         copyCell(changeToUndo->prevVal, /* <- src */
-                 game->userBoard[changeToUndo->x - 1][changeToUndo->y - 1]); /* Restore previous value */
+                 game->userBoard[changeToUndo->y - 1][changeToUndo->x - 1]); /* Restore previous value */
         if (changeToPrint->prevVal->value == 0) { /* decrements counter only when deleting a value */
             if (changeToUndo->currVal->value != 0) {
                 game->counter--;
@@ -476,10 +463,10 @@ int redo(gameParams *game) {
     changeToPrint = changeToRedo;
 
     while (changeToRedo != NULL) {
-        free(game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
-        game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1] = createCell(0);
+        free(game->userBoard[changeToRedo->y - 1][changeToRedo->x - 1]);
+        game->userBoard[changeToRedo->y - 1][changeToRedo->x - 1] = createCell(0);
         /* copying currVal to userBoard */
-        copyCell(changeToRedo->currVal, game->userBoard[changeToRedo->x - 1][changeToRedo->y - 1]);
+        copyCell(changeToRedo->currVal, game->userBoard[changeToRedo->y - 1][changeToRedo->x - 1]);
         if (changeToRedo->prevVal->value == 0) {
             if (changeToRedo->currVal->value != 0) {
                 game->counter++;
@@ -531,10 +518,10 @@ int hint(int x, int y, gameParams *game) {
     if (hasErrCells(game) == TRUE) {
         printf("Error: board contains erroneous values\n");
         return FALSE;
-    } else if ((game->userBoard[x - 1][y - 1]->isFixed) == TRUE) {
+    } else if ((game->userBoard[y - 1][x - 1]->isFixed) == TRUE) {
         printf("Error: cell is fixed\n");
         return FALSE;
-    } else if ((game->userBoard[x - 1][y - 1]->value != EMPTY)) {
+    } else if ((game->userBoard[y - 1][x - 1]->value != EMPTY)) {
         printf("Error: cell already contains a value\n");
         return FALSE;
     }
@@ -599,7 +586,7 @@ int autoFill(gameParams *game) {
     }
 
     setNewChangeListToGame(game, changeListHead);
-    setValuesBychangeListHead(game, changeListHead);
+    setValuesByChangeListHead(game, changeListHead);
     game->counter += numOfChanges;
     updateErrors(game);
     printBoard(game);

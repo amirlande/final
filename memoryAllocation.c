@@ -22,7 +22,7 @@ gameParams *initSudokuGame() {
     newGame->solution = NULL;
     newGame->userBoard = NULL;
     newGame->counter = 0;
-    newGame->movesList = allocateMoveList(); /* TODO - ask Eran how should be initialized here as well as in initializeSudokuGameFields */
+    newGame->movesList = allocateMoveList();
     return newGame;
 }
 
@@ -68,7 +68,7 @@ void cleanSudokuGame(gameParams *game) {
     freeCellMatrix(game->userBoard, game->N);
     freeCellMatrix(game->solution, game->N);
     /* Free all memory used by moveList nodes and set head and current to NULL */
-    freeAllUserMoveNodes(game->movesList->head); /* TODO ask Eran about this */
+    freeAllUserMoveNodes(game->movesList->head);
     game->movesList->currentMove = NULL;
     game->movesList->head = NULL;
 }
@@ -115,7 +115,7 @@ void freeCellChangeRecNode(cellChangeRecNode *changeToFree) {
     freeCellChangeRecNode(changeToFree->next);
 
     free(changeToFree->prevVal);
-    free(changeToFree->currVal); /* TODO Causes program to crash on specific scenario */
+    free(changeToFree->currVal);
     free(changeToFree);
 
 }
@@ -147,7 +147,7 @@ cell ***allocateCellMatrix(int N) {
     return mat;
 }
 
-/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
+/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed*/
 cell *createCell(int value) {
     cell *newCell = (cell *) malloc(sizeof(cell));
     if (newCell == NULL) {

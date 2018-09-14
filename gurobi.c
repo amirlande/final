@@ -47,7 +47,6 @@ cell ***fromIntMatToCellMat(int **src, int N) {
 }
 
 
-#if 0
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
@@ -267,7 +266,7 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreeenv(env);
 }
 
-#endif
+#if 0
 
 
 /* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
@@ -278,6 +277,10 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     int N, i, j;
     N = n * m;
 
+    if(!command){
+        printf("not command (?) \n");
+        return 0;
+    }
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
             res[i][j] = board[i][j];
@@ -413,4 +416,6 @@ int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
     return 1;
 }
 
+
+#endif
 

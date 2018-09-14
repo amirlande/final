@@ -19,7 +19,7 @@ void playSudoku() {
     while (continueGame) {
         continueGame = playTurn(game); /* playTurn returns TRUE (1) on all commands except EXIT */
         fflush(stdout);
-        printf("game counter: %d\n",game->counter);
+       /* printf("game counter: %d\n", game->counter);*/
     }
 }
 
@@ -88,8 +88,46 @@ int main() {
     seed = time(NULL);
     srand(seed);
 
-    emptyBoardGenerator("xxx"); /* TODO delete this before submitting project! */
+   /* emptyBoardGenerator("xxx"); TODO*/
 
     playSudoku();
+
+/*
+    int x, y, i, j, k, **board;
+    gameParams *game;
+    game = (gameParams *) malloc(sizeof(gameParams));
+    game->userBoard = allocateCellMatrix(2);
+    game->n = 1;
+    game->m = 2;
+    game->counter = 0;
+    game->solution = allocateCellMatrix(2);
+    game->N = 2;
+    game->markErrors = 1;
+    game->movesList = allocateMoveList();
+    for (x = 0; x < 2; x++) {
+        for (y = 0; y < 2; y++) {
+            if (rand() % 2 == 1) {
+                game->userBoard[x][y]->value = rand() % 2 + 1;
+            } else {
+                game->userBoard[x][y]->value = 0;
+            }
+        }
+    }
+
+
+    board = fromCellMatToIntMat(game->userBoard, 2);
+    printBoard(game);
+
+    for (x = 0; x < 2; x++) {
+        for (y = 0; y < 2; y++) {
+            for (k = 1; k < 3; k++) {
+                if (checkIfValid(x, y, k, game)) {
+                    printf("cell <%d,%d> (%d) can have %d\n", x + 1, y + 1, game->userBoard[y][x]->value, k);
+                }
+            }
+        }
+    }
+
+*/
     return 1;
 }

@@ -36,7 +36,7 @@ cell ***allocateCellMatrix(int N);
 void freeCellMatrix(cell ***mat, int N);
 
 
-/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
+/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed */
 cell *createCell(int value);
 
 /* Allocates memory for int matrix

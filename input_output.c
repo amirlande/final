@@ -100,6 +100,6 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
     }
 
     game->counter = numberOfFilledCells;
-    /* TODO - should call a function that goes over all the board and updates cell->isValid fields */
+    updateErrors(game);
     return TRUE;
 }

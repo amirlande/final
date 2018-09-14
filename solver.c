@@ -30,7 +30,7 @@ int solveUsingILP(gameParams *game, ILPCommand cmd) {
  * (the helper functions only use N, n, m and userBoard fields) */
 gameParams *wrapInGameParamsStruct(cell ***board, int N, int n, int m) {
     gameParams *temporaryGameParams;
-    temporaryGameParams = (gameParams *)malloc(sizeof(gameParams));
+    temporaryGameParams = (gameParams *) malloc(sizeof(gameParams));
     if (temporaryGameParams == NULL) {
         printMallocFailed();
         exit(EXIT_FAILURE);
@@ -82,8 +82,7 @@ void pushValidValues(gameParams *partialGameParams, int row, int col, Stack *sta
     /* Iterate value from N down to 1 to check validity of assignment of value to (row, col) cell
      * If assignment is valid - push onto stack en element with row, col and val */
     for (value = N; value > 0; value--) {
-        if (checkIfValid(row, col, value,
-                         partialGameParams)) { /* TODO adapt checkIfValid function to take cell *** rather than only gameParams */
+        if (checkIfValid(col, row, value, partialGameParams)) {
             push(stack, row, col, value);
         }
     }
@@ -159,7 +158,7 @@ int countSolutions(gameParams *game) {
     tempBoard = copyBoard(game->userBoard, game->N);
     markAsFixed(tempBoard, game->N);
     temporaryGameParams = wrapInGameParamsStruct(tempBoard, game->N, game->n,
-                                               game->m); /* TODO remember this may cause problems check while debugging */
+                                                 game->m); /* TODO remember this may cause problems check while debugging */
 
     /* Call the main Backtracking Iterative function: */
     countWithBacktracking(temporaryGameParams, &numOfSols);
