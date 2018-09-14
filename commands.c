@@ -27,6 +27,7 @@ int solve(gameParams *game, char *filePath) {
     /* Load new fields from file */
     loadGameParamsFromFile(game, file, SOLVE_MODE);
     /* At this point game should hold the new parameters of the loaded board */
+    printBoard(game);
     fclose(file);
     return TRUE;
 }
@@ -52,6 +53,7 @@ int edit(gameParams *game, char *filePath) {
     loadGameParamsFromFile(game, file, EDIT_MODE);
     game->mode = EDIT_MODE;
     /* At this point game should hold the new parameters of the loaded board */
+    printBoard(game);
     fclose(file);
     return TRUE;
 }
@@ -144,16 +146,14 @@ int set(int x, int y, int z, gameParams *game) {
     copyCell(game->userBoard[x - 1][y - 1], game->movesList->currentMove->change->currVal);
     updateErrors(game);
 
-    /* TODO : handling the game when it's done */
-
+    printBoard(game);
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
-        if (validate(game) == TRUE) {
+        /* TODO - implement solveUsingILP from SET command!! */
+        if (solveUsingILP(game, ILP_COMMAND_SET) == TRUE) {
             printf("Puzzle solved successfully\n");
             game->mode = INIT_MODE;
-            /* TODO should follow by "Enter your command:\n" */
         } else {
             printf("Puzzle solution erroneous\n");
-            /* TODO the user will have to undo the move to continue solving ?? where to implement */
         }
     }
     return 1;
@@ -250,6 +250,7 @@ int randomlyFillXCells(gameParams *game, int x) {
 /* Return TRUE (1) on success, FALSE (0) on failure */
 int randomlyFillXCellsAndSolve(gameParams *game, int x) {
     int i, success;
+    success = FALSE;
     for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
         success = randomlyFillXCells(game, x); /* Works on game->userBoard */
         if (!success) {
@@ -270,19 +271,29 @@ int randomlyFillXCellsAndSolve(gameParams *game, int x) {
     return ((success == TRUE) ? TRUE : FALSE);
 }
 
-void randomlyClearYCells(gameParams *game, int y) {
-    int x;
-    x = y;
-    x++;
-    game++;
-    /* TODO - implement */
+void randomlyClearAllButYCells(gameParams *game, int y) {
+    int randomRow, randomCol, counter, N, cellsToRemove;
+
+    N = game->N;
+
+    counter = 0;
+    cellsToRemove = N*N - y;
+    while (counter < cellsToRemove) {
+        randomRow = rand() % N;
+        randomCol = rand() % N;
+
+        if (game->solution[randomRow][randomCol]->value != EMPTY) {
+            game->solution[randomRow][randomCol]->value = EMPTY;
+            counter++;
+        }
+    }
 }
 
 /* Pre:
  * Available in EDIT mode only
  * x, y are valid integers */
 int generate(gameParams *game, int x, int y) {
-    int succeeded;
+    int succeeded, i, j;
 
     if (!boardIsEmpty(game)) {
         printf("Error: board is not empty\n");
@@ -295,9 +306,14 @@ int generate(gameParams *game, int x, int y) {
         return FALSE;
     }
     /* Randomly clear Y cells: */
-    randomlyClearYCells(game, y);
+    randomlyClearAllButYCells(game, y);
+    /* Copy solution to userBoard */
+    for (i = 0; i < game->N; i++) {
+        for (j = 0; j < game->N; j++)
+        game->userBoard[i][j]->value = game->solution[i][j]->value;
+    }
     markFullCellsAsFixed(game->userBoard, game->N); /* Mark as FIXED all remaining cells */
-
+    printBoard(game);
     return TRUE;
 }
 
@@ -422,12 +438,12 @@ int save(gameParams *game, char *filePath) {
             printf("Error: board contains erroneous values\n");
             return FALSE;
         }
-        /*
-        if (validate(game) == FALSE) {
+        /* TODO - implement solveUsingILP from SAVE command!! */
+
+        if (solveUsingILP(game, ILP_COMMAND_SAVE) == FALSE) {
             printf("Error: board validation failed\n");
             return FALSE;
         }
-         */
     }
     /*file = fopen("C:\\temp\\sudoku", "w"); */
     file = fopen(filePath, "w");
@@ -521,6 +537,16 @@ int autoFill(gameParams *game) {
     updateErrors(game);
     printBoard(game);
 
+    /* TODO - implement solveUsingILP from AUTOFILL command!! */
+    if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
+        if (solveUsingILP(game, ILP_COMMAND_AUTOFILL) == TRUE) {
+            printf("Puzzle solved successfully\n");
+            game->mode = INIT_MODE;
+        } else {
+            printf("Puzzle solution erroneous\n");
+        }
+    }
+
     return 1;
 }
 
@@ -550,6 +576,7 @@ int reset(gameParams *game) {
 
     game->movesList = allocateMoveList();
     printf("Board reset\n");
+    printBoard(game);
     return 1;
 }
 
@@ -558,7 +585,6 @@ void exitGame(gameParams *game) {
 
     printf("Exiting...\n");
     freeSudokuGame(game);
-    /* TODO (Amir?) : close all open files */
 }
 
 

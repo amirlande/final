@@ -39,8 +39,8 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
     N = n * m;
 
     /* Allocate new matrix */
-    newUserBoard = allocateCellMatrix(N);
-    newSolution = allocateCellMatrix(N);
+    game->userBoard = allocateCellMatrix(N);
+    game->solution = allocateCellMatrix(N);
 
     /* Assign new fields to game: */
     game->mode = mode;
@@ -48,28 +48,25 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
     game->m = m;
     game->n = n;
     game->N = N;
-    game->userBoard = newUserBoard;
-    game->solution = newSolution;
 
-    newUserBoard = game->userBoard;
     numberOfFilledCells = 0;
     row = 0;
     /* Read file to assign new values to new cells: */
     while (row < N) {
         col = 0;
         while (col < N) {
-            newUserBoard[row][col]->isValid = TRUE;
+            game->userBoard[row][col]->isValid = TRUE;
             /* Enter only if a non whitespace character has been read */
             if (isspace(c = fgetc(sourceFile)) == FALSE) {
                 /* Classify into two options: '.' or a digit */
 
                 if (c == '.') { /* FIXED CELL */
-                    newUserBoard[row][col]->isFixed = TRUE;
+                    game->userBoard[row][col]->isFixed = TRUE;
                     col++;
                 }
 
                 else { /* DIGIT */
-                    newUserBoard[row][col]->value = (c - '0');
+                    game->userBoard[row][col]->value = (c - '0');
                     if ((c - '0') != 0) { /* If a non-zero digit read increment counter */
                         numberOfFilledCells++;
                     }
@@ -78,22 +75,22 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
                     c = fgetc(sourceFile);
 
                     if (isspace(c)) { /* NON-FIXED SINGLE DIGIT */
-                        newUserBoard[row][col]->isFixed = FALSE;
+                        game->userBoard[row][col]->isFixed = FALSE;
                         col++;
                     }
                     else if (c == '.') { /* FIXED SINGLE DIGIT */
-                        newUserBoard[row][col]->isFixed = TRUE;
+                        game->userBoard[row][col]->isFixed = TRUE;
                         col++;
                     }
                     else { /* TWO-DIGIT NUMBER (second char also digit) */
-                        newUserBoard[row][col]->value = 10* (newUserBoard[row][col]->value) + (c - '0'); /* Update value */
+                        game->userBoard[row][col]->value = 10* (game->userBoard[row][col]->value) + (c - '0'); /* Update value */
                         /* Read next char (third char of this iteration) to determine FIXED or NOT */
                         c = fgetc(sourceFile);
                         if (isspace(c)) {
-                            newUserBoard[row][col]->isFixed = FALSE;
+                            game->userBoard[row][col]->isFixed = FALSE;
                         }
                         else {
-                            newUserBoard[row][col]->isFixed = TRUE;
+                            game->userBoard[row][col]->isFixed = TRUE;
                         }
                         col++;
                     }
