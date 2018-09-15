@@ -57,6 +57,9 @@ int validate(gameParams *game);
  * x, y are valid integers */
 int generate(gameParams *game, int x, int y);
 
+
+cellChangeRecNode *getGenerateChangeList(gameParams *game);
+
 /* Pre:
  * command is valid
  * game is at edit or solve mode

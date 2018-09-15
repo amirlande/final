@@ -4,10 +4,10 @@
 /* Allocates memory for Stack and initializes top->NULL, count->0 */
 Stack *initializeStack() {
     Stack *stack;
-    stack = (Stack *) malloc(1 * sizeof(Stack)); /* TODO free memory */
+    stack = (Stack *) malloc(1 * sizeof(Stack));
     if (stack == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     stack->count = 0;
     stack->top = NULL;
@@ -21,7 +21,7 @@ element *allocateMemoryForStackElement() {
     newElement = (element *) malloc(1 * sizeof(element));
     if (newElement == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     return newElement;
 }
@@ -72,7 +72,7 @@ void push(Stack *stack, BOARD boardSnapshot)
     newStackElement = (element *)malloc(sizeof( element)); /* Allocate memory for the "box", the stack element */
     if (newStackElement == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     newStackElement->currentBoard = boardSnapshot; /* update data */
     newStackElement->next = stack->top;

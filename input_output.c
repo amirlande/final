@@ -11,7 +11,7 @@ int saveGameParamsToFile(gameParams *game, FILE *destFile, enum gameMode mode) {
             fprintf(destFile, "%d", game->userBoard[row][col]->value);
             /* If in EDIT mode or cell is fixed - write an extra '.' next to digit */
             if (((game->userBoard[row][col]->isFixed == TRUE) && (game->userBoard[row][col]->value != EMPTY))
-            || ((mode == EDIT_MODE) && game->userBoard[row][col]->value != EMPTY)) {
+                || ((mode == EDIT_MODE) && game->userBoard[row][col]->value != EMPTY)) {
                 fprintf(destFile, ".");
             }
             /* If haven't reached end of row write space */
@@ -29,7 +29,6 @@ int saveGameParamsToFile(gameParams *game, FILE *destFile, enum gameMode mode) {
 int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mode) {
     int row, col, m, n, N;
     int numberOfFilledCells, c;
-    cell ***newUserBoard, ***newSolution;
     /* Get new parameters for gameParams fields: */
     /* First get m, n (ignoring white spaces) */
     while (isspace(c = fgetc(sourceFile))) {}
@@ -63,9 +62,7 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
                 if (c == '.') { /* FIXED CELL */
                     game->userBoard[row][col]->isFixed = TRUE;
                     col++;
-                }
-
-                else { /* DIGIT */
+                } else { /* DIGIT */
                     game->userBoard[row][col]->value = (c - '0');
                     if ((c - '0') != 0) { /* If a non-zero digit read increment counter */
                         numberOfFilledCells++;
@@ -77,19 +74,17 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
                     if (isspace(c)) { /* NON-FIXED SINGLE DIGIT */
                         game->userBoard[row][col]->isFixed = FALSE;
                         col++;
-                    }
-                    else if (c == '.') { /* FIXED SINGLE DIGIT */
+                    } else if (c == '.') { /* FIXED SINGLE DIGIT */
                         game->userBoard[row][col]->isFixed = TRUE;
                         col++;
-                    }
-                    else { /* TWO-DIGIT NUMBER (second char also digit) */
-                        game->userBoard[row][col]->value = 10* (game->userBoard[row][col]->value) + (c - '0'); /* Update value */
+                    } else { /* TWO-DIGIT NUMBER (second char also digit) */
+                        game->userBoard[row][col]->value =
+                                10 * (game->userBoard[row][col]->value) + (c - '0'); /* Update value */
                         /* Read next char (third char of this iteration) to determine FIXED or NOT */
                         c = fgetc(sourceFile);
                         if (isspace(c)) {
                             game->userBoard[row][col]->isFixed = FALSE;
-                        }
-                        else {
+                        } else {
                             game->userBoard[row][col]->isFixed = TRUE;
                         }
                         col++;
@@ -101,6 +96,6 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
     }
 
     game->counter = numberOfFilledCells;
-    /* TODO - should call a function that goes over all the board and updates cell->isValid fields */
+    updateErrors(game);
     return TRUE;
 }

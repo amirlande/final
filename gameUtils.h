@@ -66,13 +66,13 @@ void setValue(gameParams *game, int x, int y, int z);
 cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges);
 
 
-void setValuesBychangeListHead(gameParams *game, cellChangeRecNode *changeListNode);
+void setValuesByChangeListHead(gameParams *game, cellChangeRecNode *changeListNode);
 
 
 /* Called by autoFill */
 void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead);
 
-/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed TODO */
+/* "Constructor" - creates a cell with the passed value. By default new cells are valid and no fixed  */
 cell *createCell(int value);
 
 
@@ -84,6 +84,11 @@ void getNewCurrentMove(gameParams *game);
 
 /* Cleans game->userBoard and game->solution to zero's */
 void cleanUserBoardAndSolution(gameParams *game);
+
+
+/* Cleans game->userBoard to zero's */
+void cleanUserBoard(gameParams *game);
+
 
 /* Used by randomlyFillXCells */
 void setToEmpty(int **matrix, int N);

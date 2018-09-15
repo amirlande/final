@@ -8,7 +8,7 @@ commandStruct *initializeCommand() {
     commandStruct *command = (commandStruct *) malloc(sizeof(commandStruct));
     if (command == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     command->type = INVALID_COMMAND;
     command->isValid = FALSE;
