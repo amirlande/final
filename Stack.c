@@ -4,7 +4,7 @@
 /* Allocates memory for Stack and initializes top->NULL, count->0 */
 Stack *initializeStack() {
     Stack *stack;
-    stack = (Stack *) malloc(1 * sizeof(Stack)); /* TODO free memory */
+    stack = (Stack *) malloc(1 * sizeof(Stack));
     if (stack == NULL) {
         printMallocFailed();
         exit(0);

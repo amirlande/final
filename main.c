@@ -12,7 +12,7 @@ void playSudoku() {
     int continueGame;
 
     printf("Sudoku\n------\n");
-    fflush(stdout); /* TODO check on fflush*/
+    fflush(stdout);
     game = initSudokuGame();
 
     continueGame = TRUE;
@@ -37,7 +37,7 @@ int emptyBoardGenerator(char *filePath) {
         exit(0);
     }
 
-    n = 1;
+    n = 2;
     m = 2;
 
     while (n == 0) { n = rand() % 6; }
@@ -61,34 +61,12 @@ int emptyBoardGenerator(char *filePath) {
     return TRUE;
 }
 
-void testFileOpening() {
-    FILE *file;
-
-    /* Reading existing, RELATIVE */
-    file = fopen("C:\\Users\\amirlande\\CLionProjects\\final\\cmake-build-debug\\board1", "r");
-    if (file == NULL) {
-        printf("Error opening ""board1"" for reading\n");
-    } else {
-        printf("Success\n");
-    }
-    fclose(file);
-
-    /* Writing to existing, RELATIVE */
-    file = fopen("board3", "w");
-    if (file == NULL) {
-        printf("Error opening ""board1"" for writing\n");
-    } else {
-        printf("Success\n");
-    }
-    fclose(file);
-}
-
 int main() {
     int seed;
     seed = time(NULL);
     srand(seed);
 
-   /* emptyBoardGenerator("xxx"); TODO*/
+   /* emptyBoardGenerator("xxx"); */
 
     playSudoku();
 
