@@ -33,7 +33,7 @@ gameParams *wrapInGameParamsStruct(cell ***board, int N, int n, int m) {
     temporaryGameParams = (gameParams *) malloc(sizeof(gameParams));
     if (temporaryGameParams == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     temporaryGameParams->N = N;
     temporaryGameParams->n = n;

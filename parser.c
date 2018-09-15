@@ -214,7 +214,7 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
             command->fileName = (char *) malloc(strlen(firstToken) + 1); /* allocate memory for fileName */
             if (command->fileName == NULL) {
                 printMallocFailed();
-                exit(EXIT_FAILURE);
+                exit(0);
             }
             strcpy(command->fileName, firstToken);
             command->isValid = TRUE;
@@ -229,7 +229,7 @@ void getParams(commandStruct *command, commandType typeOfCommand, char *copyOfIn
                 command->fileName = (char *) malloc(strlen(firstToken) + 1);
                 if (command->fileName == NULL) {
                     printMallocFailed();
-                    exit(EXIT_FAILURE);
+                    exit(0);
                 }
                 strcpy(command->fileName, firstToken);
             }
@@ -267,28 +267,33 @@ commandStruct *getCommandFromUser(gameParams *game) {
     commandStruct *command;
     char input[COMMAND_LEN];
     char copyOfInput[COMMAND_LEN]; /* holds a copy of input string, to be passed to getParams function (since strtok alters input) */
-    char *token;
+    char *token, *zeroToken;
+    int valid;
 
     command = initializeCommand(); /* memory allocation - Freed in the end of playSudoku() */
     token = (char *) malloc(COMMAND_LEN * sizeof(char) + 1); /* allocate memory using the COMMAND_LEN upper bound (memory freed in the end of the function)*/
     if (token == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
+    valid = FALSE;
     do {
         /* read command from console (at most 256 chars) */
         printf("Enter your command:\n");
         if (fgets(input, COMMAND_LEN, stdin) == NULL) {
-            /* exitCleanly(); */
             freeCommand(command);
             free(token);
             freeSudokuGame(game);
-            exit(EXIT_FAILURE);
-        } /* TODO reached EOF - exit cleanly - to be implemented */
+            exit(0);
+        }
         strcpy(copyOfInput, input);
-        strcpy(token, strtok(input, " \t\r\n")); /* Read first token and copy it to the allocated memory */
-    } while (token == NULL); /* while input == empty line (ignoring empty lines) */
+        zeroToken = strtok(input, " \t\r\n"); /* Read first token */
+        if (zeroToken != NULL) {
+            strcpy(token, zeroToken);
+            valid = TRUE;
+        }
+    } while (valid == FALSE); /* while valid == FALSE user entered only newline */
 
     /* classify command according to first token */
     if (strcmp(token, "set") == 0) {

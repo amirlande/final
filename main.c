@@ -34,7 +34,7 @@ int emptyBoardGenerator(char *filePath) {
     file = fopen(filePath, "w");
     if (file == NULL) {
         printf("Failed to open file at emptyBoardGenerator\n");
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     n = 1;
