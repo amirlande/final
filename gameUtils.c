@@ -101,8 +101,7 @@ void getNewCurrentMove(gameParams *game) {
 
     if (newCurr == NULL) {
         printMallocFailed();
-        freeSudokuGame(game);
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     if (newPrev != NULL) { /* Set previous's next to the new current move, unless prev was NULL */
         newPrev->next = newCurr;
@@ -115,15 +114,13 @@ void getNewCurrentMove(gameParams *game) {
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
     if (newCurr->change == NULL) {
         printMallocFailed();
-        freeSudokuGame(game);
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     newCurr->change->currVal = (cell *) malloc(sizeof(cell));
     if (newCurr->change->currVal == NULL) {
         printMallocFailed();
-        freeSudokuGame(game);
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     newCurr->change->next = NULL;
@@ -317,7 +314,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                         if (changeListHead == NULL) {
                             freeSudokuGame(game);
                             printMallocFailed();
-                            exit(EXIT_FAILURE);
+                            exit(0);
                         }
                         currentChange = changeListHead;
                         currentChange->next = NULL;
@@ -326,7 +323,7 @@ cellChangeRecNode *getAutoFillChangeList(gameParams *game, int *numOfChanges) {
                         if (currentChange->next == NULL) {
                             freeSudokuGame(game);
                             printMallocFailed();
-                            exit(EXIT_FAILURE);
+                            exit(0);
                         }
                         currentChange = currentChange->next;
                         currentChange->next = NULL;
@@ -373,7 +370,7 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     if (newMove == NULL) {
         freeSudokuGame(game);
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     if (game->movesList->currentMove == NULL) {
         game->movesList->currentMove = newMove;

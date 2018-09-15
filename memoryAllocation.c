@@ -11,7 +11,7 @@ gameParams *initSudokuGame() {
     newGame = (gameParams *) malloc(sizeof(gameParams));
     if (newGame == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     newGame->mode = INIT_MODE;
@@ -132,13 +132,13 @@ cell ***allocateCellMatrix(int N) {
     mat = (cell ***) malloc(N * sizeof(cell **));
     if (mat == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     for (i = 0; i < N; i++) {
         mat[i] = (cell **) malloc(N * sizeof(cell *));
         if (mat[i] == NULL) {
             printMallocFailed();
-            exit(EXIT_FAILURE);
+            exit(0);
         }
         for (j = 0; j < N; j++) {
             mat[i][j] = createCell(0);
@@ -152,7 +152,7 @@ cell *createCell(int value) {
     cell *newCell = (cell *) malloc(sizeof(cell));
     if (newCell == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     newCell->value = value;
     newCell->isValid = TRUE;

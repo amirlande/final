@@ -201,7 +201,7 @@ int getRandomLegalValue(gameParams *game, int row, int col) {
     possibleLegalVals = (int *) calloc((size_t) N, sizeof(int));
     if (possibleLegalVals == NULL) {
         printCallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     numberOfLegalValues = getPossibleValues(game, row, col, possibleLegalVals);
@@ -341,7 +341,7 @@ cellChangeRecNode *getGenerateChangeList(gameParams *game) {
                     if (changeListHead == NULL) {
                         freeSudokuGame(game);
                         printMallocFailed();
-                        exit(EXIT_FAILURE);
+                        exit(0);
                     }
                     currentChange = changeListHead;
                     currentChange->next = NULL;
@@ -350,7 +350,7 @@ cellChangeRecNode *getGenerateChangeList(gameParams *game) {
                     if (currentChange->next == NULL) {
                         freeSudokuGame(game);
                         printMallocFailed();
-                        exit(EXIT_FAILURE);
+                        exit(0);
                     }
                     currentChange = currentChange->next;
                     currentChange->next = NULL;

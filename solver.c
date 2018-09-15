@@ -33,13 +33,13 @@ gameParams *wrapInGameParamsStruct(cell ***board, int N, int n, int m) {
     temporaryGameParams = (gameParams *) malloc(sizeof(gameParams));
     if (temporaryGameParams == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     temporaryGameParams->N = N;
     temporaryGameParams->n = n;
     temporaryGameParams->m = m;
     temporaryGameParams->userBoard = board; /* No need to allocate memory for userBoard, it points to an already-allocated struct */
-    temporaryGameParams->solution = allocateCellMatrix(N); /* TODO is it necessary? */
+    temporaryGameParams->solution = allocateCellMatrix(N);
     temporaryGameParams->markErrors = TRUE;
     temporaryGameParams->movesList = allocateMoveList();
     return temporaryGameParams;
@@ -158,8 +158,7 @@ int countSolutions(gameParams *game) {
     tempBoard = copyBoard(game->userBoard, game->N);
     markAsFixed(tempBoard, game->N);
     temporaryGameParams = wrapInGameParamsStruct(tempBoard, game->N, game->n,
-                                                 game->m); /* TODO remember this may cause problems check while debugging */
-
+                                                 game->m);
     /* Call the main Backtracking Iterative function: */
     countWithBacktracking(temporaryGameParams, &numOfSols);
 
@@ -236,7 +235,7 @@ void countSolutionsTailRec(gameParams *game, cell ***copyOfBoard, int N, int cou
 int countSolutions(gameParams *game) {
     int numOfSols;
     cell ***tempBoard;
-    tempBoard = copyBoard(game->userBoard); /* TODO implementation of copyBoard */
+    tempBoard = copyBoard(game->userBoard);
 
     numOfSols = 0;
     numOfSols = countSolutionsRec(game, tempBoard, game->N);
