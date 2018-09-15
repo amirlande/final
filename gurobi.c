@@ -3,8 +3,6 @@
 #include "gurobi.h"
 
 
-
-
 void updateSolved(double *sol, int **res, int N) {
     int i, j, k;
     for (i = 0; i < N; i++) {
@@ -46,7 +44,7 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     return dst;
 }
 
-#if 0
+#if 1
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
@@ -85,7 +83,6 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         }
     }
 
-    GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
 
     /* Create environment */
     error = GRBloadenv(&env, "sudoku.log");
@@ -94,6 +91,7 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
+    GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
 
     /* Create new model */
     error = GRBnewmodel(env, &model, "sudoku", N * N * N, NULL, lb, NULL,
@@ -222,18 +220,20 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         return result;
     }
 
+
     /* get the objective -- the optimal result of the function */
     error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     if (error) {
-        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        /* printf("ERROR: %s\n", GRBgeterrormsg(env));*/
         freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
+
     /* get the solution - the assignment to each variable */
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, N * N * N, sol);
     if (error) {
-        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        /* printf("ERROR: %s\n", GRBgeterrormsg(env));*/
         freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
@@ -268,7 +268,7 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
 
 #endif
 
-#if 1
+#if 0
 
 
 /* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)

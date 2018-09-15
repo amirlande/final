@@ -146,7 +146,7 @@ int countSolutions(gameParams *game) {
     gameParams *temporaryGameParams; /* This wraps tempBoard, N, n, m fields and passed to other functions */
 
     /* First check if all N*N cells are assigned - if they are then the board is legally (precondition) full
-     * and we return numOfSols == 1 TODO check carefully that count is incremented and decremented on changes */
+     * and we return numOfSols == 1 */
     if ((game->counter) == (game->N * game->N)) {
         numOfSols = 1;
         return numOfSols;
@@ -167,80 +167,3 @@ int countSolutions(gameParams *game) {
     return numOfSols;
 }
 
-
-#ifdef oldImplementation
-
-/* Recursive version - to be altered to iterative version with a stack */
-int countSolutionsRec(gameParams *game, cell ***copyOfBoard, int N) {
-    int row, col;
-    int val;
-    int counter;
-
-    counter = 0;
-    if (findFirstEmptyCell(copyOfBoard, N, &row, &col) == INVALID) {
-        /* no empty cell found - board is full with valid cells (assuming precondition of validity of all cells!) */
-       counter = 1; /* only 1 solution */
-    }
-
-    else {
-        /* getting here means (row, col) hold the indexes of the first empty cell */
-        for (val = 1; val < N; val++) {
-            if (checkIfValid(row, col, val, game)) { /* TODO - problematic - uses userBoard instead of the copy of the board */
-                copyOfBoard[row][col]->value = val;
-                counter = counter + countSolutionsRec(game, copyOfBoard, N);
-            }
-        }
-    }
-    return counter;
-}
-
-void countSolutionsTailRec(gameParams *game, cell ***copyOfBoard, int N, int counter) {
-    int row, col;
-    int val;
-    Stack *stack;
-    cell ***currentBoard;
-
-    initializeStack(stack); /* TODO free memory */
-    push(stack, copyOfBoard); /* push first snapshot onto stack */
-
-    while (!isEmpty(stack)) {
-        currentBoard = pop(stack);
-        /* At this point we have all the variables we need for a regular recursive call:
-         * game, N, counter - intact. currentBoard holds the snapshot value */
-
-        if (findFirstEmptyCell(currentBoard, N, &row, &col) == INVALID) {
-            /* no empty cell found - board is full with valid cells (assuming precondition of validity of all cells!) */
-            counter = counter + 1; /* only 1 solution */
-            /* TODO should we free the current snapshot memory here? */
-        }
-        else {
-            /* getting here means (row, col) hold the indexes of the first empty cell at current copyOfBoard*/
-            for (val = 1; val < N; val++) {
-                currentBoard = copyBoard(currentBoard);
-                if (checkIfValid(row, col, val,
-                                 game)) { /* TODO - problematic - uses userBoard instead of the copy of the board */
-                    currentBoard[row][col]->value = val;
-                    /* Instead of a recursive call we push the new snapshot onto the stack */
-                    push(stack, currentBoard);
-                    /* countSolutionsTailRec(game, copyOfBoard, N, &counter); */
-                }
-            }
-        }
-    }
-}
-
-/* precondition: board has no erroneous values (to be checked before calling this function)
- * the function returns the number of solutions for a given board using exhaustive backtracking
- * it is called by num_solutions (in commands.h) */
-int countSolutions(gameParams *game) {
-    int numOfSols;
-    cell ***tempBoard;
-    tempBoard = copyBoard(game->userBoard);
-
-    numOfSols = 0;
-    numOfSols = countSolutionsRec(game, tempBoard, game->N);
-    freeBoard(tempBoard, game->N); /* free memory before returning */
-    return numOfSols;
-}
-
-#endif

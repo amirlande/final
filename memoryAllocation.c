@@ -43,10 +43,10 @@ void initializeSudokuGameFields(gameParams *game, int m, int n) {
 int freeSudokuGame(gameParams *game) {
 
     if (game->userBoard != NULL) {
-        freeCellMatrix(game->userBoard, game->m * game->n);
+        freeCellMatrix(game->userBoard, game->N);
     }
     if (game->solution != NULL) {
-        freeCellMatrix(game->solution, game->m * game->n);
+        freeCellMatrix(game->solution, game->N);
     }
     if (game->movesList != NULL) {
         freeAllUserMoveNodes(game->movesList->head);
@@ -59,14 +59,14 @@ int freeSudokuGame(gameParams *game) {
 
 /* Frees memory allocated to game fields, and initilizes its fields */
 void cleanSudokuGame(gameParams *game) {
+    freeCellMatrix(game->userBoard, game->N);
+    freeCellMatrix(game->solution, game->N);
     game->markErrors = TRUE;
     game->m = 0;
     game->n = 0;
     game->N = 0;
     game->mode = INIT_MODE;
     game->counter = 0;
-    freeCellMatrix(game->userBoard, game->N);
-    freeCellMatrix(game->solution, game->N);
     /* Free all memory used by moveList nodes and set head and current to NULL */
     freeAllUserMoveNodes(game->movesList->head);
     game->movesList->currentMove = NULL;
@@ -166,13 +166,13 @@ cell *createCell(int value) {
 int **allocateIntMatrix(int N) {
 
     int i, **mat;
-    mat = calloc((size_t)N, sizeof(int *));
+    mat = calloc((size_t) N, sizeof(int *));
     if (mat == NULL) {
         printCallocFailed();
         exit(0);
     }
     for (i = 0; i < N; i++) {
-        mat[i] = calloc((size_t)N, sizeof(int));
+        mat[i] = calloc((size_t) N, sizeof(int));
         if (mat[i] == NULL) {
             printCallocFailed();
             exit(0);

@@ -58,7 +58,6 @@ int validate(gameParams *game);
 int generate(gameParams *game, int x, int y);
 
 
-
 cellChangeRecNode *getGenerateChangeList(gameParams *game);
 
 /* Pre:

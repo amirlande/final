@@ -135,6 +135,7 @@ int set(int x, int y, int z, gameParams *game) {
         return 0;
     }
 
+
     getNewCurrentMove(game); /* Clears all "next" moves and creates e new moveNode */
     game->movesList->currentMove->change->x = x;
     game->movesList->currentMove->change->y = y;
@@ -148,6 +149,8 @@ int set(int x, int y, int z, gameParams *game) {
 
     updateErrors(game);
     printBoard(game);
+
+
     if ((game->mode == SOLVE_MODE) && (game->counter == game->N * game->N)) {
         if (solveUsingILP(game, ILP_COMMAND_VALIDATE) == TRUE) {
             printf("Puzzle solved successfully\n");
@@ -283,8 +286,8 @@ void randomlyClearAllButYCells(gameParams *game, int y) {
         randomRow = rand() % N;
         randomCol = rand() % N;
 
-        if (game->solution[randomRow][randomCol]->value != EMPTY) {
-            game->solution[randomRow][randomCol]->value = EMPTY;
+        if (game->solution[randomCol][randomRow]->value != EMPTY) {
+            game->solution[randomCol][randomRow]->value = EMPTY;
             counter++;
         }
     }
@@ -368,7 +371,6 @@ cellChangeRecNode *getGenerateChangeList(gameParams *game) {
         }
     }
 
-    printf("changes are: %d\n", changes);
     return changeListHead;
 }
 
@@ -529,7 +531,7 @@ int hint(int x, int y, gameParams *game) {
         printf("Error: board is unsolvable\n");
         return FALSE;
     }
-    hint = game->solution[x - 1][y - 1]->value;
+    hint = game->solution[y - 1][x - 1]->value;
     printf("Hint: set cell to %d\n", hint);
     return 1;
 }
@@ -579,6 +581,8 @@ int autoFill(gameParams *game) {
 
     if (numOfChanges == 0) {
         /* no alloc were made at this point */
+        updateErrors(game);
+        printBoard(game);
         return 1;
     }
 
@@ -623,9 +627,7 @@ int reset(gameParams *game) {
     game->counter = 0;
      */
 
-    game->movesList = allocateMoveList();
     printf("Board reset\n");
-    printBoard(game);
     return 1;
 }
 

@@ -78,7 +78,4 @@ typedef struct gameParams {
 } gameParams;
 
 
-
-
-
 #endif

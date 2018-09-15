@@ -92,12 +92,15 @@ void getNewCurrentMove(gameParams *game) {
 
     userMoveNode *newPrev, *newCurr;
 
+    newCurr = (userMoveNode *) malloc(sizeof(userMoveNode));
     /* First free all userMove nodes that are next to currentMove (NULL check needed in case moveList is empty) */
     if (game->movesList->currentMove != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
+    } else {
+        freeAllUserMoveNodes(game->movesList->head);
+        game->movesList->head = newCurr;
     }
     newPrev = game->movesList->currentMove;
-    newCurr = (userMoveNode *) malloc(sizeof(userMoveNode));
 
     if (newCurr == NULL) {
         printMallocFailed();
@@ -124,9 +127,6 @@ void getNewCurrentMove(gameParams *game) {
     }
 
     newCurr->change->next = NULL;
-    if (game->movesList->currentMove->prev == NULL) { /* In case the new current move node becomes the head */
-        game->movesList->head = game->movesList->currentMove;
-    }
 
     /* game->movesList->size++; */
 }
@@ -366,7 +366,7 @@ void setNewChangeListToGame(gameParams *game, cellChangeRecNode *changeListHead)
     if (game->movesList->currentMove != NULL && game->movesList->currentMove->next != NULL) {
         freeAllUserMoveNodes(game->movesList->currentMove->next);
     }
-    newMove = (userMoveNode *) malloc(sizeof(userMoveNode *));
+    newMove = (userMoveNode *) malloc(sizeof(userMoveNode));
     if (newMove == NULL) {
         freeSudokuGame(game);
         printMallocFailed();
