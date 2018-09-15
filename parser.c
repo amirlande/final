@@ -273,6 +273,7 @@ commandStruct *getCommandFromUser(gameParams *game) {
     token = (char *) malloc(COMMAND_LEN * sizeof(char) + 1); /* allocate memory using the COMMAND_LEN upper bound (memory freed in the end of the function)*/
     if (token == NULL) {
         printMallocFailed();
+        freeSudokuGame(game);
         exit(EXIT_FAILURE);
     }
 

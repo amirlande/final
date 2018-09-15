@@ -101,6 +101,7 @@ void getNewCurrentMove(gameParams *game) {
 
     if (newCurr == NULL) {
         printMallocFailed();
+        freeSudokuGame(game);
         exit(EXIT_FAILURE);
     }
     if (newPrev != NULL) { /* Set previous's next to the new current move, unless prev was NULL */
@@ -114,12 +115,14 @@ void getNewCurrentMove(gameParams *game) {
     newCurr->change = (cellChangeRecNode *) malloc(sizeof(cellChangeRecNode));
     if (newCurr->change == NULL) {
         printMallocFailed();
+        freeSudokuGame(game);
         exit(EXIT_FAILURE);
     }
 
     newCurr->change->currVal = (cell *) malloc(sizeof(cell));
     if (newCurr->change->currVal == NULL) {
         printMallocFailed();
+        freeSudokuGame(game);
         exit(EXIT_FAILURE);
     }
 
