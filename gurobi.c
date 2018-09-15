@@ -46,7 +46,6 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     return dst;
 }
 
-#if 0
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
@@ -265,9 +264,9 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreemodel(model);
     GRBfreeenv(env);
 }
-#endif
 
-#if 1
+
+#if 0
 
 
 /* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
