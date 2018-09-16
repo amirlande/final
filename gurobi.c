@@ -1,14 +1,50 @@
-//
-// Created by eran on 01/09/18.
-//
+
 
 #include "gurobi.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "gameUtils.h"
-#include "memoryAllocation.h"
 
+
+void updateSolved(double *sol, int **res, int N) {
+    int i, j, k;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            for (k = 0; k < N; k++) {
+                if (sol[i * N * N + j * N + k] == 1) {
+                    res[i][j] = k + 1;
+                }
+            }
+        }
+    }
+}
+
+int **fromCellMatToIntMat(cell ***src, int N) {
+
+    int **dst, i, j;
+    dst = allocateIntMatrix(N);
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            dst[i][j] = src[i][j]->value;
+        }
+    }
+    return dst;
+}
+
+
+cell ***fromIntMatToCellMat(int **src, int N) {
+
+    int i, j;
+    cell ***dst;
+    dst = allocateCellMatrix(N);
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+
+            dst[i][j]->value = src[i][j];
+        }
+    }
+
+    return dst;
+}
+
+#if 1
 
 /* Solves sudoku using ILP
  * res will hold the solved board values */
@@ -17,9 +53,10 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     int N, error, i, j, v, ig, jg, count, *ind, *ind2, optimstatus, result;
     double *sol, *val, *val2, *lb, objval;
     char *vtype;
+    GRBmodel *model;
     GRBenv *env;
     env = NULL;
-    GRBmodel *model = NULL;
+    model = NULL;
     N = n * m;
     sol = (double *) malloc(N * N * N * sizeof(double));
     ind = (int *) malloc(N * sizeof(int));
@@ -46,6 +83,7 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         }
     }
 
+
     /* Create environment */
     error = GRBloadenv(&env, "sudoku.log");
     if (error) {
@@ -53,6 +91,7 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
+    GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
 
     /* Create new model */
     error = GRBnewmodel(env, &model, "sudoku", N * N * N, NULL, lb, NULL,
@@ -133,13 +172,13 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
 
     /* Each value must appear once in each subgrid */
     for (v = 0; v < N; v++) {
-        // defines what block are we at
+        /* defines what block are we at */
         for (ig = 0; ig < n; ig++) {
-            // number of blocks vertically (rows)
+            /* number of blocks vertically (rows) */
             for (jg = 0; jg < m; jg++) {
-                // number of block horizontally (cols)
+                /* number of block horizontally (cols) */
                 count = 0;
-                // iterates over the cells in that block
+                /* iterates over the cells in that block */
                 for (i = ig * m; i < (ig + 1) * m; i++) {
                     for (j = jg * n; j < (jg + 1) * n; j++) {
                         ind[count] = i * N * N + j * N + v;
@@ -181,25 +220,27 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
         return result;
     }
 
+
     /* get the objective -- the optimal result of the function */
     error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     if (error) {
-        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        /* printf("ERROR: %s\n", GRBgeterrormsg(env));*/
         freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
+
     /* get the solution - the assignment to each variable */
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, N * N * N, sol);
     if (error) {
-        printf("ERROR: %s\n", GRBgeterrormsg(env));
+        /* printf("ERROR: %s\n", GRBgeterrormsg(env));*/
         freeILP(sol, ind, ind2, val, val2, lb, vtype, env, model);
         return result;
     }
 
     /* board is solved */
     if (optimstatus == GRB_OPTIMAL) {
-        if (command != VALIDATE) {
+        if (command != ILP_COMMAND_VALIDATE) {
             updateSolved(sol, res, N);
         }
         result = 1;
@@ -210,48 +251,6 @@ int ILP(int **board, int **res, int n, int m, ILPCommand command) {
     return result;
 }
 
-
-void updateSolved(double *sol, int **res, int N) {
-    int i, j, k;
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            for (k = 0; k < N; k++) {
-                if (sol[i * N * N + j * N + k] == 1) {
-                    res[i][j] = k + 1;
-                }
-            }
-        }
-    }
-}
-
-int **fromCellMatToIntMat(cell ***src, int N) {
-
-    int **dst, i, j;
-    dst = allocateIntMatrix(N);
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            dst[i][j] = src[i][j]->value;
-        }
-    }
-
-    return dst;
-}
-
-
-cell ***fromIntMatToCellMat(int **src, int N) {
-
-    int i, j;
-    cell ***dst;
-    dst = allocateCellMatrix(N);
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-
-            dst[i][j]->value = src[i][j];
-        }
-    }
-
-    return dst;
-}
 
 void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double *lb, char *vtype, GRBenv *env,
              GRBmodel *model) {
@@ -266,3 +265,159 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreemodel(model);
     GRBfreeenv(env);
 }
+
+#endif
+
+#if 0
+
+
+/* solves a sudoku board using the deterministic Backtracking algorithm (if solvable)
+ * returns "1" if solvable, "0" otherwise
+ * */
+int ILP(int **board, int **res, int n, int m, ILPCommand command) {
+
+    int N, i, j;
+    N = n * m;
+
+    if(!command){
+        printf("not command (?) \n");
+        return 0;
+    }
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            res[i][j] = board[i][j];
+        }
+    }
+
+
+     return solveDet(res, n, m);
+
+}
+
+
+int solveDet(int **res, int n, int m) {
+    int row, col, val, N;
+    N = n * m;
+
+    /* if no empty cells exist then board is legally full - return 1 (true)
+  * otherwise - (row, col) holds the first unassigned cell from (left to right and top to bottom) */
+    if (findEmptyCell(res, N, &row, &col) == 0) {
+        return 1;
+    }
+
+    /* check 1-N values for (row,col) */
+    for (val = 1; val <= N; val++) {
+        /* use checkIfValid function to check validity of assignment */
+        if (tempCheckIfValid(row, col, val, res, n, m)) {
+            res[row][col] = val;
+            /* if assigning (row, col) = val resulted in success return 1 (true), otherwise - remove val */
+            if (solveDet(res, n, m)) {
+                return 1;
+            } else {
+                res[row][col] = 0;
+            }
+        }
+    }
+    /* return 0 (false) if 1-N assignments to (row,col) returned false (an unsolvable board)
+     * and backtrack (this return serves as one piece of the if (solveUsingDetBacktrackting(userBoard)) recursion chain */
+    return 0;
+
+
+}
+
+/* userBoard is a 9x9 matrix (sudoku board), row and col are pointers to ints
+ * finds first empty cell and assigns its coordinates to row and col
+ * */
+int findEmptyCell(int **userBoard, int N, int *row, int *col) {
+    int i, j;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            if (userBoard[i][j] == 0) {
+                *row = i;
+                *col = j;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+
+/* Checks if Z is a valid value for non-fixed cell <X,Y> */
+int tempCheckIfValid(int x, int y, int z, int **board, int n, int m) {
+
+    if (z == 0) return 1; /* always legal to set a non-fixed cell to 0 */
+    if (tempCheckIfSquareValid(x, y, z, board, n, m) == FALSE) {
+        return 0;
+    }
+
+    if (tempCheckIfRowValid(x, y, z, board, n, m) == FALSE) {
+        return 0;
+    }
+
+    if (tempCheckIfColumnValid(x, y, z, board, n, m) == FALSE) {
+        return 0;
+    }
+
+    return 1;
+
+}
+
+
+/* Checks if value z does not appear his 3x3 square in the matrix */
+int tempCheckIfSquareValid(int x, int y, int z, int **board, int n, int m) {
+
+    int i, j;
+
+    for (i = x - x % m; i < x - x % m + m; i++) {
+        for (j = y - y % n; j < y - y % n + n; j++) {
+
+            if (board[i][j] == z) {
+                if (!((i == x) && (j == y))) { /* exclude cell (x,y) from the square check */
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+/* Checks if value z does not appear in row x */
+int tempCheckIfRowValid(int x, int y, int z, int **board, int n, int m) {
+
+    int j, N;
+    N = n * m;
+
+    for (j = 0; j < N; j++) {
+        if (j != y) { /* exclude cell (x,y) from the square check */
+            if (board[x][j] == z) {
+                return 0;
+            }
+        }
+    }
+
+
+    return 1;
+}
+
+/* Checks if value z does not appear in column y */
+int tempCheckIfColumnValid(int x, int y, int z, int **board, int n, int m) {
+
+
+    int i, N;
+    N = n * m;
+
+    for (i = 0; i < N; i++) {
+        if (i != x) { /* exclude cell (x,y) from the square check */
+            if (board[i][y] == z) {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+
+#endif
+

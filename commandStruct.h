@@ -1,16 +1,14 @@
-//
-// Created by amirlande on 8/23/2018.
-//
 
 #ifndef FINAL_COMMANDSTRUCT_H
 #define FINAL_COMMANDSTRUCT_H
 
 #include <stdlib.h>
+#include "errorMessages.h"
 
 #define TRUE 1
 #define FALSE 0
 
-enum commandType {
+typedef enum commandType {
     INVALID_COMMAND = 0,
     SET = 1,
     HINT = 2,
@@ -26,8 +24,8 @@ enum commandType {
     REDO = 12,
     SAVE = 13,
     NUM_SOLS = 14,
-    AUTO_FILL = 15,
-};
+    AUTO_FILL = 15
+} commandType;
 
 /* definition of a struct used to represent a command
  * it holds type of command, arguments and indication of validity */
@@ -38,7 +36,7 @@ typedef struct commandStruct {
     int y;
     int z;
     char *fileName; /* used by solve and edit commands */
-    int markError; /* used by mark_errors command */
+    int markErrors; /* used by mark_errors command */
 } commandStruct;
 
 /* allocated memory for s commandStruct and returns pointer to it
@@ -47,4 +45,4 @@ commandStruct *initializeCommand();
 
 void freeCommand(commandStruct *command);
 
-#endif //FINAL_COMMANDSTRUCT_H
+#endif

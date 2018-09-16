@@ -1,18 +1,16 @@
-//
-// Created by eran on 31/07/18.
-//
+
 #ifndef FINAL_COMMANDS_H
 #define FINAL_COMMANDS_H
 
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gameUtils.h" /* gives access to all struct definitions */
-#include "input_output.h" /* gives access to edit, solve and save commands */
+
+#include "gameUtils.h"
+#include "input_output.h"
+#include "solver.h"
 #include "gurobi.h"
 #include "memoryAllocation.h"
-
-#define MAX_NUMBER_OF_ATTEMPTS 1000
 
 
 /* Starts a puzzle at SOLVE mode
@@ -58,6 +56,9 @@ int validate(gameParams *game);
  * Available in EDIT mode only
  * x, y are valid integers */
 int generate(gameParams *game, int x, int y);
+
+
+cellChangeRecNode *getGenerateChangeList(gameParams *game);
 
 /* Pre:
  * command is valid
@@ -110,4 +111,4 @@ int reset(gameParams *game);
 void exitGame(gameParams *game);
 
 
-#endif //FINAL_COMMANDS_H
+#endif

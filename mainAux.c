@@ -1,6 +1,5 @@
-//
-// Created by amirlande on 9/1/2018.
-//
+
+
 
 #include "mainAux.h"
 
@@ -18,71 +17,55 @@ int playTurn(gameParams *game) {
         type = commandToPlay->type;
         switch (type) {
             case SET:
-                printCallingFunc("SET");
-                /* set(commandToPlay->x, commandToPlay->y, commandToPlay->z, game); */
+                set(commandToPlay->x, commandToPlay->y, commandToPlay->z, game);
                 break;
             case HINT:
-                printCallingFunc("HINT");
-                /* hint(commandToPlay->x, commandToPlay->y); */
+                hint(commandToPlay->x, commandToPlay->y, game);
                 break;
             case VALIDATE:
-                printCallingFunc("VALIDATE");
-                /* validate(game); */
+                validate(game);
                 break;
             case RESET:
-                printCallingFunc("RESET");
-                /* reset(game); */
+                reset(game);
                 break;
             case EXIT:
-                /* exitGame(game); */
-                printCallingFunc("EXIT");
                 freeCommand(commandToPlay);
+                exitGame(game);
                 return FALSE;
             case SOLVE:
-                printCallingFunc("SOLVE");
                 solve(game, commandToPlay->fileName);
                 break;
             case EDIT:
-                printCallingFunc("EDIT");
-                /* edit(commandToPlay->fileName, game); */
+                edit(game, commandToPlay->fileName);
                 break;
             case MARK_ERRORS:
-                printCallingFunc("MARK_ERRORS");
-                /* mark_errors(game, commandToPlay->markError); */
+                mark_errors(game, commandToPlay->markErrors);
                 break;
             case PRINT_BOARD:
-                printCallingFunc("PRINT_BOARD");
-                /* print_board(game); */
+                printBoard(game);
                 break;
             case GENERATE:
-                printCallingFunc("GENERATE");
-                /* generate(commandToPlay->x, commandToPlay->y, game); */
+                generate(game, commandToPlay->x, commandToPlay->y);
                 break;
             case UNDO:
-                /* undo(game); */
-                printCallingFunc("UNDO");
+                undo(game);
                 break;
             case REDO:
-                /* redo(game); */
-                printCallingFunc("REDO");
+                redo(game);
                 break;
             case SAVE:
-                /* save(commandToPlay->fileName, game); */
-                printCallingFunc("SAVE");
+                save(game, commandToPlay->fileName);
                 break;
             case NUM_SOLS:
-                /* num_solutions(game); */
-                printCallingFunc("NUM_SOLS");
+                numSolutions(game);
                 break;
             case AUTO_FILL:
-                /* autoFill(game); */
-                printCallingFunc("AUTO_FILL");
+                autoFill(game);
                 break;
             default:
                 printErrorInCodeFlow("playTurn", "parser.c");
         }
-        printBoard(game);
-        freeCommand(commandToPlay);
-        return TRUE;
     }
+    freeCommand(commandToPlay);
+    return TRUE;
 }

@@ -1,16 +1,13 @@
-//
-// Created by amirlande on 8/28/2018.
-//
 
 #include "Stack.h"
 
 /* Allocates memory for Stack and initializes top->NULL, count->0 */
 Stack *initializeStack() {
     Stack *stack;
-    stack = (Stack *) malloc(1 * sizeof(Stack)); /* TODO free memory */
+    stack = (Stack *) malloc(1 * sizeof(Stack));
     if (stack == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     stack->count = 0;
     stack->top = NULL;
@@ -24,7 +21,7 @@ element *allocateMemoryForStackElement() {
     newElement = (element *) malloc(1 * sizeof(element));
     if (newElement == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     return newElement;
 }
@@ -64,6 +61,7 @@ int isEmpty(Stack *stack) {
         printErrorInCodeFlow("isEmpty", "Stack.c");
         return FALSE;
     }
+    return FALSE;
 }
 
 #ifdef OldStack
@@ -74,7 +72,7 @@ void push(Stack *stack, BOARD boardSnapshot)
     newStackElement = (element *)malloc(sizeof( element)); /* Allocate memory for the "box", the stack element */
     if (newStackElement == NULL) {
         printMallocFailed();
-        exit(EXIT_FAILURE);
+        exit(0);
     }
     newStackElement->currentBoard = boardSnapshot; /* update data */
     newStackElement->next = stack->top;
