@@ -145,6 +145,7 @@ int countSolutions(gameParams *game) {
     cell ***tempBoard; /* This is a pointer to a *copy* of the board (cell ***) that we'll work on */
     gameParams *temporaryGameParams; /* This wraps tempBoard, N, n, m fields and passed to other functions */
 
+    numOfSols = 0;
     /* First check if all N*N cells are assigned - if they are then the board is legally (precondition) full
      * and we return numOfSols == 1 */
     if ((game->counter) == (game->N * game->N)) {
