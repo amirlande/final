@@ -187,8 +187,8 @@ int getPossibleValues(gameParams *game, int row, int col, int *possibleLegalVals
     int val;
 
     counter = 0;
-    for (val = 0; val < game->N; val++) {
-        if (checkIfValid(col, row, val, game)) {
+    for (val = 1; val <= game->N; val++) {
+        if (checkIfValid(row, col, val, game)) {
             possibleLegalVals[counter] = val;
             counter++;
         }
@@ -233,7 +233,7 @@ int randomlyFillXCells(gameParams *game, int x) {
         randomRow = rand() % N;
         randomCol = rand() % N;
 
-        while (matrixOfChoices[randomRow][randomCol] == FULL) {
+        while (matrixOfChoices[randomCol][randomRow] == FULL) {
             randomRow = rand() % N;
             randomCol = rand() % N;
         }
@@ -242,7 +242,7 @@ int randomlyFillXCells(gameParams *game, int x) {
             freeIntMatrix(matrixOfChoices, N);
             return FALSE;
         }
-        game->userBoard[randomRow][randomCol]->value = randomVal;
+        game->userBoard[randomCol][randomRow]->value = randomVal;
         counter++;
     }
     freeIntMatrix(matrixOfChoices, N);

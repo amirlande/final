@@ -77,6 +77,8 @@ int loadGameParamsFromFile(gameParams *game, FILE *sourceFile, enum gameMode mod
                     } else if (c == '.') { /* FIXED SINGLE DIGIT */
                         game->userBoard[row][col]->isFixed = TRUE;
                         col++;
+                    } else if (c == EOF) {
+                        break;
                     } else { /* TWO-DIGIT NUMBER (second char also digit) */
                         game->userBoard[row][col]->value =
                                 10 * (game->userBoard[row][col]->value) + (c - '0'); /* Update value */

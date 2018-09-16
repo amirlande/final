@@ -352,7 +352,6 @@ commandStruct *getCommandFromUser(gameParams *game) {
         if (commandAvailable(MARK_ERRORS, game->mode)) {
             command->type = MARK_ERRORS;
             getParams(command, MARK_ERRORS, copyOfInput, game->N);
-            command->isValid = TRUE; /* no need for further parameters, therefore the command is valid */
         } else {
             printInvalidCommand();
         }
