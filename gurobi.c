@@ -44,8 +44,6 @@ cell ***fromIntMatToCellMat(int **src, int N) {
     return dst;
 }
 
-#if 1
-
 /* Solves sudoku using ILP
  * res will hold the solved board values */
 int ILP(int **board, int **res, int n, int m, ILPCommand command) {
@@ -266,7 +264,6 @@ void freeILP(double *sol, int *ind, int *ind2, double *val, double *val2, double
     GRBfreeenv(env);
 }
 
-#endif
 
 #if 0
 

@@ -82,7 +82,7 @@ void pushValidValues(gameParams *partialGameParams, int row, int col, Stack *sta
     /* Iterate value from N down to 1 to check validity of assignment of value to (row, col) cell
      * If assignment is valid - push onto stack en element with row, col and val */
     for (value = N; value > 0; value--) {
-        if (checkIfValid(col, row, value, partialGameParams)) {
+        if (checkIfValid(row, col, value, partialGameParams)) {
             push(stack, row, col, value);
         }
     }
