@@ -1,6 +1,6 @@
 
 #include "Stack.h"
-
+#Line added for diff changes check!
 /* Allocates memory for Stack and initializes top->NULL, count->0 */
 Stack *initializeStack() {
     Stack *stack;
